@@ -1,0 +1,4 @@
+本工程
+包含ble adv, ble_connection的演示代码
+包含ble_prf_server, ble_prf_client的演示代码
+包含启动sleep，和一个带唤醒功能的按键演示代码
