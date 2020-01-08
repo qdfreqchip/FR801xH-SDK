@@ -70,6 +70,12 @@ const struct patch_element_t patch_elements[] =
     [9] = {
         .patch_pc = 0x00012f30, // disable LLM_CH_MAP_TO temporary
     },
+    [8] = {
+        .patch_pc = 0x00000001, // take place
+    },
+    [7] = {
+        .patch_pc = 0x0001e500,
+    },
 };
 
 __attribute__((aligned(64))) uint32_t patch_map[16] =
@@ -81,8 +87,8 @@ __attribute__((aligned(64))) uint32_t patch_map[16] =
     0xBF00DF04,
     0xBF00DF05,
     0xBF00DF06,
-    0xBF00DF07,
-    0xBF00DF08,
+    0x0001F8FF,
+    0xBF00DF08,     // 8
     0xBF00BF00,
     0xBF00DF0a,		//10
     0xBF00DF0b,
