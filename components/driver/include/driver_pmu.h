@@ -333,5 +333,7 @@ void pmu_calibration_start(uint8_t type, uint16_t counter);
  */
 void pmu_calibration_stop(void);
 
+void pmu_set_led2_value(uint8_t value);
+
 #endif  //_DRIVER_PMU_H
 

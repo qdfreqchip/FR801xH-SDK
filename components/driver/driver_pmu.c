@@ -251,6 +251,15 @@ void pmu_set_gpio_value(enum system_port_t port, uint8_t bits, uint8_t value)
         ool_write(sel_reg, (ool_read(sel_reg) | bits ) );
 }
 
+void pmu_set_led2_value(uint8_t value)
+{
+    if( value == 0 )
+        ool_write(PMU_REG_LED_CTRL, 0x00);
+    else
+        ool_write(PMU_REG_LED_CTRL, 0x04 );
+}
+
+
 /*********************************************************************
  * @fn      pmu_get_gpio_value
  *

@@ -96,5 +96,8 @@ void codec_set_vol(uint8_t value);
  */
 void codec_init(uint8_t sample_rate);
 
+void audio_speaker_codec_init(void);
+
+
 #endif  // _DRIVER_CODEC_H
 

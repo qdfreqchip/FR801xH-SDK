@@ -321,7 +321,7 @@ __attribute__((section("ram_code"))) void ssp_send_bytes(const uint8_t *tx_buf, 
 
     while(length--)
     {
-        // while(ssp->status.tnf == 0);
+        //while(ssp->status.tnf == 0);
         *tx_fifo_addr = *tx_buf++;
     }
 }

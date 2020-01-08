@@ -78,6 +78,8 @@ uint8_t iic_read_byte(enum iic_channel_t channel, uint8_t slave_addr, uint8_t re
  * @return  None.
  */
 uint8_t iic_read_bytes(enum iic_channel_t channel, uint8_t slave_addr, uint8_t reg_addr, uint8_t *buffer, uint16_t length);
+uint8_t iic_write_bytes_imp(enum iic_channel_t channel, uint8_t slave_addr, uint8_t reg_addr, 
+									uint8_t *buffer, uint16_t length);
 
 /*********************************************************************
  * @fn      iic_init

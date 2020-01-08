@@ -1,0 +1,671 @@
+;#<FEEDBACK># ARM Linker, 5060422: Last Updated: Mon Dec 30 20:52:03 2019
+;VERSION 0.2
+;FILE app.o
+__asm___5_app_c_01419ee7____REV16 <= USED 0
+__asm___5_app_c_01419ee7____REVSH <= USED 0
+__asm___5_app_c_01419ee7____RRX <= USED 0
+appm_delete_act <= USED 0
+appm_stop_act <= USED 0
+ble_gap_get_peer_info <= USED 0
+ble_set_diagport <= USED 0
+;FILE app_conn.o
+appm_conn_send_data <= USED 0
+appm_delete_conn_act <= USED 0
+appm_stop_conn <= USED 0
+;FILE app_mesh_info.o
+mesh_info_clear <= USED 0
+mesh_info_load <= USED 0
+mesh_info_store <= USED 0
+mesh_info_store_into_flash <= USED 0
+;FILE app_prf.o
+;FILE app_proj_event.o
+;FILE app_sec.o
+ble_sec_remove_bond <= USED 0
+ble_sec_send_paring_password <= USED 0
+ble_sec_send_security_req <= USED 0
+;FILE attc.o
+;FILE attm.o
+attm_att_set_permission <= USED 0
+attm_reserve_handle_range <= USED 0
+attm_svc_create_db_128 <= USED 0
+attm_svc_set_permission <= USED 0
+;FILE attm_db.o
+attmdb_svc_visibility_set <= USED 0
+;FILE atts.o
+;FILE ble_simple_central.o
+;FILE button.o
+button_init <= USED 0
+button_int_isr <= USED 0
+button_send_event <= USED 0
+button_toggle_detected <= USED 0
+;FILE core_cm3_isr.o
+;FILE driver_i2s.o
+__asm___12_driver_i2s_c_52821329____REV16 <= USED 0
+__asm___12_driver_i2s_c_52821329____REVSH <= USED 0
+__asm___12_driver_i2s_c_52821329____RRX <= USED 0
+i2s_clear_fifo <= USED 0
+i2s_get_data <= USED 0
+i2s_get_int_status <= USED 0
+i2s_init <= USED 0
+i2s_send_data <= USED 0
+i2s_start <= USED 0
+i2s_stop <= USED 0
+;FILE driver_iic.o
+__asm___12_driver_iic_c_8d61f799____REV16 <= USED 0
+__asm___12_driver_iic_c_8d61f799____REVSH <= USED 0
+__asm___12_driver_iic_c_8d61f799____RRX <= USED 0
+iic0_isr <= USED 0
+iic_init <= USED 0
+iic_read_byte <= USED 0
+iic_read_bytes <= USED 0
+iic_write_byte <= USED 0
+iic_write_bytes <= USED 0
+;FILE driver_keyscan.o
+keyscan_init <= USED 0
+keyscan_test <= USED 0
+;FILE driver_pmu.o
+pmu_codec_power_disable <= USED 0
+pmu_codec_power_enable <= USED 0
+pmu_disable_irq <= USED 0
+pmu_get_gpio_value <= USED 0
+pmu_set_aldo_voltage <= USED 0
+pmu_set_gpio_value <= USED 0
+pmu_set_led2_value <= USED 0
+pmu_set_lp_clk_src <= USED 0
+pmu_set_pin_output <= USED 0
+pmu_set_pin_pull <= USED 0
+pmu_set_pin_to_CPU <= USED 0
+pmu_set_pin_to_PMU <= USED 0
+pmu_set_port_mux <= USED 0
+;FILE driver_pmu_qdec.o
+pmu_qdec_autorest_cnt_flag <= USED 0
+pmu_qdec_init <= USED 0
+pmu_qdec_set_debounce_cnt <= USED 0
+pmu_qdec_set_irq_type <= USED 0
+pmu_qdec_set_pin <= USED 0
+pmu_qdec_set_threshold <= USED 0
+;FILE driver_rtc.o
+__asm___12_driver_rtc_c_rtc_init____REV16 <= USED 0
+__asm___12_driver_rtc_c_rtc_init____REVSH <= USED 0
+__asm___12_driver_rtc_c_rtc_init____RRX <= USED 0
+rtc_disalarm <= USED 0
+rtc_init <= USED 0
+;FILE driver_uart.o
+__asm___13_driver_uart_c____REV16 <= USED 0
+__asm___13_driver_uart_c____REVSH <= USED 0
+__asm___13_driver_uart_c____RRX <= USED 0
+;FILE driver_wdt.o
+wdt_feed <= USED 0
+wdt_init <= USED 0
+wdt_start <= USED 0
+wdt_stop <= USED 0
+wdt_test <= USED 0
+;FILE entry.o
+__asm___7_entry_c_41ec2f8c____REV16 <= USED 0
+__asm___7_entry_c_41ec2f8c____REVSH <= USED 0
+__asm___7_entry_c_41ec2f8c____RRX <= USED 0
+;FILE gap_api.o
+gap_address_set <= USED 0
+gap_bond_manager_delete <= USED 0
+gap_conn_param_update <= USED 0
+gap_get_connect_status <= USED 0
+gap_get_encryption_status <= USED 0
+gap_get_link_rssi <= USED 0
+gap_security_req <= USED 0
+gap_security_send_pairing_password <= USED 0
+gap_set_advertising_data <= USED 0
+gap_set_advertising_param <= USED 0
+gap_set_advertising_rsp_data <= USED 0
+gap_set_dev_appearance <= USED 0
+gap_stop_conn <= USED 0
+;FILE gapc.o
+;FILE gapc_hci.o
+;FILE gapc_sig.o
+;FILE gapc_task.o
+;FILE gapm.o
+gapm_get_id_from_task <= USED 0
+gapm_get_task_from_id <= USED 0
+;FILE gapm_actv.o
+;FILE gapm_addr.o
+;FILE gapm_adv.o
+;FILE gapm_cfg.o
+;FILE gapm_init.o
+;FILE gapm_list.o
+;FILE gapm_per_sync.o
+;FILE gapm_scan.o
+;FILE gapm_smp.o
+;FILE gatt_api.o
+gatt_add_service <= USED 0
+gatt_change_client_uuid <= USED 0
+gatt_change_svc_uuid <= USED 0
+gatt_client_write_req <= USED 0
+gatt_discovery_peer_svc <= USED 0
+gatt_get_mtu <= USED 0
+gatt_indication <= USED 0
+gatt_mtu_exchange_req <= USED 0
+gatt_notification <= USED 0
+;FILE gattc.o
+gattc_get_op_seq_num <= USED 0
+;FILE gattm.o
+;FILE jump_table.o
+__asm___12_jump_table_c_5f817404____REV16 <= USED 0
+__asm___12_jump_table_c_5f817404____REVSH <= USED 0
+__asm___12_jump_table_c_5f817404____RRX <= USED 0
+jump_table_set_static_keys_store_offset <= USED 0
+;FILE l2cc.o
+;FILE l2cc_lecb.o
+;FILE l2cc_pdu.o
+;FILE l2cc_sig.o
+;FILE l2cc_task.o
+;FILE l2cm.o
+;FILE m_al_activity.o
+gapm_activity_created_ind_handler <= USED 0
+gapm_activity_stopped_ind_handler <= USED 0
+m_al_activity_cmd_send <= USED 0
+m_al_activity_cmp_evt_handler <= USED 0
+m_al_activity_init <= USED 0
+;FILE m_al_adv.o
+m_al_adv_cmp_evt_handler <= USED 0
+m_al_adv_created_ind_handler <= USED 0
+m_al_adv_init <= USED 0
+m_al_adv_stopped_ind_handler <= USED 0
+;FILE m_al_con.o
+gattc_cmp_evt_handler <= USED 0
+gattc_read_req_ind_handler <= USED 0
+gattc_write_req_ind_handler <= USED 0
+m_al_con_cleanup <= USED 0
+m_al_con_cmp_evt_handler <= USED 0
+m_al_con_create <= USED 0
+m_al_con_created_ind_handler <= USED 0
+m_al_con_init <= USED 0
+m_al_con_stopped_ind_handler <= USED 0
+mesh_con_timer_ind_handler <= USED 0
+;FILE m_al_djob.o
+m_al_djob_init <= USED 0
+m_al_djob_reg <= USED 0
+;FILE m_al_scan.o
+gapm_ext_adv_report_ind_handler <= USED 0
+m_al_scan_cmp_evt_handler <= USED 0
+m_al_scan_created_ind_handler <= USED 0
+m_al_scan_init <= USED 0
+m_al_scan_start <= USED 0
+m_al_scan_stop <= USED 0
+m_al_scan_stopped_ind_handler <= USED 0
+;FILE m_al_sec.o
+gapm_gen_dh_key_ind_handler <= USED 0
+gapm_pub_key_ind_handler <= USED 0
+gapm_use_enc_block_ind_handler <= USED 0
+m_al_sec_aes <= USED 0
+m_al_sec_aes_ccm <= USED 0
+m_al_sec_aes_cmac <= USED 0
+m_al_sec_aes_k1 <= USED 0
+m_al_sec_aes_k2 <= USED 0
+m_al_sec_aes_k3 <= USED 0
+m_al_sec_aes_k4 <= USED 0
+m_al_sec_aes_req <= USED 0
+m_al_sec_aes_s1 <= USED 0
+m_al_sec_cmp_evt_handler <= USED 0
+m_al_sec_ecdh_secret <= USED 0
+m_al_sec_init <= USED 0
+m_al_sec_pub_key_read <= USED 0
+m_al_sec_rand <= USED 0
+;FILE m_al_task.o
+m_al_free <= USED 0
+m_al_int_message_handler <= USED 0
+m_al_local_id_get <= USED 0
+m_al_malloc <= USED 0
+m_al_msg_alloc <= USED 0
+m_al_msg_free <= USED 0
+m_al_msg_send <= USED 0
+m_al_msg_src_id_get <= USED 0
+m_al_prf_itf_get <= USED 0
+;FILE m_al_timer.o
+m_al_timer_clear <= USED 0
+m_al_timer_get_clock <= USED 0
+m_al_timer_get_delay <= USED 0
+m_al_timer_get_time_ms <= USED 0
+m_al_timer_init <= USED 0
+m_al_timer_set <= USED 0
+m_al_timer_set_clock <= USED 0
+mesh_timer_ind_handler <= USED 0
+;FILE m_api.o
+m_api_buf_alloc <= USED 0
+m_api_buf_alloc_block <= USED 0
+m_api_buf_data_get <= USED 0
+m_api_buf_data_len_get <= USED 0
+m_api_buf_free_block <= USED 0
+m_api_buf_release <= USED 0
+m_api_compo_data_cfm <= USED 0
+m_api_disable <= USED 0
+m_api_enable <= USED 0
+m_api_get_env_size <= USED 0
+m_api_get_run_time <= USED 0
+m_api_health_cfm <= USED 0
+m_api_health_status_send <= USED 0
+m_api_init <= USED 0
+m_api_iv_upd_test_mode <= USED 0
+m_api_load_stored_info <= USED 0
+m_api_lpn_select_friend <= USED 0
+m_api_lpn_start <= USED 0
+m_api_lpn_stop <= USED 0
+m_api_message_handler <= USED 0
+m_api_model_opcode_status <= USED 0
+m_api_model_publish <= USED 0
+m_api_model_rsp_send <= USED 0
+m_api_prov_oob_auth_rsp <= USED 0
+m_api_prov_param_rsp <= USED 0
+m_api_prov_pub_key_read <= USED 0
+m_api_proxy_ctrl <= USED 0
+m_api_register_model <= USED 0
+m_api_send_attention_update_ind <= USED 0
+m_api_send_compo_data_req_ind <= USED 0
+m_api_send_fault_clear_ind <= USED 0
+m_api_send_fault_get_req_ind <= USED 0
+m_api_send_fault_period_ind <= USED 0
+m_api_send_fault_test_req_ind <= USED 0
+m_api_send_lpn_offer_ind <= USED 0
+m_api_send_lpn_status_ind <= USED 0
+m_api_send_node_reset_ind <= USED 0
+m_api_send_update_ind <= USED 0
+m_api_set <= USED 0
+m_api_set_run_time <= USED 0
+;FILE m_api_msg.o
+m_api_msg_handler <= USED 0
+m_api_msg_init <= USED 0
+;FILE m_bcn.o
+m_bcn_connect_api <= USED 0
+m_bcn_get_env_size <= USED 0
+m_bcn_init <= USED 0
+m_bcn_proxy_con_start <= USED 0
+m_bcn_start_tx_unprov_bcn <= USED 0
+m_bcn_state_update <= USED 0
+m_bcn_stop_tx_unprov_bcn <= USED 0
+m_bcn_subnet_update_ind <= USED 0
+;FILE m_bearer.o
+m_bearer_closed <= USED 0
+m_bearer_connect_client_cb <= USED 0
+m_bearer_get_env_size <= USED 0
+m_bearer_init <= USED 0
+m_bearer_opened <= USED 0
+m_bearer_rx <= USED 0
+m_bearer_sent <= USED 0
+m_bearer_start <= USED 0
+m_bearer_started <= USED 0
+m_bearer_stop <= USED 0
+m_bearer_stopped <= USED 0
+;FILE m_bearer_adv.o
+m_bearer_adv_connect_api_al <= USED 0
+m_bearer_adv_send <= USED 0
+m_bearer_adv_start <= USED 0
+m_bearer_adv_stop <= USED 0
+m_bearer_adv_tx_prepare <= USED 0
+m_bearer_adv_update <= USED 0
+;FILE m_bearer_gatt.o
+m_bearer_gatt_connect_api_al <= USED 0
+m_bearer_gatt_send <= USED 0
+m_bearer_gatt_start <= USED 0
+m_bearer_gatt_stop <= USED 0
+m_bearer_gatt_tx_prepare <= USED 0
+m_bearer_gatt_update <= USED 0
+;FILE m_fnd.o
+m_fnd_get_env_size <= USED 0
+m_fnd_init <= USED 0
+;FILE m_fnd_confs.o
+m_fnd_confs_get_env_size <= USED 0
+m_fnd_confs_init <= USED 0
+;FILE m_fnd_hlths.o
+m_fnd_hlths_cfm <= USED 0
+m_fnd_hlths_get_env_size <= USED 0
+m_fnd_hlths_init <= USED 0
+m_fnd_hlths_status_ind <= USED 0
+;FILE m_lay.o
+m_lay_get_env_size <= USED 0
+m_lay_init <= USED 0
+;FILE m_lay_access.o
+m_lay_access_connect_api_utrans <= USED 0
+m_lay_access_get_env_size <= USED 0
+m_lay_access_init <= USED 0
+m_lay_access_opcode_status <= USED 0
+m_lay_access_publish <= USED 0
+m_lay_access_rsp_send <= USED 0
+;FILE m_lay_friend.o
+m_lay_friend_cb_state_updated <= USED 0
+m_lay_friend_connect_api_net <= USED 0
+m_lay_friend_connect_api_utrans <= USED 0
+m_lay_friend_get_env_size <= USED 0
+m_lay_friend_init <= USED 0
+;FILE m_lay_hb.o
+m_lay_hb_cb_state_updated <= USED 0
+m_lay_hb_connect_api_utrans <= USED 0
+m_lay_hb_get_env_size <= USED 0
+m_lay_hb_init <= USED 0
+;FILE m_lay_lpn.o
+m_lay_lpn_connect_api_utrans <= USED 0
+m_lay_lpn_get_env_size <= USED 0
+m_lay_lpn_init <= USED 0
+m_lay_lpn_select_friend <= USED 0
+m_lay_lpn_start <= USED 0
+m_lay_lpn_stop <= USED 0
+;FILE m_lay_ltrans.o
+m_lay_ltrans_connect_api_net <= USED 0
+m_lay_ltrans_connect_cb <= USED 0
+m_lay_ltrans_connect_cb_seg <= USED 0
+m_lay_ltrans_get_env_size <= USED 0
+m_lay_ltrans_init <= USED 0
+;FILE m_lay_net.o
+m_lay_net_connect_api_bearer <= USED 0
+m_lay_net_connect_cb <= USED 0
+m_lay_net_connect_cb_lpn_rx <= USED 0
+m_lay_net_get_env_size <= USED 0
+m_lay_net_init <= USED 0
+;FILE m_lay_proxy.o
+m_lay_proxy_bearer_adv_ctrl <= USED 0
+m_lay_proxy_bearer_connect_api <= USED 0
+m_lay_proxy_connect_api_net <= USED 0
+m_lay_proxy_get_env_size <= USED 0
+m_lay_proxy_init <= USED 0
+m_lay_proxy_state_set <= USED 0
+;FILE m_lay_utrans.o
+m_lay_utrans_connect_api_ltrans <= USED 0
+m_lay_utrans_connect_cb <= USED 0
+m_lay_utrans_get_env_size <= USED 0
+m_lay_utrans_init <= USED 0
+;FILE m_prov.o
+m_prov_get_env_size <= USED 0
+m_prov_init <= USED 0
+m_prov_link_closed <= USED 0
+m_prov_link_open <= USED 0
+m_prov_oob_auth_rsp <= USED 0
+m_prov_param_rsp <= USED 0
+m_prov_pdu_rx <= USED 0
+m_prov_pdu_sent <= USED 0
+m_prov_pub_key_get <= USED 0
+m_prov_start <= USED 0
+;FILE m_prov_adv_trans.o
+m_prov_adv_trans_clean_up <= USED 0
+m_prov_adv_trans_link_close_send <= USED 0
+m_prov_adv_trans_rx <= USED 0
+m_prov_adv_trans_send <= USED 0
+m_prov_adv_trans_sent <= USED 0
+;FILE m_prov_bearer.o
+m_prov_bearer_close <= USED 0
+m_prov_bearer_connect_api <= USED 0
+m_prov_bearer_gatt_send <= USED 0
+m_prov_bearer_gatt_start <= USED 0
+m_prov_bearer_gatt_stop <= USED 0
+m_prov_bearer_init <= USED 0
+m_prov_bearer_scan_start <= USED 0
+m_prov_bearer_scan_stop <= USED 0
+m_prov_bearer_send <= USED 0
+;FILE m_tb.o
+m_tb_get_env_size <= USED 0
+m_tb_init <= USED 0
+;FILE m_tb_buf.o
+m_tb_buf_acquire <= USED 0
+m_tb_buf_alloc <= USED 0
+m_tb_buf_block_alloc <= USED 0
+m_tb_buf_block_free <= USED 0
+m_tb_buf_copy <= USED 0
+m_tb_buf_copy_data_from_mem <= USED 0
+m_tb_buf_copy_data_to_mem <= USED 0
+m_tb_buf_get_env_size <= USED 0
+m_tb_buf_head_release <= USED 0
+m_tb_buf_head_reserve <= USED 0
+m_tb_buf_init <= USED 0
+m_tb_buf_release <= USED 0
+m_tb_buf_reuse <= USED 0
+m_tb_buf_tail_release <= USED 0
+m_tb_buf_tail_reserve <= USED 0
+;FILE m_tb_friend.o
+m_tb_friend_get_env_size <= USED 0
+m_tb_friend_get_friend_cnt <= USED 0
+m_tb_friend_get_nb_lpn_estab <= USED 0
+m_tb_friend_get_nb_lpn_known <= USED 0
+m_tb_friend_get_polltimeout_ms <= USED 0
+m_tb_friend_init <= USED 0
+m_tb_friend_is_lpn <= USED 0
+m_tb_friend_is_subs_dst <= USED 0
+m_tb_friend_lpn_add <= USED 0
+m_tb_friend_lpn_estab <= USED 0
+m_tb_friend_lpn_rem <= USED 0
+m_tb_friend_subs_list_update <= USED 0
+;FILE m_tb_key.o
+m_tb_key_app_add <= USED 0
+m_tb_key_app_delete <= USED 0
+m_tb_key_app_find <= USED 0
+m_tb_key_app_get <= USED 0
+m_tb_key_app_get_ids <= USED 0
+m_tb_key_app_get_lids <= USED 0
+m_tb_key_app_lid_from_net_aid <= USED 0
+m_tb_key_app_update <= USED 0
+m_tb_key_dev_add <= USED 0
+m_tb_key_dev_get <= USED 0
+m_tb_key_friend_end_ind <= USED 0
+m_tb_key_friend_get_key <= USED 0
+m_tb_key_friend_get_nid <= USED 0
+m_tb_key_friend_net_lid_from_nid <= USED 0
+m_tb_key_friend_new_ind <= USED 0
+m_tb_key_get_env_size <= USED 0
+m_tb_key_get_iv_rx <= USED 0
+m_tb_key_get_iv_seq <= USED 0
+m_tb_key_get_model_appkey_ids <= USED 0
+m_tb_key_get_nb_app_keys <= USED 0
+m_tb_key_get_nb_net_keys <= USED 0
+m_tb_key_get_net_from_net_id <= USED 0
+m_tb_key_get_net_info <= USED 0
+m_tb_key_get_netkey_id <= USED 0
+m_tb_key_get_node_identity <= USED 0
+m_tb_key_get_phase <= USED 0
+m_tb_key_init <= USED 0
+m_tb_key_iv_upd_test_mode_ind <= USED 0
+m_tb_key_model_bind <= USED 0
+m_tb_key_model_bind_check <= USED 0
+m_tb_key_model_unbind <= USED 0
+m_tb_key_net_add <= USED 0
+m_tb_key_net_delete <= USED 0
+m_tb_key_net_find <= USED 0
+m_tb_key_net_get <= USED 0
+m_tb_key_net_get_ids <= USED 0
+m_tb_key_net_lid_from_nid <= USED 0
+m_tb_key_net_next <= USED 0
+m_tb_key_net_revoke_old <= USED 0
+m_tb_key_net_update <= USED 0
+m_tb_key_net_use_new <= USED 0
+m_tb_key_phase_transition_ind <= USED 0
+m_tb_key_secure_bcn_rx_ind <= USED 0
+m_tb_key_set_iv_seq <= USED 0
+m_tb_key_set_node_identity <= USED 0
+;FILE m_tb_mio.o
+m_tb_mio_add_subscription <= USED 0
+m_tb_mio_add_subscription_virt <= USED 0
+m_tb_mio_addr_list_get <= USED 0
+m_tb_mio_addr_list_get_size <= USED 0
+m_tb_mio_addr_list_start <= USED 0
+m_tb_mio_addr_list_stop <= USED 0
+m_tb_mio_app_key_rem_ind <= USED 0
+m_tb_mio_bind <= USED 0
+m_tb_mio_cb_get <= USED 0
+m_tb_mio_delete_all_subscription <= USED 0
+m_tb_mio_delete_subscription <= USED 0
+m_tb_mio_delete_subscription_virt <= USED 0
+m_tb_mio_get_element_addr <= USED 0
+m_tb_mio_get_env_size <= USED 0
+m_tb_mio_get_label_uuid <= USED 0
+m_tb_mio_get_local_id <= USED 0
+m_tb_mio_get_model_id <= USED 0
+m_tb_mio_get_model_ids <= USED 0
+m_tb_mio_get_nb_bound_app <= USED 0
+m_tb_mio_get_nb_elements <= USED 0
+m_tb_mio_get_nb_model <= USED 0
+m_tb_mio_get_nb_models <= USED 0
+m_tb_mio_get_period <= USED 0
+m_tb_mio_get_prim_addr <= USED 0
+m_tb_mio_get_publi_param <= USED 0
+m_tb_mio_get_subscription_list <= USED 0
+m_tb_mio_get_subscription_list_size <= USED 0
+m_tb_mio_get_subscription_list_size_vaddr <= USED 0
+m_tb_mio_get_vaddr <= USED 0
+m_tb_mio_init <= USED 0
+m_tb_mio_is_dest_addr <= USED 0
+m_tb_mio_is_local_addr <= USED 0
+m_tb_mio_register_model <= USED 0
+m_tb_mio_set_prim_addr <= USED 0
+m_tb_mio_set_publi_param <= USED 0
+m_tb_mio_unbind <= USED 0
+;FILE m_tb_sec.o
+m_tb_sec_aes_start <= USED 0
+m_tb_sec_ccm_dec_start <= USED 0
+m_tb_sec_ccm_enc_start <= USED 0
+m_tb_sec_cmac_start <= USED 0
+m_tb_sec_get_env_size <= USED 0
+m_tb_sec_init <= USED 0
+m_tb_sec_k1_start <= USED 0
+m_tb_sec_k2_start <= USED 0
+m_tb_sec_k3_start <= USED 0
+m_tb_sec_k4_start <= USED 0
+m_tb_sec_rand_start <= USED 0
+m_tb_sec_s1_start <= USED 0
+;FILE m_tb_state.o
+m_tb_state_get_attention_state <= USED 0
+m_tb_state_get_beacon_state <= USED 0
+m_tb_state_get_compo_info <= USED 0
+m_tb_state_get_default_ttl <= USED 0
+m_tb_state_get_env_size <= USED 0
+m_tb_state_get_friend_state <= USED 0
+m_tb_state_get_gatt_proxy_state <= USED 0
+m_tb_state_get_hb_feat_upd <= USED 0
+m_tb_state_get_hb_pub_params <= USED 0
+m_tb_state_get_hb_subs_params <= USED 0
+m_tb_state_get_lpn_state <= USED 0
+m_tb_state_get_nb_cdata_page <= USED 0
+m_tb_state_get_net_tx_params <= USED 0
+m_tb_state_get_net_tx_state <= USED 0
+m_tb_state_get_prov_state <= USED 0
+m_tb_state_get_relay_state <= USED 0
+m_tb_state_hb_check_features <= USED 0
+m_tb_state_hb_rx_ind <= USED 0
+m_tb_state_hb_tx_ind <= USED 0
+m_tb_state_init <= USED 0
+m_tb_state_is_enabled <= USED 0
+m_tb_state_is_feature_sup <= USED 0
+m_tb_state_is_iv_update_auth <= USED 0
+m_tb_state_iv_update_ind <= USED 0
+m_tb_state_net_key_rem_ind <= USED 0
+m_tb_state_set_attention_state <= USED 0
+m_tb_state_set_beacon_state <= USED 0
+m_tb_state_set_default_ttl <= USED 0
+m_tb_state_set_enabled <= USED 0
+m_tb_state_set_friend_cb <= USED 0
+m_tb_state_set_friend_state <= USED 0
+m_tb_state_set_gatt_proxy_state <= USED 0
+m_tb_state_set_hb_cb <= USED 0
+m_tb_state_set_hb_pub_params <= USED 0
+m_tb_state_set_hb_subs_params <= USED 0
+m_tb_state_set_lpn_state <= USED 0
+m_tb_state_set_net_tx_state <= USED 0
+m_tb_state_set_prov_state <= USED 0
+m_tb_state_set_relay_state <= USED 0
+;FILE m_tb_store_wvt.o
+m_tb_store_get_compo_data <= USED 0
+m_tb_store_get_env_size <= USED 0
+m_tb_store_init <= USED 0
+m_tb_store_load <= USED 0
+m_tb_store_rx_compo_data <= USED 0
+m_tb_store_update_ind <= USED 0
+;FILE m_tb_timer.o
+m_tb_timer_clear <= USED 0
+m_tb_timer_expired <= USED 0
+m_tb_timer_get_cur_time <= USED 0
+m_tb_timer_get_env_size <= USED 0
+m_tb_timer_init <= USED 0
+m_tb_timer_set <= USED 0
+;FILE mesh_api.o
+app_mesh_enable_prf <= USED 0
+mesh_add_model <= USED 0
+mesh_api_compo_data_req_ind_handler <= USED 0
+mesh_init <= USED 0
+mesh_load_stored_info <= USED 0
+mesh_model_bind_appkey <= USED 0
+mesh_model_sub_group_addr <= USED 0
+mesh_publish_msg <= USED 0
+mesh_send_compo_data_rsp <= USED 0
+mesh_send_prov_auth_data_rsp <= USED 0
+mesh_send_prov_param_rsp <= USED 0
+mesh_set_cb_func <= USED 0
+mesh_start <= USED 0
+mesh_stop <= USED 0
+;FILE os_mem.o
+os_free <= USED 0
+os_get_free_heap_size <= USED 0
+os_malloc <= USED 0
+;FILE os_msg_q.o
+;FILE os_task.o
+ke_task_delete <= USED 0
+ke_task_saved_update <= USED 0
+os_get_free_task_id_num <= USED 0
+os_task_delete <= USED 0
+os_task_process_saved_msg <= USED 0
+;FILE os_timer.o
+os_timer_init <= USED 0
+os_timer_start <= USED 0
+os_timer_stop <= USED 0
+;FILE patch.o
+__asm___7_patch_c_487891fc____REV16 <= USED 0
+__asm___7_patch_c_487891fc____REVSH <= USED 0
+__asm___7_patch_c_487891fc____RRX <= USED 0
+;FILE patch_rf.o
+__asm___10_patch_rf_c_e73c1e89____REV16 <= USED 0
+__asm___10_patch_rf_c_e73c1e89____REVSH <= USED 0
+__asm___10_patch_rf_c_e73c1e89____RRX <= USED 0
+;FILE prf.o
+prf_dst_task_get <= USED 0
+prf_env_get <= USED 0
+prf_get_id_from_task <= USED 0
+prf_src_task_get <= USED 0
+;FILE prf_utils.o
+prf_check_svc_char_desc_validity <= USED 0
+prf_check_svc_char_validity <= USED 0
+prf_client_att_info_rsp <= USED 0
+prf_disc_svc_send <= USED 0
+prf_extract_svc_info <= USED 0
+prf_gatt_write <= USED 0
+prf_gatt_write_ntf_ind <= USED 0
+prf_pack_date_time <= USED 0
+prf_read_char_send <= USED 0
+prf_register_atthdl2gatt <= USED 0
+prf_unpack_date_time <= USED 0
+prf_unregister_atthdl2gatt <= USED 0
+;FILE proj_main.o
+__asm___11_proj_main_c_tick____REV16 <= USED 0
+__asm___11_proj_main_c_tick____REVSH <= USED 0
+__asm___11_proj_main_c_tick____RRX <= USED 0
+;FILE rwble_hl.o
+;FILE smpc.o
+;FILE smpc_api.o
+;FILE smpc_crypto.o
+;FILE smpc_util.o
+;FILE sys_utils.o
+__asm___11_sys_utils_c_a1736321____REV16 <= USED 0
+__asm___11_sys_utils_c_a1736321____REVSH <= USED 0
+__asm___11_sys_utils_c_a1736321____RRX <= USED 0
+ascii_strn2val <= USED 0
+char_to_val <= USED 0
+hex4bit_to_caps_char <= USED 0
+hex4bit_to_char <= USED 0
+hex_arr_to_str <= USED 0
+str_to_hex_arr <= USED 0
+str_to_val <= USED 0
+system_sleep_enable <= USED 0
+val_to_str <= USED 0
+;FILE user_bond_manage.o
+ble_bond_addr_check_result <= USED 0
+ble_bond_clr_info <= USED 0
+;FILE user_mem.o
+ke_free_user <= USED 0
+ke_get_mem_free <= USED 0
+ke_get_mem_max_usage <= USED 0
+ke_malloc_user <= USED 0
+show_ke_malloc <= USED 0
+show_mem_list <= USED 0
+show_msg_list <= USED 0
+;FILE user_task.o

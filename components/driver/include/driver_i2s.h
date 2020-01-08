@@ -29,6 +29,51 @@ enum i2s_data_type_t
     I2S_DATA_MONO = 0,
     I2S_DATA_STEREO = 1,
 };
+/*
+ * TYPEDEFS
+ */
+struct i2s_control_t {
+	uint32_t en:1;
+	uint32_t format:1;
+	uint32_t dlyen:1;
+	uint32_t frminv:1;
+	uint32_t bclkinv:1;
+	uint32_t mode:1;	// 1: master, 0: slave
+	uint32_t lp:1;
+	uint32_t rx_int_en:1;
+	uint32_t tx_int_en:1;
+	uint32_t inten:1;
+	uint32_t reserved:22;
+};
+
+struct i2s_int_status_t {
+	uint32_t rx_full:1;
+	uint32_t rx_half_full:1;
+	uint32_t rx_empty:1;
+	uint32_t tx_full:1;
+	uint32_t tx_half_empty:1;
+	uint32_t tx_emtpy:1;
+	uint32_t reserved:26;
+};
+
+struct i2s_int_en_t {
+	uint32_t rx_full:1;
+	uint32_t rx_half_full:1;
+	uint32_t rx_empty:1;
+	uint32_t tx_full:1;
+	uint32_t tx_half_empty:1;
+	uint32_t tx_emtpy:1;
+	uint32_t reserved:26;
+};
+
+struct i2s_reg_t {
+	struct i2s_control_t ctrl;		// @0x00
+	uint32_t bclk_div;
+	uint32_t frm_div;
+	uint32_t data;
+	struct i2s_int_status_t status; // @0x10
+	struct i2s_int_en_t mask;
+};
 
 /*********************************************************************
  * @fn      i2s_init

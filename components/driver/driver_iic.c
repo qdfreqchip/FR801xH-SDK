@@ -334,6 +334,54 @@ uint8_t iic_read_bytes(enum iic_channel_t channel, uint8_t slave_addr, uint8_t r
 
     return true;
 }
+uint8_t iic_write_bytes_imp(enum iic_channel_t channel, uint8_t slave_addr, uint8_t reg_addr, 
+									uint8_t *buffer, uint16_t length)
+{
+    volatile struct iic_reg_t *iic_reg;
+
+    if(length == 0)
+    {
+        return true;
+    }
+    length--;
+
+    if(channel == IIC_CHANNEL_0)
+    {
+        iic_reg = IIC0_REG_BASE;
+    }
+    else
+    {
+        iic_reg = IIC1_REG_BASE;
+    }
+
+    iic_reg->data = slave_addr | IIC_TRAN_START;
+    while(iic_reg->status.trans_emp != 1);
+    co_delay_10us(10);
+    if(iic_reg->status.no_ack == 1)
+    {
+        return false;
+    }
+
+    iic_reg->data = reg_addr & 0xff;
+
+    while(length)
+    {
+        while(iic_reg->status.trans_ful == 1);
+        iic_reg->data = *buffer++;
+        length--;
+    }
+
+    while(iic_reg->status.trans_ful == 1);
+    iic_reg->data = *buffer | IIC_TRAN_STOP;
+
+	co_delay_100us(1);
+	
+	return true;
+	
+    //while(iic_reg->status.bus_atv == 1);
+
+    //return true;
+}
 
 /*********************************************************************
  * @fn      iic_init

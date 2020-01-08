@@ -70,12 +70,14 @@ void button_send_event(uint8_t event, uint32_t button, uint8_t cnt)
 
 static void button_idle(uint8_t event)
 {
-    if(event == BUTTON_WORKING_EVENT_SINGLE_PRESSED) {
+    if(event == BUTTON_WORKING_EVENT_SINGLE_PRESSED)
+    {
         current_state = BUTTON_WORKING_STATE_JUST_PRESSED;
         os_timer_start(&button_state_timer, BUTTON_SHORT_DURING*10, false);
         button_send_event(BUTTON_PRESSED, current_pressed_button, pressed_cnt);
     }
-    else if(event == BUTTON_WORKING_EVENT_COMB_PRESSED) {
+    else if(event == BUTTON_WORKING_EVENT_COMB_PRESSED)
+    {
         current_state = BUTTON_WORKING_STATE_COMB_JUST_PRESSED;
         os_timer_start(&button_state_timer, BUTTON_SHORT_DURING*10, false);
         button_send_event(BUTTON_COMB_PRESSED, current_pressed_button, pressed_cnt);
@@ -84,17 +86,20 @@ static void button_idle(uint8_t event)
 
 static void button_just_pressed(uint8_t event)
 {
-    if(event == BUTTON_WORKING_EVENT_RELEASED) {
+    if(event == BUTTON_WORKING_EVENT_RELEASED)
+    {
         current_state = BUTTON_WORKING_STATE_IDLE;
         os_timer_stop(&button_state_timer);
         button_send_event(BUTTON_RELEASED, last_saved_button, pressed_cnt);
     }
-    else if(event == BUTTON_WORKING_EVENT_COMB_PRESSED) {
+    else if(event == BUTTON_WORKING_EVENT_COMB_PRESSED)
+    {
         current_state = BUTTON_WORKING_STATE_COMB_JUST_PRESSED;
         os_timer_start(&button_state_timer, BUTTON_SHORT_DURING*10, false);
         button_send_event(BUTTON_COMB_PRESSED, current_pressed_button, pressed_cnt);
     }
-    else if(event == BUTTON_WORKING_EVENT_TIME_OUT) {
+    else if(event == BUTTON_WORKING_EVENT_TIME_OUT)
+    {
         current_state = BUTTON_WORKING_STATE_PRESSED;
         os_timer_start(&button_state_timer, (BUTTON_LONG_DURING*10-BUTTON_SHORT_DURING)*10, false);
     }
@@ -102,12 +107,15 @@ static void button_just_pressed(uint8_t event)
 
 static void button_pressed(uint8_t event)
 {
-    if(event == BUTTON_WORKING_EVENT_RELEASED) {
-        if(0/*__jump_table.button_disable_multi_click*/ & last_saved_button) {
+    if(event == BUTTON_WORKING_EVENT_RELEASED)
+    {
+        if(0/*__jump_table.button_disable_multi_click*/ & last_saved_button)
+        {
             current_state = BUTTON_WORKING_STATE_IDLE;
             button_send_event(BUTTON_SHORT_PRESSED, last_saved_button, 0);
         }
-        else {
+        else
+        {
             //TBD，是否开启多击按键
             current_state = BUTTON_WORKING_STATE_WAIT_MULTI;
             button_to_be_send = last_saved_button;
@@ -115,12 +123,14 @@ static void button_pressed(uint8_t event)
             os_timer_start(&button_state_timer, BUTTON_MULTI_INTERVAL*10, false);
         }
     }
-    else if(event == BUTTON_WORKING_EVENT_COMB_PRESSED) {
+    else if(event == BUTTON_WORKING_EVENT_COMB_PRESSED)
+    {
         current_state = BUTTON_WORKING_STATE_COMB_JUST_PRESSED;
         os_timer_start(&button_state_timer, BUTTON_SHORT_DURING*10, false);
         button_send_event(BUTTON_COMB_PRESSED, current_pressed_button, pressed_cnt);
     }
-    else if(event == BUTTON_WORKING_EVENT_TIME_OUT) {
+    else if(event == BUTTON_WORKING_EVENT_TIME_OUT)
+    {
         current_state = BUTTON_WORKING_STATE_LONG_PRESSED;
         os_timer_start(&button_state_timer, ((BUTTON_LONG_LONG_DURING-BUTTON_LONG_DURING)*10)*10, false);
         os_timer_start(&button_pressing_timer, BUTTON_LONG_PRESSING_INTERVAL*10, false);
@@ -130,12 +140,16 @@ static void button_pressed(uint8_t event)
 
 static void button_wait_multi(uint8_t event)
 {
-    if(event == BUTTON_WORKING_EVENT_SINGLE_PRESSED) {
-        if(current_pressed_button != button_to_be_send) {
-            if(pressed_cnt > 1) {
+    if(event == BUTTON_WORKING_EVENT_SINGLE_PRESSED)
+    {
+        if(current_pressed_button != button_to_be_send)
+        {
+            if(pressed_cnt > 1)
+            {
                 button_send_event(BUTTON_MULTI_PRESSED, button_to_be_send, pressed_cnt);
             }
-            else {
+            else
+            {
                 button_send_event(BUTTON_SHORT_PRESSED, button_to_be_send, pressed_cnt);
             }
             button_send_event(BUTTON_PRESSED, current_pressed_button, pressed_cnt);
@@ -143,18 +157,22 @@ static void button_wait_multi(uint8_t event)
         current_state = BUTTON_WORKING_STATE_JUST_PRESSED;
         os_timer_start(&button_state_timer, BUTTON_SHORT_DURING*10, false);
     }
-    else if(event == BUTTON_WORKING_EVENT_COMB_PRESSED) {
+    else if(event == BUTTON_WORKING_EVENT_COMB_PRESSED)
+    {
         current_state = BUTTON_WORKING_STATE_COMB_JUST_PRESSED;
         os_timer_start(&button_state_timer, BUTTON_SHORT_DURING*10, false);
         button_send_event(BUTTON_COMB_PRESSED, current_pressed_button, pressed_cnt);
         button_send_event(BUTTON_SHORT_PRESSED, button_to_be_send, pressed_cnt);
     }
-    else if(event == BUTTON_WORKING_EVENT_TIME_OUT) {
+    else if(event == BUTTON_WORKING_EVENT_TIME_OUT)
+    {
         current_state = BUTTON_WORKING_STATE_IDLE;
-        if(pressed_cnt > 1) {
+        if(pressed_cnt > 1)
+        {
             button_send_event(BUTTON_MULTI_PRESSED, button_to_be_send, pressed_cnt);
         }
-        else {
+        else
+        {
             button_send_event(BUTTON_SHORT_PRESSED, button_to_be_send, pressed_cnt);
         }
     }
@@ -162,20 +180,23 @@ static void button_wait_multi(uint8_t event)
 
 static void button_long_pressed(uint8_t event)
 {
-    if(event == BUTTON_WORKING_EVENT_RELEASED) {
+    if(event == BUTTON_WORKING_EVENT_RELEASED)
+    {
         current_state = BUTTON_WORKING_STATE_IDLE;
         os_timer_stop(&button_state_timer);
         os_timer_stop(&button_pressing_timer);
         button_send_event(BUTTON_LONG_RELEASED, last_saved_button, pressed_cnt);
     }
-    else if(event == BUTTON_WORKING_EVENT_COMB_PRESSED) {
+    else if(event == BUTTON_WORKING_EVENT_COMB_PRESSED)
+    {
         current_state = BUTTON_WORKING_STATE_COMB_JUST_PRESSED;
         os_timer_start(&button_state_timer, BUTTON_SHORT_DURING*10, false);
         os_timer_stop(&button_pressing_timer);
         button_send_event(BUTTON_COMB_PRESSED, current_pressed_button, pressed_cnt);
         button_send_event(BUTTON_LONG_RELEASED, last_saved_button, pressed_cnt);
     }
-    else if(event == BUTTON_WORKING_EVENT_TIME_OUT) {
+    else if(event == BUTTON_WORKING_EVENT_TIME_OUT)
+    {
         current_state = BUTTON_WORKING_STATE_LONG_LONG_PRESSED;
         button_send_event(BUTTON_LONG_LONG_PRESSED, current_pressed_button, pressed_cnt);
     }
@@ -183,12 +204,14 @@ static void button_long_pressed(uint8_t event)
 
 static void button_long_long_pressed(uint8_t event)
 {
-    if(event == BUTTON_WORKING_EVENT_RELEASED) {
+    if(event == BUTTON_WORKING_EVENT_RELEASED)
+    {
         os_timer_stop(&button_pressing_timer);
         current_state = BUTTON_WORKING_STATE_IDLE;
         button_send_event(BUTTON_LONG_LONG_RELEASED, last_saved_button, pressed_cnt);
     }
-    else if(event == BUTTON_WORKING_EVENT_COMB_PRESSED) {
+    else if(event == BUTTON_WORKING_EVENT_COMB_PRESSED)
+    {
         current_state = BUTTON_WORKING_STATE_COMB_JUST_PRESSED;
         os_timer_start(&button_state_timer, BUTTON_SHORT_DURING*10, false);
         os_timer_stop(&button_pressing_timer);
@@ -199,23 +222,27 @@ static void button_long_long_pressed(uint8_t event)
 
 static void button_comb_just_pressed(uint8_t event)
 {
-    if(event == BUTTON_WORKING_EVENT_RELEASED) {
+    if(event == BUTTON_WORKING_EVENT_RELEASED)
+    {
         current_state = BUTTON_WORKING_STATE_IDLE;
         os_timer_stop(&button_state_timer);
         button_send_event(BUTTON_COMB_RELEASED, last_saved_button, pressed_cnt);
     }
-    else if(event == BUTTON_WORKING_EVENT_SINGLE_PRESSED) {
+    else if(event == BUTTON_WORKING_EVENT_SINGLE_PRESSED)
+    {
         current_state = BUTTON_WORKING_STATE_JUST_PRESSED;
         os_timer_start(&button_state_timer, BUTTON_SHORT_DURING*10, false);
         button_send_event(BUTTON_COMB_RELEASED, last_saved_button, pressed_cnt);
         button_send_event(BUTTON_PRESSED, current_pressed_button, pressed_cnt);
     }
-    else if(event == BUTTON_WORKING_EVENT_COMB_PRESSED) {
+    else if(event == BUTTON_WORKING_EVENT_COMB_PRESSED)
+    {
         current_state = BUTTON_WORKING_STATE_JUST_PRESSED;
         os_timer_start(&button_state_timer, BUTTON_SHORT_DURING*10, false);
         button_send_event(BUTTON_COMB_PRESSED, current_pressed_button, pressed_cnt);
     }
-    else if(event == BUTTON_WORKING_EVENT_TIME_OUT) {
+    else if(event == BUTTON_WORKING_EVENT_TIME_OUT)
+    {
         current_state = BUTTON_WORKING_STATE_COMB_PRESSED;
         os_timer_start(&button_state_timer, (BUTTON_LONG_DURING*10-BUTTON_SHORT_DURING)*10, false);
     }
@@ -223,24 +250,28 @@ static void button_comb_just_pressed(uint8_t event)
 
 static void button_comb_pressed(uint8_t event)
 {
-    if(event == BUTTON_WORKING_EVENT_RELEASED) {
+    if(event == BUTTON_WORKING_EVENT_RELEASED)
+    {
         current_state = BUTTON_WORKING_STATE_IDLE;
         os_timer_stop(&button_state_timer);
         button_send_event(BUTTON_COMB_SHORT_PRESSED, last_saved_button, pressed_cnt);
     }
-    else if(event == BUTTON_WORKING_EVENT_SINGLE_PRESSED) {
+    else if(event == BUTTON_WORKING_EVENT_SINGLE_PRESSED)
+    {
         current_state = BUTTON_WORKING_STATE_JUST_PRESSED;
         os_timer_start(&button_state_timer, BUTTON_SHORT_DURING*10, false);
         button_send_event(BUTTON_COMB_SHORT_PRESSED, last_saved_button, pressed_cnt);
         button_send_event(BUTTON_PRESSED, current_pressed_button, pressed_cnt);
     }
-    else if(event == BUTTON_WORKING_EVENT_COMB_PRESSED) {
+    else if(event == BUTTON_WORKING_EVENT_COMB_PRESSED)
+    {
         current_state = BUTTON_WORKING_STATE_COMB_JUST_PRESSED;
         os_timer_start(&button_state_timer, BUTTON_SHORT_DURING*10, false);
         button_send_event(BUTTON_COMB_SHORT_PRESSED, last_saved_button, pressed_cnt);
         button_send_event(BUTTON_COMB_PRESSED, current_pressed_button, pressed_cnt);
     }
-    else if(event == BUTTON_WORKING_EVENT_TIME_OUT) {
+    else if(event == BUTTON_WORKING_EVENT_TIME_OUT)
+    {
         current_state = BUTTON_WORKING_STATE_COMB_LONG_PRESSED;
         os_timer_start(&button_state_timer, ((BUTTON_LONG_LONG_DURING-BUTTON_LONG_DURING)*10)*10, false);
         os_timer_start(&button_pressing_timer, BUTTON_LONG_PRESSING_INTERVAL*10, false);
@@ -250,27 +281,31 @@ static void button_comb_pressed(uint8_t event)
 
 static void button_comb_long_pressed(uint8_t event)
 {
-    if(event == BUTTON_WORKING_EVENT_RELEASED) {
+    if(event == BUTTON_WORKING_EVENT_RELEASED)
+    {
         current_state = BUTTON_WORKING_STATE_IDLE;
         os_timer_stop(&button_state_timer);
         os_timer_stop(&button_pressing_timer);
         button_send_event(BUTTON_COMB_LONG_RELEASED, last_saved_button, pressed_cnt);
     }
-    else if(event == BUTTON_WORKING_EVENT_SINGLE_PRESSED) {
+    else if(event == BUTTON_WORKING_EVENT_SINGLE_PRESSED)
+    {
         current_state = BUTTON_WORKING_STATE_JUST_PRESSED;
         os_timer_start(&button_state_timer, BUTTON_SHORT_DURING*10, false);
         os_timer_stop(&button_pressing_timer);
         button_send_event(BUTTON_COMB_LONG_RELEASED, last_saved_button, pressed_cnt);
         button_send_event(BUTTON_PRESSED, current_pressed_button, pressed_cnt);
     }
-    else if(event == BUTTON_WORKING_EVENT_COMB_PRESSED) {
+    else if(event == BUTTON_WORKING_EVENT_COMB_PRESSED)
+    {
         current_state = BUTTON_WORKING_STATE_COMB_JUST_PRESSED;
         os_timer_start(&button_state_timer, BUTTON_SHORT_DURING*10, false);
         os_timer_stop(&button_pressing_timer);
         button_send_event(BUTTON_COMB_LONG_RELEASED, last_saved_button, pressed_cnt);
         button_send_event(BUTTON_COMB_PRESSED, current_pressed_button, pressed_cnt);
     }
-    else if(event == BUTTON_WORKING_EVENT_TIME_OUT) {
+    else if(event == BUTTON_WORKING_EVENT_TIME_OUT)
+    {
         current_state = BUTTON_WORKING_STATE_COMB_LONG_LONG_PRESSED;
         button_send_event(BUTTON_COMB_LONG_LONG_PRESSED, current_pressed_button, pressed_cnt);
     }
@@ -278,19 +313,22 @@ static void button_comb_long_pressed(uint8_t event)
 
 static void button_comb_long_long_pressed(uint8_t event)
 {
-    if(event == BUTTON_WORKING_EVENT_RELEASED) {
+    if(event == BUTTON_WORKING_EVENT_RELEASED)
+    {
         current_state = BUTTON_WORKING_STATE_IDLE;
         os_timer_stop(&button_pressing_timer);
         button_send_event(BUTTON_COMB_LONG_LONG_RELEASED, last_saved_button, pressed_cnt);
     }
-    else if(event == BUTTON_WORKING_EVENT_SINGLE_PRESSED) {
+    else if(event == BUTTON_WORKING_EVENT_SINGLE_PRESSED)
+    {
         current_state = BUTTON_WORKING_STATE_JUST_PRESSED;
         os_timer_start(&button_state_timer, BUTTON_SHORT_DURING*10, false);
         os_timer_stop(&button_pressing_timer);
         button_send_event(BUTTON_COMB_LONG_LONG_RELEASED, last_saved_button, pressed_cnt);
         button_send_event(BUTTON_PRESSED, current_pressed_button, pressed_cnt);
     }
-    else if(event == BUTTON_WORKING_EVENT_COMB_PRESSED) {
+    else if(event == BUTTON_WORKING_EVENT_COMB_PRESSED)
+    {
         current_state = BUTTON_WORKING_STATE_COMB_JUST_PRESSED;
         os_timer_start(&button_state_timer, BUTTON_SHORT_DURING*10, false);
         os_timer_stop(&button_pressing_timer);
@@ -299,7 +337,8 @@ static void button_comb_long_long_pressed(uint8_t event)
     }
 }
 
-void (*const button_statemachines[BUTTON_WORKING_STATE_MAX])(uint8_t) = {
+void (*const button_statemachines[BUTTON_WORKING_STATE_MAX])(uint8_t) =
+{
     button_idle,
     button_just_pressed,
     button_pressed,
@@ -318,16 +357,21 @@ static int button_toggle_handler(uint32_t curr_button)
     enum button_working_event_t event;
 
     current_pressed_button = curr_button;
-    
-    if(last_saved_button != current_pressed_button) {
-        if(current_pressed_button == 0) {
+
+    if(last_saved_button != current_pressed_button)
+    {
+        if(current_pressed_button == 0)
+        {
             event = BUTTON_WORKING_EVENT_RELEASED;
         }
-        else {
-            if((current_pressed_button & (current_pressed_button-1)) == 0) {
+        else
+        {
+            if((current_pressed_button & (current_pressed_button-1)) == 0)
+            {
                 event = BUTTON_WORKING_EVENT_SINGLE_PRESSED;
             }
-            else {
+            else
+            {
                 event = BUTTON_WORKING_EVENT_COMB_PRESSED;
             }
         }
@@ -348,10 +392,12 @@ static void button_timeout_handler(void *param)
 static void button_pressing_timeout_handler(void *param)
 {
     enum button_type_t event;
-    if((current_pressed_button & (current_pressed_button - 1)) == 0) {
+    if((current_pressed_button & (current_pressed_button - 1)) == 0)
+    {
         event = BUTTON_LONG_PRESSING;
     }
-    else {
+    else
+    {
         event = BUTTON_COMB_LONG_PRESSING;
     }
 
@@ -367,8 +413,9 @@ static void button_anti_shake_timeout_handler(void *param)
 
     curr_button = ool_read32(PMU_REG_GPIOA_V);
     curr_button &= button_io_mask;
-    
-    if(curr_button == curr_button_before_anti_shake) {
+
+    if(curr_button == curr_button_before_anti_shake)
+    {
         curr_button ^= button_io_mask;
         toggle_event.event_id = BUTTON_TOGGLE;
         toggle_event.param = (void *)&curr_button;
@@ -379,7 +426,8 @@ static void button_anti_shake_timeout_handler(void *param)
 
 static int button_task_func(os_event_t *event)
 {
-    switch(event->event_id) {
+    switch(event->event_id)
+    {
         case BUTTON_TOGGLE:
             button_toggle_handler(*(uint32_t *)event->param);
             break;

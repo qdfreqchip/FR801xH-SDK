@@ -34,8 +34,8 @@
                 import PendSV_Handler
                 import SysTick_Handler
                 import rwble_isr_patch
-                import uart0_isr
-                import uart1_isr
+                import uart0_isr_ram
+                import uart1_isr_ram
                 ;import pmu_isr_ram
                 import i2s_isr_ram
                 import pdm_isr
@@ -75,8 +75,8 @@ __initial_sp    EQU     0x40004000
                 DCD     rwble_isr_patch                 ; 0
                 DCD     0                         ; 1
                 DCD     0                         ; 2
-                DCD     uart0_isr                 ; 3
-                DCD     uart1_isr                 ; 4
+                DCD     uart0_isr_ram                 ; 3
+                DCD     uart1_isr_ram                 ; 4
                 DCD     0                         ; 5
                 DCD     0                         ; 6
                 DCD     0                         ; 7

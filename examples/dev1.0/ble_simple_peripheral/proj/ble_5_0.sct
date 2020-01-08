@@ -1,0 +1,39 @@
+;256k bytes, which is 2M ROM
+;ROM 0x00000000  0x40000	0x30000
+ROM 0x01000000  0x80000
+{
+    ER_TABLE +0
+    {
+        *(jump_table)
+    }
+    
+    ER_RO +0
+	{
+		*(+RO)
+	}
+    
+    ER_BOOT 0x20000000
+    {
+        app_boot_vectors.o (RESET, +FIRST)
+    }
+    
+    USER_RE_RAM 0x20000B60
+	{
+		*(ram_code)
+    }
+	
+    ER_RW +0
+    {
+        *(+RW)
+    }
+
+    ER_ZI +0
+    {
+        *(+ZI)
+    }
+	
+	HEAP_KE +0 
+	{
+        *(heap_ke)
+    }
+}
