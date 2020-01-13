@@ -439,7 +439,7 @@ enum pmu_gpio_mux_t
 #define GPIO_PD4              (1<<28)
 #define GPIO_PD5              (1<<29)
 #define GPIO_PD6              (1<<30)
-#define GPIO_PD7              (1<<31)
+#define GPIO_PD7              ((uint32_t)1<<31)
 
 enum system_port_t
 {

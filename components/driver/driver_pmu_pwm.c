@@ -40,13 +40,13 @@ void pmu_pwm_stop(enum system_port_t port, enum system_port_bit_t bit)
     switch( (port * 8 + bit)%4 )
     {
         case 0:
-            ool_write(PMU_REG_PTC0_CTRL, 0 );
+            ool_write(PMU_REG_PTC0_CTRL, PMU_PTC_CNT_RESET );
             break;
         case 1:
-            ool_write(PMU_REG_PTC1_CTRL, 0 );
+            ool_write(PMU_REG_PTC1_CTRL, PMU_PTC_CNT_RESET );
             break;
         case 2:
-            ool_write(PMU_REG_PTC2_CTRL, 0 );
+            ool_write(PMU_REG_PTC2_CTRL, PMU_PTC_CNT_RESET );
             break;
     }
 }

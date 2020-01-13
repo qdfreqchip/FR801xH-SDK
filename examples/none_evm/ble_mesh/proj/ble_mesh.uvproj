@@ -77,10 +77,10 @@
             <nStopB2X>0</nStopB2X>
           </BeforeMake>
           <AfterMake>
-            <RunUserProg1>0</RunUserProg1>
-            <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name></UserProg1Name>
-            <UserProg2Name></UserProg2Name>
+            <RunUserProg1>1</RunUserProg1>
+            <RunUserProg2>1</RunUserProg2>
+            <UserProg1Name>fromelf.exe  --text  -c -o ble_mesh.txt  Objects/ble_mesh.axf</UserProg1Name>
+            <UserProg2Name>fromelf.exe  --bin -o ble_mesh.bin  Objects/ble_mesh.axf</UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
             <nStopA1X>0</nStopA1X>
@@ -374,7 +374,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\components\ble\include;..\..\..\..\components\driver\include;..\..\..\..\components\modules\os\include;..\..\..\..\components\modules\sys\include;..\..\..\..\components\modules\platform\include;..\..\..\..\components\modules\common\include;..\..\..\..\components\modules\lowpow\include;..\..\..\..\components\modules\button;..\..\..\..\components\ble\include\gap;..\..\..\..\components\ble\include\gatt;..\..\..\..\components\ble\include\mesh;..\..\..\..\components\ble\profiles\ble_ota;..\code</IncludePath>
+              <IncludePath>..\..\..\..\components\ble\include;..\..\..\..\components\driver\include;..\..\..\..\components\modules\os\include;..\..\..\..\components\modules\sys\include;..\..\..\..\components\modules\platform\include;..\..\..\..\components\modules\common\include;..\..\..\..\components\modules\lowpow\include;..\..\..\..\components\modules\button;..\..\..\..\components\modules\sha256;..\..\..\..\components\ble\include\gap;..\..\..\..\components\ble\include\gatt;..\..\..\..\components\ble\include\mesh;..\..\..\..\components\ble\profiles\ble_ota;..\code</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -454,44 +454,14 @@
           <GroupName>driver</GroupName>
           <Files>
             <File>
+              <FileName>driver_codec.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\components\driver\driver_codec.c</FilePath>
+            </File>
+            <File>
               <FileName>driver_efuse.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\components\driver\driver_efuse.c</FilePath>
-            </File>
-            <File>
-              <FileName>driver_uart.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\components\driver\driver_uart.c</FilePath>
-            </File>
-            <File>
-              <FileName>driver_iic.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\components\driver\driver_iic.c</FilePath>
-            </File>
-            <File>
-              <FileName>driver_pmu.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\components\driver\driver_pmu.c</FilePath>
-            </File>
-            <File>
-              <FileName>driver_keyscan.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\components\driver\driver_keyscan.c</FilePath>
-            </File>
-            <File>
-              <FileName>driver_pmu_qdec.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\components\driver\driver_pmu_qdec.c</FilePath>
-            </File>
-            <File>
-              <FileName>driver_rtc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\components\driver\driver_rtc.c</FilePath>
-            </File>
-            <File>
-              <FileName>driver_wdt.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\components\driver\driver_wdt.c</FilePath>
             </File>
             <File>
               <FileName>driver_i2s.c</FileName>
@@ -499,9 +469,59 @@
               <FilePath>..\..\..\..\components\driver\driver_i2s.c</FilePath>
             </File>
             <File>
+              <FileName>driver_iic.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\components\driver\driver_iic.c</FilePath>
+            </File>
+            <File>
+              <FileName>driver_keyscan.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\components\driver\driver_keyscan.c</FilePath>
+            </File>
+            <File>
+              <FileName>driver_pmu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\components\driver\driver_pmu.c</FilePath>
+            </File>
+            <File>
+              <FileName>driver_pmu_pwm.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\components\driver\driver_pmu_pwm.c</FilePath>
+            </File>
+            <File>
+              <FileName>driver_pmu_qdec.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\components\driver\driver_pmu_qdec.c</FilePath>
+            </File>
+            <File>
               <FileName>driver_ssp.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\components\driver\driver_ssp.c</FilePath>
+            </File>
+            <File>
+              <FileName>driver_timer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\components\driver\driver_timer.c</FilePath>
+            </File>
+            <File>
+              <FileName>driver_wdt.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\components\driver\driver_wdt.c</FilePath>
+            </File>
+            <File>
+              <FileName>driver_rtc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\components\driver\driver_rtc.c</FilePath>
+            </File>
+            <File>
+              <FileName>driver_exti.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\components\driver\driver_exti.c</FilePath>
+            </File>
+            <File>
+              <FileName>driver_uart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\components\driver\driver_uart.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -537,6 +557,16 @@
               <FileName>fr8010h_stack.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\..\..\..\components\ble\library\fr8010h_stack.lib</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>module</GroupName>
+          <Files>
+            <File>
+              <FileName>sha256.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\components\modules\sha256\sha256.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -268,6 +268,29 @@ __INLINE uint8_t gpio_portd_get_dir(void)
  * @return  None.
  */
 void gpio_set_dir(enum system_port_t port, enum system_port_bit_t bit, uint8_t dir);
+/*********************************************************************
+ * @fn      gpio_get_pin_value
+ *
+ * @brief   get specific gpio pin vale.
+ *
+ * @param   port    - which port this channel belongs to. @ref system_port_t
+ *          bit     - channel number. @ref system_port_bit_t
+ *
+ * @return  gpio pin value. 0, pin is at low voltage; 1, pin is at high voltage;
+ */
+uint8_t gpio_get_pin_value(enum system_port_t port, enum system_port_bit_t bit);
+/*********************************************************************
+ * @fn      gpio_set_pin_value
+ *
+ * @brief   set specific gpio pin vale.
+ *
+ * @param   port    - which port this channel belongs to. @ref system_port_t
+ *          bit     - channel number. @ref system_port_bit_t
+ *          value   - high-low voltage value. 0, output as low voltage; 1 output as high voltage
+ *
+ * @return  None.
+ */
+void gpio_set_pin_value(enum system_port_t port, enum system_port_bit_t bit, uint8_t value);
 
 #endif //_DRIVER_GPIO_H
 

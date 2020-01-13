@@ -34,10 +34,13 @@
                 import PendSV_Handler
                 import SysTick_Handler
                 import rwble_isr_patch
+                import timer0_isr_ram
+                import timer1_isr_ram					
                 import uart0_isr_ram
                 import uart1_isr_ram
                 ;import pmu_isr_ram
                 import i2s_isr_ram
+                import exti_isr_ram					
                 import pdm_isr
 
 
@@ -73,8 +76,8 @@ __initial_sp    EQU     0x40004000
                 DCD     SysTick_Handler     ; SysTick Handler
                     
                 DCD     rwble_isr_patch                 ; 0
-                DCD     0                         ; 1
-                DCD     0                         ; 2
+                DCD     timer0_isr_ram                ; 1
+                DCD     timer1_isr_ram                ; 2
                 DCD     uart0_isr_ram                 ; 3
                 DCD     uart1_isr_ram                 ; 4
                 DCD     0                         ; 5
@@ -82,7 +85,7 @@ __initial_sp    EQU     0x40004000
                 DCD     0                         ; 7
                 DCD     0                         ; 8
                 DCD     i2s_isr_ram               ; 9
-                DCD     0                         ; 10
+                DCD     exti_isr_ram              ; 10
                 DCD     pmu_isr_ram               ; 11
                 DCD     0                         ; 12
                 DCD     pdm_isr				      ; 13

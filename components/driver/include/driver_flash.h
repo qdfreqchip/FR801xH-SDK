@@ -3,6 +3,7 @@
  *
  * All rights reserved.
  *
+ * NOTE: This driver is for inner flash operation through inner qspi interface.
  *
  */
 #ifndef _DRIVER_FLASH_H

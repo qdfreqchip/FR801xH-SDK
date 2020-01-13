@@ -100,7 +100,7 @@ typedef struct
 // Scan result, find remote advertising devide
 typedef struct 
 {
-    uint8_t evt_type;               //!< Bit field providing information about the received report (@see enum gapm_adv_report_info)
+    uint8_t evt_type;               //!< Bit field providing information about the received report (@see GAP_SCAN_EVT_TYPE_DEFINES)
     gap_mac_addr_t src_addr;        //!< Target address (in case of a directed advertising report)
     int8_t tx_pwr;                  //!< TX power (in dBm)
     int8_t rssi;                    //!< RSSI (between -127 and +20 dBm)

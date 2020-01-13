@@ -56,62 +56,11 @@ void proj_ble_gap_evt_func(gap_event_t *event)
             //gap_start_advertising(0);
         }
         break;
-        case GAP_EVT_SCAN_END:
-            co_printf("scan_end,status:0x%02x\r\n",event->param.scan_end_status);
-            break;
-        case GAP_EVT_ADV_REPORT:
-        {
-
-            if(memcmp(event->param.adv_rpt->src_addr.addr.addr,"\x0C\x0C\x0C\x0C\x0C\x0B",6)==0)
-            {
-                co_printf("evt_type:0x%02x,rssi:%d\r\n",event->param.adv_rpt->evt_type,event->param.adv_rpt->rssi);
-
-                co_printf("content:");
-                show_reg(event->param.adv_rpt->data,event->param.adv_rpt->length,1);
-            }
-
-        }
-        break;
-
-        case GAP_EVT_ALL_SVC_ADDED:
-        {
-            co_printf("all svc added\r\n");
-            extern uint8_t svc_id;
-            gatt_change_svc_uuid(svc_id,0,"\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55",16);
-            gatt_change_svc_uuid(svc_id,2,"\x44\x44\x44\x44\x44\x44\x44\x44\x44\x44\x44\x44\x44\x44\x44\x44",16);
-            gatt_change_svc_uuid(svc_id,6,"\x33\x33\x33\x33\x33\x33\x33\x33\x33\x33\x33\x33\x33\x33\x33\x33",16);
-            gatt_change_svc_uuid(svc_id,8,"\x22\x22",2);
-#ifdef USER_MEM_API_ENABLE
-            //    show_mem_list();
-            //      show_msg_list();
-            //      show_ke_malloc();
-#endif
-        }
-        break;
-
-        case GAP_EVT_MASTER_CONNECT:
-        {
-            co_printf("master[%d],connect. link_num:%d\r\n",event->param.master_connect.conidx,gap_get_connect_num());
-            master_link_conidx = (event->param.master_connect.conidx);
-            gap_conn_param_update(event->param.master_connect.conidx,6,6,50,500);
-#if 1
-            if (gap_security_get_bond_status())
-                gap_security_enc_req(event->param.master_connect.conidx);
-            else
-                gap_security_pairing_req(event->param.master_connect.conidx);
-#else
-            extern uint8_t client_id;
-            gatt_discovery_all_peer_svc(client_id,event->param.master_encrypt_conidx);
-#endif
-        }
-        break;
 
         case GAP_EVT_SLAVE_CONNECT:
         {
             co_printf("slave[%d],connect. link_num:%d\r\n",event->param.slave_connect.conidx,gap_get_connect_num());
             slave_link_conidx = event->param.slave_connect.conidx;
-            gatt_mtu_exchange_req(event->param.slave_connect.conidx);
-            gap_conn_param_update(event->param.slave_connect.conidx, 12, 12, 0, 500);
         }
         break;
 
@@ -128,46 +77,6 @@ void proj_ble_gap_evt_func(gap_event_t *event)
             //gap_start_advertising(0);
         }
         break;
-
-        case GAP_EVT_LINK_PARAM_REJECT:
-            co_printf("Link[%d]param reject,status:0x%02x\r\n"
-                      ,event->param.link_reject.conidx,event->param.link_reject.status);
-            break;
-
-        case GAP_EVT_LINK_PARAM_UPDATE:
-            co_printf("Link[%d]param update,interval:%d,latency:%d,timeout:%d\r\n",event->param.link_update.conidx
-                      ,event->param.link_update.con_interval,event->param.link_update.con_latency,event->param.link_update.sup_to);
-            break;
-
-        case GAP_EVT_CONN_END:
-            co_printf("conn_end,reason:0x%02x\r\n",event->param.conn_end_reason);
-            break;
-
-        case GAP_EVT_PEER_FEATURE:
-            co_printf("peer[%d] feats ind\r\n",event->param.peer_feature.conidx);
-            show_reg((uint8_t *)&(event->param.peer_feature.features),8,1);
-            break;
-
-        case GAP_EVT_MTU:
-            co_printf("mtu update,conidx=%d,mtu=%d\r\n"
-                      ,event->param.mtu.conidx,event->param.mtu.value);
-            break;
-        case GAP_EVT_LINK_RSSI:
-            co_printf("link rssi %d\r\n",event->param.link_rssi);
-            break;
-        case GAP_SEC_EVT_MASTER_AUTH_REQ:
-            co_printf("link[%d],recv auth req:0x%02x\r\n",event->param.auth_req.conidx,event->param.auth_req.auth);
-            break;
-        case GAP_SEC_EVT_MASTER_ENCRYPT:
-            co_printf("master[%d]_encrypted\r\n",event->param.master_encrypt_conidx);
-            //extern uint8_t client_id;
-            //gatt_discovery_all_peer_svc(client_id,event->param.master_encrypt_conidx);
-            //uint8_t group_uuid[] = {0xb7, 0x5c, 0x49, 0xd2, 0x04, 0xa3, 0x40, 0x71, 0xa0, 0xb5, 0x35, 0x85, 0x3e, 0xb0, 0x83, 0x07};
-            //gatt_discovery_peer_svc(client_id,event->param.master_encrypt_conidx,16,group_uuid);
-            break;
-        case GAP_SEC_EVT_SLAVE_ENCRYPT:
-            co_printf("slave[%d]_encrypted\r\n",event->param.slave_encrypt_conidx);
-            break;
 
         default:
             break;
@@ -187,12 +96,8 @@ void proj_ble_gap_evt_func(gap_event_t *event)
  */
 void user_custom_parameters(void)
 {
-    __jump_table.addr.addr[0] = 0x01;
-    __jump_table.addr.addr[1] = 0x01;
-    __jump_table.addr.addr[2] = 0x01;
-    __jump_table.addr.addr[3] = 0x01;
-    __jump_table.addr.addr[4] = 0x01;
-    __jump_table.addr.addr[5] = 0xc1;
+    extern void ali_mesh_get_addr(uint8_t *);
+    ali_mesh_get_addr(&__jump_table.addr.addr[0]);
     
     __jump_table.image_size = 0x19000;  // 100KB
     __jump_table.firmware_version = 0x00010000;
@@ -320,7 +225,7 @@ void user_entry_after_ble_init(void)
 
     gap_set_cb_func(proj_ble_gap_evt_func);
 
-    prf_server_create();
+    //prf_server_create();
     ali_mesh_led_init();
 
     mac_addr_t addr;

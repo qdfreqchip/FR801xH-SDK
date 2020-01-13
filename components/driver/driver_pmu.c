@@ -182,11 +182,11 @@ void pmu_set_port_mux(enum system_port_t port, enum system_port_bit_t bit, enum 
 }
 
 /*********************************************************************
- * @fn      pmu_set_pin_output
+ * @fn      pmu_set_pin_dir
  *
  * @brief   set the in-out of IOs which are controlled by PMU and in GPIO mode.
  *          example usage:
- *          pmu_set_pin_output(GPIO_PORT_A, (1<<GPIO_BIT_0) | (1<<GPIO_BIT_1), GPIO_DIR_OUT)
+ *          pmu_set_pin_dir(GPIO_PORT_A, (1<<GPIO_BIT_0) | (1<<GPIO_BIT_1), GPIO_DIR_OUT)
  *
  * @param   port    - which group the io belongs to, @ref system_port_t
  *          bits    - the numbers of io
@@ -194,7 +194,7 @@ void pmu_set_port_mux(enum system_port_t port, enum system_port_bit_t bit, enum 
  *
  * @return  None.
  */
-void pmu_set_pin_output(enum system_port_t port, uint8_t bits, uint8_t dir)
+void pmu_set_pin_dir(enum system_port_t port, uint8_t bits, uint8_t dir)
 {
     uint8_t sel_reg = PMU_REG_PORTA_OEN;
     sel_reg += port;
@@ -587,7 +587,7 @@ extern void onkey_isr_ram(void);
 extern void pmu_gpio_isr_ram(void);
 
 
-__attribute__((weak)) void charge_isr_ram(uint8_t type)
+__attribute__((weak)) __attribute__((section("ram_code"))) void charge_isr_ram(uint8_t type)
 {
     if(type == 2)
     {
@@ -603,23 +603,23 @@ __attribute__((weak)) void charge_isr_ram(uint8_t type)
     }
 }
 
-__attribute__((weak)) void lvd_isr_ram(void)
+__attribute__((weak)) __attribute__((section("ram_code"))) void lvd_isr_ram(void)
 {
     co_printf("lvd\r\n");
     pmu_disable_isr(PMU_ISR_LVD_EN);
 }
 
-__attribute__((weak)) void otd_isr_ram(void)
+__attribute__((weak)) __attribute__((section("ram_code"))) void otd_isr_ram(void)
 {
     co_printf("otd\r\n");
     pmu_disable_isr(PMU_ISR_OTP_EN);
 }
-__attribute__((weak)) void pmu_gpio_isr_ram(void)
+__attribute__((weak)) __attribute__((section("ram_code"))) void pmu_gpio_isr_ram(void)
 {
     co_printf("gpio new value = 0x%08x.\r\n", ool_read32(PMU_REG_GPIOA_V));
 }
 
-__attribute__((weak)) void onkey_isr_ram(void)
+__attribute__((weak)) __attribute__((section("ram_code"))) void onkey_isr_ram(void)
 {
     if(ool_read(PMU_REG_ANA_RAW_STATUS) & PMU_ONKEY_RAW_STATUS)
     {

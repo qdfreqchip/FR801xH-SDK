@@ -96,7 +96,7 @@ uint8_t pmu_qdec_get_cnt(enum pmu_qdec_direction dir)
 /*
     weak func    pmu_qdec isr entry
 */
-__attribute__((weak)) void qdec_isr_ram(void)
+__attribute__((weak)) __attribute__((section("ram_code"))) void qdec_isr_ram(void)
 {
     co_printf("%x,%x\r\n",pmu_qdec_get_cnt(QDEC_DIR_A),pmu_qdec_get_cnt(QDEC_DIR_B));
 }

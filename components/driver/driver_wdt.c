@@ -95,17 +95,16 @@ void wdt_stop(void)
  *
  * @return  None.
  */
-__attribute__((weak)) void wdt_isr_ram(unsigned int* hardfault_args)
+__attribute__((weak)) __attribute__((section("ram_code"))) void wdt_isr_ram(unsigned int* hardfault_args)
 {
-    LOG_ERR("wdt_rest\r\n\r\n");
-    LOG_ERR("PC    = 0x%.8X\r\n",hardfault_args[6]);
-    LOG_ERR("LR    = 0x%.8X\r\n",hardfault_args[5]);
-    LOG_ERR("R0    = 0x%.8X\r\n",hardfault_args[0]);
-    LOG_ERR("R1    = 0x%.8X\r\n",hardfault_args[1]);
-    LOG_ERR("R2    = 0x%.8X\r\n",hardfault_args[2]);
-    LOG_ERR("R3    = 0x%.8X\r\n",hardfault_args[3]);
-    LOG_ERR("R12   = 0x%.8X\r\n",hardfault_args[4]);
-
+    co_printf("wdt_rest\r\n\r\n");
+    co_printf("PC    = 0x%08X\r\n",hardfault_args[6]);
+    co_printf("LR    = 0x%08X\r\n",hardfault_args[5]);
+    co_printf("R0    = 0x%08X\r\n",hardfault_args[0]);
+    co_printf("R1    = 0x%08X\r\n",hardfault_args[1]);
+    co_printf("R2    = 0x%08X\r\n",hardfault_args[2]);
+    co_printf("R3    = 0x%08X\r\n",hardfault_args[3]);
+    co_printf("R12   = 0x%08X\r\n",hardfault_args[4]);
     /* reset the system */
     ool_write(PMU_REG_RST_CTRL, ool_read(PMU_REG_RST_CTRL) & (~ PMU_RST_WDT_EN) );
 }

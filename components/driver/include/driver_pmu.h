@@ -112,11 +112,11 @@ void pmu_set_pin_to_CPU(enum system_port_t port, uint8_t bits);
 void pmu_set_port_mux(enum system_port_t port, enum system_port_bit_t bit, enum pmu_gpio_mux_t func);
 
 /*********************************************************************
- * @fn      pmu_set_pin_output
+ * @fn      pmu_set_pin_dir
  *
  * @brief   set the in-out of IOs which are controlled by PMU.
  *          example usage:
- *          pmu_set_pin_output(GPIO_PORT_A, (1<<GPIO_BIT0)|((1<<GPIO_BIT1), GPIO_DIR_OUT)
+ *          pmu_set_pin_dir(GPIO_PORT_A, (1<<GPIO_BIT0)|((1<<GPIO_BIT1), GPIO_DIR_OUT)
  *
  * @param   port    - which group the io belongs to, @ref system_port_t
  *          bits    - the numbers of io
@@ -124,7 +124,7 @@ void pmu_set_port_mux(enum system_port_t port, enum system_port_bit_t bit, enum 
  *
  * @return  None.
  */
-void pmu_set_pin_output(enum system_port_t port, uint8_t bits, uint8_t dir);
+void pmu_set_pin_dir(enum system_port_t port, uint8_t bits, uint8_t dir);
 
 /*********************************************************************
  * @fn      pmu_set_pin_pull

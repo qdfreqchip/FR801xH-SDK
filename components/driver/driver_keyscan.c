@@ -156,7 +156,7 @@ void keyscan_init(keyscan_param_t *param)
  *
  * @return  None.
  */
-__attribute__((weak)) void keyscan_isr_ram(void)
+__attribute__((weak)) __attribute__((section("ram_code"))) void keyscan_isr_ram(void)
 {
     uint32_t value;
     uint8_t reg = PMU_REG_KEYSCAN_STATUS_0;

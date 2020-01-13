@@ -16,6 +16,7 @@
 #include <string.h>
 #include <stdint.h>
 
+#include "gap_api.h"
 
 /*
  * MACROS (∫Í∂®“Â)
@@ -49,6 +50,7 @@ enum mesh_event_type_t
     MESH_EVT_UPDATE_IND,                //!< Received information update event, can be keys updated..
     MESH_EVT_RECV_MSG,                  //!< Received a mesh message. 10
     MESH_EVT_COMPO_DATA_REQ,            //!< Received composition data request from provisioner.
+    MESH_EVT_ADV_REPORT,                //!< User interface for deal ADV packets received from adv bearer.
 };
 
 // Mesh supported feature type define.
@@ -103,8 +105,20 @@ typedef struct
     uint32_t    model_id;       //!< Model ID of the received message.
     uint32_t    opcode;         //!< Mesh message operation code (can be 1, 2 or 3 octet operation code).
     uint16_t    msg_len;        //!< Message length.
-    uint8_t     *p_msg;         //!< Message data.
+    uint8_t     msg[];          //!< Message data.
 } mesh_publish_msg_t;
+
+// Mesh response message type define
+typedef struct
+{
+    uint8_t     element_idx;    //!< Element index of the sending message.
+    uint8_t     app_key_lid;    //!< App key index of the sending message.
+    uint32_t    model_id;       //!< Model ID of the sending message.
+    uint32_t    opcode;         //!< Mesh message operation code (can be 1, 2 or 3 octet operation code).
+    uint16_t    dst_addr;       //!< Destination address of the sending message.
+    uint16_t    msg_len;        //!< Message length.
+    uint8_t     msg[];          //!< Message data.
+} mesh_rsp_msg_t;
 
 // Mesh receive message type define
 typedef struct
@@ -154,6 +168,7 @@ typedef struct
         void *update_ind;                   //!< Mesh status update indication message.
         mesh_model_msg_ind_t model_msg;     //!< Mesh model message.
         uint8_t compo_data_req_page;        //!< Mesh composition data request page.
+        gap_evt_adv_report_t adv_report;    //!< ADV report from adv bearer.
     } param;
 } mesh_event_t;
 
@@ -277,6 +292,17 @@ void mesh_add_model(const mesh_model_t *p_model);
  * @return  None.
  */
 void mesh_publish_msg(mesh_publish_msg_t *p_publish_msg);
+
+/*********************************************************************
+ * @fn      mesh_send_rsp
+ *
+ * @brief   Send a response message in mesh network.
+ *
+ * @param   p_rsp_msg   - Address of message to be send.
+ *
+ * @return  None.
+ */
+void mesh_send_rsp(mesh_rsp_msg_t *p_rsp_msg);
 
 /*********************************************************************
  * @fn      mesh_send_prov_param_rsp

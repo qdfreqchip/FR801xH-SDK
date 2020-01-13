@@ -19,8 +19,6 @@
 /*
  * MACROS (�궨��)
  */
-#define SSP_FIFO_SIZE           128
-
 /*
  * TYPEDEFS (���Ͷ���)
  */
@@ -189,6 +187,22 @@ void ssp_send_then_recv(uint8_t* tx_buffer, uint32_t n_tx, uint8_t* rx_buffer, u
         ssp_env.ssp_cs_ctrl(SSP_CS_DISABLE);
     }
 }
+void ssp_get_data_(unsigned char* buf, uint32_t size)
+{
+    unsigned char c;
+    volatile struct ssp * const ssp = (volatile struct ssp *)SSP0_BASE;
+    while(size > 0)
+    {
+        //while((ssp->status.rne == 0) && (ssp->status.tnf == 1));
+        while(ssp->status.rne == 0);
+        if(ssp->status.rne != 0)    // receive fifo is not empty
+        {
+            c = ssp->data.data;
+            *buf++ = c;
+            size --;
+        }
+    }
+}
 
 /*********************************************************************
  * @fn      ssp_recv_data
@@ -321,7 +335,7 @@ __attribute__((section("ram_code"))) void ssp_send_bytes(const uint8_t *tx_buf, 
 
     while(length--)
     {
-        //while(ssp->status.tnf == 0);
+        while(ssp->status.tnf == 0);
         *tx_fifo_addr = *tx_buf++;
     }
 }
@@ -515,7 +529,7 @@ void ssp_init_(uint8_t bit_width, uint8_t frame_type, uint8_t ms, uint32_t bit_r
 
     /* clock rate */
     ssp->clock_prescale.cpsdvsr = prescale;
-    ssp->ctrl0.scr = ((system_get_pclk()/(prescale*bit_rate)) - 1);
+    ssp->ctrl0.scr = (system_get_pclk()/(prescale*bit_rate)) - 1;
 
     if(ms == 0x1)
         ssp->ctrl1.sod = 0x0;   //slave mode, slave can send

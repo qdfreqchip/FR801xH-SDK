@@ -47,6 +47,7 @@ void pwm_update(enum pwm_channel_t channel, uint32_t frequency, uint8_t high_dut
 {
     uint32_t total_count;
     uint32_t high_count;
+    GLOBAL_INT_DISABLE();
 
     total_count = system_get_pclk() / frequency;
     if(high_duty < 100) {
@@ -58,6 +59,7 @@ void pwm_update(enum pwm_channel_t channel, uint32_t frequency, uint8_t high_dut
 
     pwm_ctrl->channel[channel].total_cnt = total_count;
     pwm_ctrl->channel[channel].high_cnt = high_count;
+    GLOBAL_INT_RESTORE();
 }
 
 void pwm_start(enum pwm_channel_t channel)

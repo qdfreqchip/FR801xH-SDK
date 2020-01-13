@@ -305,14 +305,14 @@ uint8_t timer_init(uint32_t timer_addr, uint32_t count_us, uint8_t run_mode)
     return true;
 }
 
-__attribute__((section("ram_code"))) void timer0_isr(void)
+__attribute__((weak)) __attribute__((section("ram_code"))) void timer0_isr_ram(void)
 {
     timer_clear_interrupt(TIMER0);
 
     co_printf("0\r\n");
 }
 
-__attribute__((section("ram_code"))) void timer1_isr(void)
+__attribute__((weak)) __attribute__((section("ram_code"))) void timer1_isr_ram(void)
 {
     timer_clear_interrupt(TIMER1);
 

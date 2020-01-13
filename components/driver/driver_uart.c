@@ -3,7 +3,7 @@
 #include "driver_uart.h"
 
 
-__attribute__((weak)) void uart1_isr_ram(void)
+__attribute__((weak)) __attribute__((section("ram_code"))) void uart1_isr_ram(void)
 {
     uint8_t int_id;
     uint8_t c;
@@ -22,7 +22,7 @@ __attribute__((weak)) void uart1_isr_ram(void)
     }
 }
 
-__attribute__((weak)) void uart0_isr_ram(void)
+__attribute__((weak)) __attribute__((section("ram_code"))) void uart0_isr_ram(void)
 {
     uint8_t int_id;
     uint8_t c;

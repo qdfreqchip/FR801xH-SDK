@@ -6,6 +6,8 @@
 /*
  * TYPEDEFS (类型定义)
  */
+#define SSP_FIFO_SIZE           128
+
 enum ssp_frame_type_t
 {
     SSP_FRAME_MOTO,
@@ -130,6 +132,7 @@ void ssp_wait_send_end(void);
 void ssp_init_(uint8_t bit_width, uint8_t frame_type, uint8_t ms, uint32_t bit_rate, uint8_t prescale, void (*ssp_cs_ctrl)(uint8_t));
 
 void ssp_test(uint8_t *buffer, uint32_t length);
+void ssp_get_data_(unsigned char* buf, uint32_t size);
 
 #endif
 

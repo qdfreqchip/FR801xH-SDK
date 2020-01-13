@@ -94,7 +94,7 @@ void rtc_disalarm(enum rtc_idx_t rtc_idx)
     ool_write(PMU_REG_RTC_SETTINGS, ool_read(PMU_REG_RTC_SETTINGS) & (~ CO_BIT(rtc_idx+2) ) );
 }
 
-__attribute__((weak)) void rtc_isr_ram(uint8_t rtc_idx)
+__attribute__((weak)) __attribute__((section("ram_code"))) void rtc_isr_ram(uint8_t rtc_idx)
 {
     if(rtc_idx == RTC_A)
     {
