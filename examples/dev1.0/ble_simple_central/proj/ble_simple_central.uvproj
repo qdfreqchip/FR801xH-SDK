@@ -491,6 +491,16 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\components\driver\driver_i2s.c</FilePath>
             </File>
+            <File>
+              <FileName>driver_exti.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\components\driver\driver_exti.c</FilePath>
+            </File>
+            <File>
+              <FileName>driver_timer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\components\driver\driver_timer.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
