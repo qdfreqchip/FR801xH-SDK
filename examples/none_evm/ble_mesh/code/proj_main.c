@@ -25,9 +25,13 @@
 #include "driver_pmu.h"
 #include "driver_uart.h"
 
+#include "ali_mesh_info.h"
+
 uint8_t slave_link_conidx;
 uint8_t master_link_conidx;
 uint8_t tick = 1;
+
+void app_mesh_led_init(void);
 
 void proj_ble_gap_evt_func(gap_event_t *event)
 {
@@ -96,12 +100,15 @@ void proj_ble_gap_evt_func(gap_event_t *event)
  */
 void user_custom_parameters(void)
 {
-    extern void ali_mesh_get_addr(uint8_t *);
-    ali_mesh_get_addr(&__jump_table.addr.addr[0]);
+    app_mesh_ali_info_load_bdaddr(&__jump_table.addr.addr[0]);
     
     __jump_table.image_size = 0x19000;  // 100KB
     __jump_table.firmware_version = 0x00010000;
     __jump_table.system_clk = SYSTEM_SYS_CLK_48M;
+
+    __jump_table.diag_port = 0x83000000;
+
+    jump_table_set_static_keys_store_offset(MESH_SECRET_KEY_ADDR);
 }
 
 /*********************************************************************
@@ -120,6 +127,12 @@ void user_custom_parameters(void)
 __attribute__((section("ram_code"))) void user_entry_before_sleep_imp(void)
 {
     uart_putc_noint_no_wait(UART1, 's');
+
+    /* process in normal procedure after wakeup */
+    ool_write(PMU_REG_SYSTEM_STATUS, 0xaa);
+
+    /* sleep forever */
+    ool_write32(PMU_REG_SLP_VAL_0, 0);
 }
 
 /*********************************************************************
@@ -185,7 +198,6 @@ void user_entry_before_ble_init(void)
                    | PMU_ISR_BIT_LVD
                    | PMU_ISR_BIT_BAT
                    | PMU_ISR_BIT_ONKEY_HIGH);
-    NVIC_EnableIRQ(PMU_IRQn);
     
     /* AT command interface */
     app_at_init();
@@ -226,9 +238,10 @@ void user_entry_after_ble_init(void)
     gap_set_cb_func(proj_ble_gap_evt_func);
 
     //prf_server_create();
-    ali_mesh_led_init();
+    app_mesh_led_init();
 
     mac_addr_t addr;
     gap_address_get(&addr);
     show_reg(&addr.addr[0], 6, 1);
 }
+

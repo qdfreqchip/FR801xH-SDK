@@ -73,6 +73,14 @@ void co_list_push_back(struct co_list *list, struct co_list_hdr *list_hdr);
  ****************************************************************************************
  */
 struct co_list_hdr *co_list_pop_front(struct co_list *list);
+
+/**
+ ****************************************************************************************
+ * @brief Test if the list is empty.
+ * @param list           Pointer to the list structure.
+ * @return true if the list is empty, false else otherwise.
+ ****************************************************************************************
+ */
 __INLINE bool co_list_is_empty(const struct co_list *const list)
 {
     bool listempty;
@@ -80,5 +88,18 @@ __INLINE bool co_list_is_empty(const struct co_list *const list)
     return (listempty);
 }
 
+/**
+ ****************************************************************************************
+ * @brief Pick the first element from the list without removing it.
+ *
+ * @param list           Pointer to the list structure.
+ *
+ * @return First element address. Returns NULL pointer if the list is empty.
+ ****************************************************************************************
+ */
+__INLINE struct co_list_hdr *co_list_pick(const struct co_list *const list)
+{
+    return(list->first);
+}
 
 #endif

@@ -24,6 +24,9 @@ extern void ke_free_user(void* mem_ptr);
 void pmu_calibration_start(uint8_t type, uint16_t counter);
 void pmu_calibration_stop(void);
 
+void enable_cache(uint8_t invalid_ram);
+void disable_cache(void);
+
 /*
  * keil debug breakpoint will take place FPB entry at the beginning of patch table with increasing
  * direction, so use patch entry point start at the end of patch table with decreasing direction.
@@ -175,22 +178,10 @@ __attribute__((section("ram_code"))) void low_power_restore_entry_imp(uint8_t ty
     {
 #ifndef KEEP_CACHE_SRAM_RETENTION
         // manul enable the cache and invalidating the SRAM
-        *(volatile uint32_t *)0x500a0000 = 0x38;
-        *(volatile uint32_t *)0x500a0000 = 0x3c;
-        while(((*(volatile uint32_t *)0x500a0004) & 0x10) == 0);
-        *(volatile uint32_t *)0x500a0000 = 0x3e;
-        while((*(volatile uint32_t *)0x500a0000) & 0x02);
-        *(volatile uint32_t *)0x500a0000 = 0x3d;
-        while(((*(volatile uint32_t *)0x500a0004) & 0x03) != 0x02);
+        enable_cache(true);
 #else
         // manul enable the cache without invalidating the SRAM
-        *(volatile uint32_t *)0x500a0000 = 0x38;
-        *(volatile uint32_t *)0x500a0000 = 0x3c;
-        while(((*(volatile uint32_t *)0x500a0004) & 0x10) == 0);
-        //*(volatile uint32_t *)0x500a0000 = 0x1e;
-        //while((*(volatile uint32_t *)0x500a0000) & 0x02);
-        *(volatile uint32_t *)0x500a0000 = 0x3d;
-        while(((*(volatile uint32_t *)0x500a0004) & 0x03) != 0x02);
+        enable_cache(false);
 #endif
     }
     else if(type == LOW_POWER_RESTORE_ENTRY_DRIVER)
@@ -226,22 +217,10 @@ __attribute__((section("ram_code"))) void low_power_restore_entry_imp(uint8_t ty
     {
 #ifndef KEEP_CACHE_SRAM_RETENTION
         // manul enable the cache and invalidating the SRAM
-        *(volatile uint32_t *)0x500a0000 = 0x38;
-        *(volatile uint32_t *)0x500a0000 = 0x3c;
-        while(((*(volatile uint32_t *)0x500a0004) & 0x10) == 0);
-        *(volatile uint32_t *)0x500a0000 = 0x3e;
-        while((*(volatile uint32_t *)0x500a0000) & 0x02);
-        *(volatile uint32_t *)0x500a0000 = 0x3d;
-        while(((*(volatile uint32_t *)0x500a0004) & 0x03) != 0x02);
+        enable_cache(true);
 #else
         // manul enable the cache without invalidating the SRAM
-        *(volatile uint32_t *)0x500a0000 = 0x38;
-        *(volatile uint32_t *)0x500a0000 = 0x3c;
-        while(((*(volatile uint32_t *)0x500a0004) & 0x10) == 0);
-        //*(volatile uint32_t *)0x500a0000 = 0x1e;
-        //while((*(volatile uint32_t *)0x500a0000) & 0x02);
-        *(volatile uint32_t *)0x500a0000 = 0x3d;
-        while(((*(volatile uint32_t *)0x500a0004) & 0x03) != 0x02);
+        enable_cache(false);
 #endif
     }
     else if(type == LOW_POWER_RESTORE_ENTRY_DRIVER)
@@ -270,5 +249,25 @@ __attribute__((section("ram_code"))) __attribute__((weak)) void user_entry_after
 
     //uart_putc_noint_no_wait(UART0, 'w');
     //pmu_calibration_start(PMU_CALI_SRC_LP_RC, __jump_table.lp_clk_calib_cnt);
+}
+
+__attribute__((section("ram_code"))) void flash_write(uint32_t offset, uint32_t length, uint8_t * buffer)
+{
+    void (*flash_write_)(uint32_t offset, uint32_t length, uint8_t * buffer) = (void (*)(uint32_t, uint32_t, uint8_t *))0x00004899;
+    disable_cache();
+    GLOBAL_INT_DISABLE();
+    flash_write_(offset, length, buffer);
+    GLOBAL_INT_RESTORE();
+    enable_cache(true);
+}
+
+__attribute__((section("ram_code"))) void flash_erase(uint32_t offset, uint32_t length)
+{
+    void (*flash_erase_)(uint32_t offset, uint32_t length) = (void (*)(uint32_t, uint32_t))0x00004775;
+    disable_cache();
+    GLOBAL_INT_DISABLE();
+    flash_erase_(offset, length);
+    GLOBAL_INT_RESTORE();
+    enable_cache(true);
 }
 

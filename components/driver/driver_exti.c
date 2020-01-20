@@ -6,7 +6,7 @@
 #include "co_printf.h"
 
 
-struct ext_int_t *const ext_int_reg = (struct ext_int_t *)EXTI_BASE;
+volatile struct ext_int_t *const ext_int_reg = (struct ext_int_t *)EXTI_BASE;
 
 void ext_int_set_port_mux(enum exti_channel_t exti_channel,enum exti_mux_t exti_io)
 {

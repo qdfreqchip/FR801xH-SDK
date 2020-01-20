@@ -137,7 +137,7 @@
           </Simulator>
           <Target>
             <UseTarget>1</UseTarget>
-            <LoadApplicationAtStartup>1</LoadApplicationAtStartup>
+            <LoadApplicationAtStartup>0</LoadApplicationAtStartup>
             <RunToMain>0</RunToMain>
             <RestoreBreakpoints>1</RestoreBreakpoints>
             <RestoreWatchpoints>1</RestoreWatchpoints>
@@ -170,7 +170,7 @@
             <UseTargetDll>1</UseTargetDll>
             <UseExternalTool>0</UseExternalTool>
             <RunIndependent>0</RunIndependent>
-            <UpdateFlashBeforeDebugging>1</UpdateFlashBeforeDebugging>
+            <UpdateFlashBeforeDebugging>0</UpdateFlashBeforeDebugging>
             <Capability>0</Capability>
             <DriverSelection>-1</DriverSelection>
           </Flash1>
@@ -424,6 +424,16 @@
               <FilePath>..\code\ali_mesh_led.c</FilePath>
             </File>
             <File>
+              <FileName>ali_mesh_info.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\code\ali_mesh_info.c</FilePath>
+            </File>
+            <File>
+              <FileName>ali_mesh_led_driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\code\ali_mesh_led_driver.c</FilePath>
+            </File>
+            <File>
               <FileName>app_at.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\code\app_at.c</FilePath>
@@ -522,6 +532,11 @@
               <FileName>driver_uart.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\components\driver\driver_uart.c</FilePath>
+            </File>
+            <File>
+              <FileName>driver_pwm.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\components\driver\driver_pwm.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -42,8 +42,8 @@ enum mesh_event_type_t
     MESH_EVT_STOPPED,                   //!< Mesh stopped.
     MESH_EVT_RESET,                     //!< Received reset command from provisioner.
     MESH_EVT_READY,                     //!< Mesh is ready, can be started.
-    MESH_EVT_MODEL_APPKEY_BINDED,       //!< Model is binded with an appkey.
-    MESH_EVT_MODEL_GRPADDR_SUBED,       //!< Model has subscribed to a group addr.  5
+    MESH_EVT_MODEL_APPKEY_BINDED,       //!< Model is binded with an appkey, used in ali mesh provisioning procedure
+    MESH_EVT_MODEL_GRPADDR_SUBED,       //!< Model has subscribed to a group addr, used in ali mesh provisioning procedure. 5
     MESH_EVT_PROV_PARAM_REQ,            //!< Received provision parameter request from provisioner.
     MESH_EVT_PROV_AUTH_DATA_REQ,        //!< Received authentication data request from provisioner.
     MESH_EVT_PROV_RESULT,               //!< Received provision result.
@@ -51,6 +51,18 @@ enum mesh_event_type_t
     MESH_EVT_RECV_MSG,                  //!< Received a mesh message. 10
     MESH_EVT_COMPO_DATA_REQ,            //!< Received composition data request from provisioner.
     MESH_EVT_ADV_REPORT,                //!< User interface for deal ADV packets received from adv bearer.
+};
+
+// Mesh network information update type
+enum mesh_update_type_t {
+    MESH_UPD_TYPE_NET_KEY_UPDATED,      //!< Network key updated
+    MESH_UPD_TYPE_NET_KEY_DELETED,      //!< Network key deleted
+    MESH_UPD_TYPE_APP_KEY_UPDATED,      //!< Application key updated
+    MESH_UPD_TYPE_APP_KEY_DELETED,      //!< Application key deleted
+    MESH_UPD_TYPE_PUBLI_PARAM,          //!< Model publication parameters updated
+    MESH_UPD_TYPE_SUBS_LIST,            //!< Model subscription list updated
+    MESH_UPD_TYPE_BINDING,              //!< Model/application key binding updated
+    MESH_UPD_TYPE_STATE,                //!< State updated
 };
 
 // Mesh supported feature type define.
@@ -129,14 +141,6 @@ typedef struct
     uint8_t     *p_msg;         //!< Message data.
 } mesh_recv_msg_t;
 
-// Mesh model struct.
-typedef struct
-{
-    uint32_t        model_id;       //!< Model ID of the model to be added.
-    uint8_t         model_vendor;   //!< If it is SIG model or vendor specific model. @MODEL_VENDOR_MODE
-    uint8_t         element_idx;    //!< Element index in the mesh device.
-} mesh_model_t;
-
 /// Mesh Provisioning state change indication
 typedef struct
 {
@@ -158,6 +162,105 @@ typedef struct
     const uint8_t  *msg;                //!< Message content 
 } mesh_model_msg_ind_t;
 
+/// Network key information entry structure if network key is not being updated
+typedef struct mesh_netkey
+{
+    uint8_t  length;            //!< Entry length
+    uint8_t  info;              //!< Information
+    uint16_t netkey_id;         //!< NetKey ID
+    uint8_t  key[16];           //!< Network Key
+} mesh_netkey_t;
+
+/// Network key information entry structure if network key is being updated
+typedef struct mesh_netkey_upd
+{
+    uint8_t  length;            //!< Entry length
+    uint8_t  info;              //!< Information
+    uint16_t netkey_id;         //!< NetKey ID
+    uint8_t  key[16];           //!< Network Key
+    uint8_t  new_key[16];       //!< New network key
+} mesh_netkey_upd_t;
+
+/// Application key information entry structure if application key is not being updated
+typedef struct mesh_appkey
+{
+    uint8_t  length;            //!< Entry length
+    uint8_t  info;              //!< Information
+    uint16_t netkey_id;         //!< NetKey ID
+    uint16_t appkey_id;         //!< AppKey ID
+    uint8_t  key[16];           //!< Application Key
+} mesh_appkey_t;
+
+/// Application key information entry structure if application key is being updated
+typedef struct mesh_appkey_upd
+{
+    uint8_t  length;                //!< Entry length
+    uint8_t  info;                  //!< Information
+    uint16_t netkey_id;             //!< NetKey ID
+    uint16_t appkey_id;             //!< AppKey ID
+    uint8_t  key[16];               //!< Application Key
+    uint8_t  new_key[16];           //!< New application key
+} mesh_appkey_upd_t;
+
+/// Model publication parameter entry structure if publication address is not a virtual address
+typedef struct mesh_publi
+{
+    uint8_t  length;        //!< Entry length
+    uint8_t  info;          //!< Information
+    uint16_t element_addr;  //!< Element address
+    uint32_t model_id;      //!< Model ID
+    uint16_t addr;          //!< Publication address
+    uint16_t appkey_id;     //!< AppKey ID
+    uint8_t  ttl;           //!< TTL
+    uint8_t  period;        //!< Period
+    uint8_t  retx_params;   //!< Retransmission parameters
+    uint8_t  friend_cred;   //!< Friend credentials
+} mesh_publi_t;
+
+/// Model publication parameter entry structure if publication address is a virtual address
+typedef struct mesh_publi_virt
+{
+    uint8_t  length;        //!< Entry length
+    uint8_t  info;          //!< Information
+    uint16_t element_addr;  //!< Element address
+    uint32_t model_id;      //!< Model ID
+    uint16_t addr;          //!< Publication address
+    uint16_t appkey_id;     //!< AppKey ID
+    uint8_t  ttl;           //!< TTL
+    uint8_t  period;        //!< Period
+    uint8_t  retx_params;   //!< Retransmission parameters
+    uint8_t  friend_cred;   //!< Friend credentials
+    uint8_t  label_uuid[16];//!< Label UUID
+} mesh_publi_virt_t;
+
+/// Model subscription list entry structure
+typedef struct mesh_subs
+{
+    uint8_t  length;                //!< Entry length
+    uint8_t  info;                  //!< Information
+    uint16_t element_addr;          //!< Element address
+    uint32_t model_id;              //!< Model ID
+    uint8_t  list[];                //!< List
+} mesh_subs_t;
+
+/// Model/Application key binding entry structure
+typedef struct mesh_binding
+{
+    uint8_t  length;                    //!< Entry length
+    uint8_t  info;                      //!< Information
+    uint16_t element_addr;              //!< Element address
+    uint32_t model_id;                  //!< Model ID
+    uint16_t appkey_ids[];              //!< List of AppKey IDs
+} mesh_binding_t;
+
+/// Configuration update indication message structure
+typedef struct mesh_update_ind
+{
+    uint8_t upd_type;           //!< Update type
+    uint8_t length;             //!< Entry length
+    uint8_t data[];             //!< Entry value
+} mesh_update_ind_t;
+
 // Mesh event structure
 typedef struct
 {
@@ -165,12 +268,21 @@ typedef struct
     union
     {
         mesh_prov_result_ind_t prov_result; //!< Provision result, see @mesh_prov_result_ind_t
-        void *update_ind;                   //!< Mesh status update indication message.
+        mesh_update_ind_t *update_ind;      //!< Mesh status update indication message.
         mesh_model_msg_ind_t model_msg;     //!< Mesh model message.
         uint8_t compo_data_req_page;        //!< Mesh composition data request page.
         gap_evt_adv_report_t adv_report;    //!< ADV report from adv bearer.
     } param;
 } mesh_event_t;
+
+// Mesh model struct.
+typedef struct
+{
+    uint32_t        model_id;       //!< Model ID of the model to be added.
+    uint8_t         model_vendor;   //!< If it is SIG model or vendor specific model. @MODEL_VENDOR_MODE
+    uint8_t         element_idx;    //!< Element index in the mesh device.
+    void (*msg_handler)(const mesh_model_msg_ind_t*); //!< Model message handler.
+} mesh_model_t;
 
 // Gap callback function define for mesh event handling.
 typedef void(* mesh_callback_func_t)(mesh_event_t * event);
@@ -356,8 +468,8 @@ void mesh_send_compo_data_rsp(uint8_t page, uint8_t *data, uint8_t length);
 /*********************************************************************
  * @fn      mesh_info_store_into_flash
  *
- * @brief   store mesh information into flash. For avoid program flash too
- *          frequently, app level should call this function with 2 or more
+ * @brief   store mesh network information into flash. For avoid program flash
+ *          too frequently, app level should call this function with 2 or more
  *          second delay after receiving MESH_EVT_UPDATE_IND meassge.
  *
  * @param   None.
@@ -369,7 +481,7 @@ void mesh_info_store_into_flash(void);
 /*********************************************************************
  * @fn      mesh_info_clear
  *
- * @brief   used to clear mesh information stored in flash.
+ * @brief   used to clear mesh network information stored in flash.
  *
  * @param   None.
  *

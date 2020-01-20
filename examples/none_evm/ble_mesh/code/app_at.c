@@ -14,6 +14,7 @@
 #include "driver_pmu.h"
 #include "driver_efuse.h"
 #include "driver_frspim.h"
+#include "driver_flash.h"
 
 #define AT_RECV_MAX_LEN             32
 
@@ -118,6 +119,33 @@ static void app_at_recv_cmd_A(uint8_t sub_cmd, uint8_t *data)
             frspim_wr(FR_SPI_RF_COB_CHAN, ascii_strn2val((const char *)&data[0], 16, 2), 1, ascii_strn2val((const char *)&data[3], 16, 2));
             co_printf("OK\r\n");
             break;
+        case 'U':
+            {
+                uint32_t *ptr = (uint32_t *)(ascii_strn2val((const char *)&data[0], 16, 8) & (~3));
+                uint8_t count = ascii_strn2val((const char *)&data[9], 16, 2);
+                uint32_t *start = (uint32_t *)((uint32_t)ptr & (~0x0f));
+                for(uint8_t i=0; i<count;) {
+                    if(((uint32_t)start & 0x0c) == 0) {
+                        co_printf("0x%08x: ", start);
+                    }
+                    if(start < ptr) {
+                        co_printf("        ");
+                    }
+                    else {
+                        i++;
+                        co_printf("%08x", *start);
+                    }
+                    if(((uint32_t)start & 0x0c) == 0x0c) {
+                        co_printf("\r\n");
+                    }
+                    else {
+                        co_printf(" ");
+                    }
+                    start++;
+                }
+                co_printf("\r\n");
+            }
+            break;
     }
 }
 
@@ -150,12 +178,32 @@ static void app_at_recv_cmd_M(uint8_t sub_cmd, uint8_t *data)
     co_printf("OK\r\n");
 }
 
+static void app_at_recv_cmd_D(uint8_t sub_cmd, uint8_t *data)
+{
+    switch(sub_cmd)
+    {
+        case 'A':
+            flash_write(ascii_strn2val((const char *)&data[0], 16, 8), ascii_strn2val((const char *)&data[9], 16, 2), (void *)0);
+            break;
+        case 'B':
+            flash_erase(ascii_strn2val((const char *)&data[0], 16, 8), ascii_strn2val((const char *)&data[9], 16, 2));
+            break;
+        default:
+            break;
+    }
+
+    co_printf("OK\r\n");
+}
+
 void app_at_cmd_recv_handler(uint8_t *data, uint16_t length)
 {
     switch(data[0])
     {
         case 'A':
             app_at_recv_cmd_A(data[1], &data[2]);
+            break;
+        case 'D':
+            app_at_recv_cmd_D(data[1], &data[2]);
             break;
         case 'M':
             app_at_recv_cmd_M(data[1], &data[2]);
@@ -220,5 +268,65 @@ __attribute__((section("ram_code")))void app_at_init(void)
     uart_init(UART1, BAUD_RATE_115200);
 
     uart1_read_for_hci(&app_at_recv_char, 1, app_at_uart_recv, NULL);
+}
+
+typedef void (*rwip_eif_callback) (void*, uint8_t);
+
+struct uart_txrxchannel
+{
+    /// call back function pointer
+    rwip_eif_callback callback;
+};
+
+struct uart_env_tag
+{
+    /// rx channel
+    struct uart_txrxchannel rx;
+    uint32_t rxsize;
+    uint8_t *rxbufptr;
+    void *dummy;
+    /// error detect
+    uint8_t errordetect;
+    /// external wakeup
+    bool ext_wakeup;
+};
+
+__attribute__((section("ram_code"))) void uart1_isr_ram(void)
+{
+    uint8_t int_id;
+    uint8_t c;
+    rwip_eif_callback callback;
+    void *dummy;
+    volatile struct uart_reg_t *uart_reg = (volatile struct uart_reg_t *)UART1_BASE;
+    struct uart_env_tag *uart1_env = (struct uart_env_tag *)0x20000a54;
+
+    int_id = uart_reg->u3.iir.int_id;
+
+    if(int_id == 0x04 || int_id == 0x0c )   /* Receiver data available or Character time-out indication */
+    {
+        while(uart_reg->lsr & 0x01)
+        {
+            c = uart_reg->u1.data;
+            *uart1_env->rxbufptr++ = c;
+            uart1_env->rxsize--;
+            if((uart1_env->rxsize == 0)
+               &&(uart1_env->rx.callback))
+            {
+                uart_reg->u3.fcr.data = 0xf1;
+                NVIC_DisableIRQ(UART1_IRQn);
+                uart_reg->u3.fcr.data = 0x21;
+                callback = uart1_env->rx.callback;
+                dummy = uart1_env->dummy;
+                uart1_env->rx.callback = 0;
+                uart1_env->rxbufptr = 0;
+                callback(dummy, 0);
+                break;
+            }
+        }
+    }
+    else if(int_id == 0x06)
+    {
+        volatile uint32_t line_status = uart_reg->lsr;
+    }
 }
 
