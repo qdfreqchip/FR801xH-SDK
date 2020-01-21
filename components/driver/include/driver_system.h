@@ -243,5 +243,17 @@ void system_sleep_enable(void);
  */
 void system_sleep_disable(void);
 
+/*********************************************************************
+ * @fn      system_get_curr_time
+ *
+ * @brief   get how many milliseconds have passed after system start-up,
+ *          and the value will loop back to 0 after reaching 858993456.
+ *
+ * @param   None.
+ *
+ * @return  None.
+ */
+uint32_t system_get_curr_time(void);
+
 #endif // _DRIVER_IOMUX_H
 

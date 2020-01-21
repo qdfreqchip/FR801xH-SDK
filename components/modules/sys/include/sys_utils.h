@@ -21,8 +21,6 @@
 
 #define TO_LITTLE_EDN_16(x) ( (x&0xff)<<8 | (x&0xff00)>>8 )
 
-#define NOW()     (rwip_time_get().hs*5/16)  //uint: 1ms
-
 __INLINE void show_reg(uint8_t *data,uint32_t len,uint8_t dbg_on)
 {
     uint32_t i=0;

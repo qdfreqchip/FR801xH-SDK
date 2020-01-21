@@ -408,7 +408,7 @@
             <ScatterFile>.\ble_5_0.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
-            <Misc>--feedback=feedback.txt syscall.txt --entry=app_main --keep=_jump_table --datacompressor=off</Misc>
+            <Misc>--feedback=feedback.txt ../../../../components/ble/library/syscall.txt --entry=app_main --keep=_jump_table --datacompressor=off</Misc>
             <LinkerInputFile></LinkerInputFile>
             <DisabledWarnings></DisabledWarnings>
           </LDads>

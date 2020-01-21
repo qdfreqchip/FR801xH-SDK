@@ -186,7 +186,7 @@ static void app_mesh_recv_lightness_msg(mesh_model_msg_ind_t const *ind)
 
     app_led_set_level(0, lightness_set->level);
     app_led_set_level(1, lightness_set->level);
-    co_printf("light lightness:%x\r\n",lightness_set->level);
+    //co_printf("light lightness:%x\r\n",lightness_set->level);
     if(ind->opcode == MESH_LIGHTNESS_SET)
     {
         status.current_level = app_led_get_level(0);

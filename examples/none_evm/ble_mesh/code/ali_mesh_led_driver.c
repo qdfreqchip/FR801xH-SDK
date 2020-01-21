@@ -40,10 +40,8 @@ static void app_led_set_state(uint8_t index)
 {
     uint8_t high_duty;
 
-    co_printf("app_led_set_state:");
     if(app_led_state[index].on_off_state == 0)
     {
-        co_printf(" 1");
         gpio_porta_write(gpio_porta_read() & (~(1<<(app_led_pwm_map[index]))));
         system_set_port_mux(GPIO_PORT_A, (enum system_port_bit_t)app_led_pwm_map[index], PORT_FUNC_GPIO);
     }
@@ -51,20 +49,17 @@ static void app_led_set_state(uint8_t index)
     {
         if(app_led_state[index].level == 0xFFFF)
         {
-            co_printf(" 2");
             gpio_porta_write(gpio_porta_read() | (1<<(app_led_pwm_map[index])));
             system_set_port_mux(GPIO_PORT_A, (enum system_port_bit_t)app_led_pwm_map[index], PORT_FUNC_GPIO);
         }
         else
         {
-            co_printf(" 3");
             app_led_calc_pwm_count(&high_duty, app_led_state[index].level);
             pwm_update((enum pwm_channel_t)app_led_pwm_map[index], FREQUENCY_SET, high_duty);
             pwm_start((enum pwm_channel_t)app_led_pwm_map[index]);
             system_set_port_mux(GPIO_PORT_A, (enum system_port_bit_t)app_led_pwm_map[index], PORT_FUNC_PWM);
         }
     }
-    co_printf("\r\n");
 
     if(app_led_inited)
     {
