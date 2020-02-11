@@ -20,7 +20,7 @@
 #include <stdint.h>         // standard definition
 #include <stdbool.h>        // boolean definition
 #include <stddef.h>         // for NULL and size_t
-#include "compiler.h"       // for __INLINE 
+#include "compiler.h"       // for __INLINE
 
 
 struct co_list_hdr
@@ -76,6 +76,18 @@ struct co_list_hdr *co_list_pop_front(struct co_list *list);
 
 /**
  ****************************************************************************************
+ * @brief Search for a given element in the list, and extract it if found.
+ *
+ * @param list           Pointer to the list structure
+ * @param list_hdr       Element to extract
+ *
+ * @return true if the element is found in the list, false otherwise
+ ****************************************************************************************
+ */
+bool co_list_extract(struct co_list *list, struct co_list_hdr *list_hdr);
+
+/**
+ ****************************************************************************************
  * @brief Test if the list is empty.
  * @param list           Pointer to the list structure.
  * @return true if the list is empty, false else otherwise.
@@ -100,6 +112,20 @@ __INLINE bool co_list_is_empty(const struct co_list *const list)
 __INLINE struct co_list_hdr *co_list_pick(const struct co_list *const list)
 {
     return(list->first);
+}
+
+/**
+ ****************************************************************************************
+ * @brief Pick the last element from the list without removing it.
+ *
+ * @param list           Pointer to the list structure.
+ *
+ * @return Last element address. Returns NULL pointer if the list is empty.
+ ****************************************************************************************
+ */
+ __INLINE struct co_list_hdr *co_list_pick_last(const struct co_list *const list)
+{
+    return(list->last);
 }
 
 #endif

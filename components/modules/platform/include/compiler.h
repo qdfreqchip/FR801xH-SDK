@@ -14,15 +14,20 @@
 #ifndef _COMPILER_H_
 #define _COMPILER_H_
 
-#ifndef __ARMCC_VERSION
-#error "File only included with keil!"
-#endif // __ARMCC_VERSION
+#if !defined(__GNUC__) && !defined(__ARMCC_VERSION)
+#error "File only included with ARM GCC or KEIL!"
+#endif // !defined(__GNUC__) && !defined(__ARMCC_VERSION)
 
 /// define the static keyword for this compiler
 #define __STATIC static
 
 /// define the force inlining attribute for this compiler
+#ifdef __GNUC__
+#define __INLINE inline
+#endif
+#ifdef __ARMCC_VERSION
 #define __INLINE __forceinline
+#endif
 
 /// define the IRQ handler attribute for this compiler
 #define __IRQ __irq

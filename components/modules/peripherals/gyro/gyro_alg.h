@@ -2,6 +2,8 @@
 #ifndef _GYRO_ALG_H_
 #define _GYRO_ALG_H_
 
+#include <stdint.h>
+
 #define USER_SKIP_MODE
 #define GYRO_IIC_CHL		IIC_CHANNEL_1
 #define GYRO_IIC_CLK_PIN	24 // PC6
@@ -9,10 +11,6 @@
 #define GYRO_ADDRESS 		0xDA
 
 #define FOR_GYRO_DRIVER
-
-typedef  unsigned char uint8_t;
-typedef  unsigned short uint16_t;
-typedef  unsigned int uint32_t;
 
 void gyroscope_init(void);
 uint16_t get_skip_num(void);

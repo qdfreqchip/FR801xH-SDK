@@ -155,7 +155,7 @@ struct system_regs_t
     struct system_keyscan_ctrl_t key_scan_ctrl;
 };
 
-extern struct system_regs_t *const system_regs;
+extern volatile struct system_regs_t *const system_regs;
 
 /*********************************************************************
  * @fn      system_get_pclk

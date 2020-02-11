@@ -28,7 +28,7 @@ typedef struct os_timer_struct
 /*********************************************************************
  * @fn      osal_timer_init
  *
- * @brief   Initialize an OS timer and malloc a buffer for it.
+ * @brief   Initialize an OS timer and insert this timer into timer list.
  *			
  *
  * @param   ptimer - pointer to the timer buffer.
@@ -37,6 +37,17 @@ typedef struct os_timer_struct
  * @return  None.
  */
 void os_timer_init(os_timer_t *ptimer, os_timer_func_t pfunction, void *parg);
+
+/*********************************************************************
+ * @fn      os_timer_destroy
+ *
+ * @brief   remove an OS timer from timer list.
+ *			
+ * @param   ptimer - pointer to the timer buffer.
+ *
+ * @return  None.
+ */
+void os_timer_destroy(os_timer_t *ptimer);
 
 /*********************************************************************
  * @fn      osal_timer_start

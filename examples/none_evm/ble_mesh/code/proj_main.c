@@ -24,6 +24,7 @@
 #include "driver_i2s.h"
 #include "driver_pmu.h"
 #include "driver_uart.h"
+#include "driver_gpio.h"
 
 #include "ali_mesh_info.h"
 
@@ -171,6 +172,10 @@ __attribute__((section("ram_code"))) void user_entry_after_sleep_imp(void)
 
     uart_putc_noint_no_wait(UART1, 'w');
 
+    co_delay_100us(500);
+    ool_write(PMU_REG_SYSTEM_STATUS, PMU_SYS_PO_MAGIC);
+    platform_reset();
+
     NVIC_EnableIRQ(PMU_IRQn);
 }
 
@@ -209,6 +214,32 @@ void user_entry_before_ble_init(void)
         system_set_port_mux(GPIO_PORT_A, GPIO_BIT_4, PORTA4_FUNC_UART0_RXD);
         system_set_port_mux(GPIO_PORT_A, GPIO_BIT_5, PORTA5_FUNC_UART0_TXD);
     }
+
+    /* set BUCK voltage to higher level */
+    ool_write(PMU_REG_BUCK_CTRL1, 0x65);
+    /* set DLDO voltage to higher level */
+    ool_write(PMU_REG_DLDO_CTRL, 0x72);
+
+    ool_write(0x1c, ool_read(0x1c) | 0x74);
+        
+#if 0
+    system_set_port_mux(GPIO_PORT_D, GPIO_BIT_4, PORTD4_FUNC_D4);
+    gpio_portd_write(gpio_portd_read() & 0xef);
+    gpio_set_dir(GPIO_PORT_D, GPIO_BIT_4, GPIO_DIR_OUT);
+    uint32_t delay = 13000;    // 1.3s~2.0s
+    while(1)
+    {
+        gpio_portd_write(gpio_portd_read() & 0xef);
+        co_delay_100us(delay);
+        gpio_portd_write(gpio_portd_read() | 0x10);
+        co_delay_100us(20000);
+        delay += 500;
+        if(delay >= 20000)
+        {
+            delay = 5000;
+        }
+    }
+#endif
 }
 
 /*********************************************************************

@@ -35,6 +35,9 @@
 #define GATT_PROP_AUTHEN_WRITE          0x0008  //!< Write requires Authentication
 #define GATT_PROP_NOTI                  0x0100  //!< Attribute is able to send notification
 #define GATT_PROP_INDI                  0x0200  //!< Attribute is able to send indication
+#define GATT_PROP_WRITE_REQ             0x0400  //!< Attribute supports write request
+#define GATT_PROP_WRITE_CMD             0x0800  //!< Attribute supports write with no response
+
 /** @} End GATT_PERMIT_BITMAPS_DEFINES */
 
 /** @defgroup GATT_OPERATION_NAME GATT operation name define, used with GATTS/C_MSG_CMP_EVT
@@ -115,6 +118,7 @@ typedef struct
 {
     gatt_msg_evt_t  msg_evt;    //!< The event that message come with
     uint8_t         conn_idx;   //!< Connection index
+    uint8_t         svc_id;     //!< service id of this message
     uint16_t        att_idx;    //!< Attribute index of in the service table
     union
     {

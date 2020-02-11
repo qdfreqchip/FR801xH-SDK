@@ -17,7 +17,7 @@
 
 #define ALI_MESH_VERSION                1
 
-#define ALI_MESH_50HZ_CHECK_IO          GPIO_PA0
+#define ALI_MESH_50HZ_CHECK_IO          GPIO_PD6
 
 static void app_mesh_recv_gen_onoff_led_msg(mesh_model_msg_ind_t const *ind);
 static void app_mesh_recv_gen_onoff_fan_msg(mesh_model_msg_ind_t const *ind);
@@ -96,7 +96,7 @@ static const struct ali_mesh_sub_map_t ali_mesh_sub_map[] =
  *
  * @brief   find group address by element.
  *
- * @param   element -
+ * @param   element - element index
  *
  * @return  None.
  */
@@ -115,6 +115,18 @@ static uint16_t app_mesh_find_group_addr(uint8_t element)
 }
 #endif  // ALI_MESH_VERSION == 1
 
+/*********************************************************************
+ * @fn      app_mesh_status_send_rsp
+ *
+ * @brief   used to send response to remote after receiving acknowledged-message.
+ *
+ * @param   ind     - message received from remote node
+ *          opcode  - opcode field should be set in response message
+ *          msg     - response message pointer
+ *          msg_len - response message length
+ *
+ * @return  None.
+ */
 static void app_mesh_status_send_rsp(mesh_model_msg_ind_t const *ind, uint32_t opcode, uint8_t *msg, uint16_t msg_len)
 {
     mesh_rsp_msg_t * p_rsp_msg = (mesh_rsp_msg_t *)os_malloc((sizeof(mesh_rsp_msg_t)+msg_len));
@@ -130,6 +142,16 @@ static void app_mesh_status_send_rsp(mesh_model_msg_ind_t const *ind, uint32_t o
     os_free(p_rsp_msg);
 }
 
+/*********************************************************************
+ * @fn      app_mesh_recv_gen_onoff_led_msg
+ *
+ * @brief   used to check new received message whether belongs to generic on-off
+ *          model or not.
+ *
+ * @param   ind     - message received from remote node
+ *
+ * @return  None.
+ */
 static void app_mesh_recv_gen_onoff_led_msg(mesh_model_msg_ind_t const *ind)
 {
     struct mesh_gen_onoff_model_status_t status;
@@ -152,6 +174,16 @@ static void app_mesh_recv_gen_onoff_led_msg(mesh_model_msg_ind_t const *ind)
     }
 }
 
+/*********************************************************************
+ * @fn      app_mesh_recv_gen_onoff_led_msg
+ *
+ * @brief   used to check new received message whether belongs to generic on-off
+ *          model of fan element or not.
+ *
+ * @param   ind     - message received from remote node
+ *
+ * @return  None.
+ */
 static void app_mesh_recv_gen_onoff_fan_msg(mesh_model_msg_ind_t const *ind)
 {
     struct mesh_gen_onoff_model_status_t status;
@@ -174,6 +206,16 @@ static void app_mesh_recv_gen_onoff_fan_msg(mesh_model_msg_ind_t const *ind)
     }
 }
 
+/*********************************************************************
+ * @fn      app_mesh_recv_gen_onoff_led_msg
+ *
+ * @brief   used to check new received message whether belongs to lightness
+ *          model or not.
+ *
+ * @param   ind     - message received from remote node
+ *
+ * @return  None.
+ */
 static void app_mesh_recv_lightness_msg(mesh_model_msg_ind_t const *ind)
 {
     struct mesh_lightness_model_status_t status;
@@ -196,6 +238,16 @@ static void app_mesh_recv_lightness_msg(mesh_model_msg_ind_t const *ind)
     }
 }
 
+/*********************************************************************
+ * @fn      app_mesh_recv_gen_onoff_led_msg
+ *
+ * @brief   used to check new received message whether belongs to hsl
+ *          model or not.
+ *
+ * @param   ind     - message received from remote node
+ *
+ * @return  None.
+ */
 static void app_mesh_recv_hsl_msg(mesh_model_msg_ind_t const *ind)
 {
     struct mesh_hsl_model_status_t status;
@@ -219,6 +271,16 @@ static void app_mesh_recv_hsl_msg(mesh_model_msg_ind_t const *ind)
     }
 }
 
+/*********************************************************************
+ * @fn      app_mesh_recv_gen_onoff_led_msg
+ *
+ * @brief   used to check new received message whether belongs to CTL
+ *          model or not.
+ *
+ * @param   ind     - message received from remote node
+ *
+ * @return  None.
+ */
 static void app_mesh_recv_CTL_msg(mesh_model_msg_ind_t const *ind)
 {
     struct mesh_CTL_model_status_t status;
@@ -244,6 +306,16 @@ static void app_mesh_recv_CTL_msg(mesh_model_msg_ind_t const *ind)
     }
 }
 
+/*********************************************************************
+ * @fn      app_mesh_recv_gen_onoff_led_msg
+ *
+ * @brief   used to check new received message whether belongs to vendor
+ *          defined model or not.
+ *
+ * @param   ind     - message received from remote node
+ *
+ * @return  None.
+ */
 static void app_mesh_recv_vendor_msg(mesh_model_msg_ind_t const *ind)
 {
     struct mesh_vendor_model_set_new_t *vendor_set;
@@ -266,6 +338,15 @@ static void app_mesh_recv_vendor_msg(mesh_model_msg_ind_t const *ind)
     }
 }
 
+/*********************************************************************
+ * @fn      mesh_callback_func
+ *
+ * @brief   mesh message deal callback function.
+ *
+ * @param   event   - event to be processed
+ *
+ * @return  None.
+ */
 static void mesh_callback_func(mesh_event_t * event)
 {
     uint8_t tmp_data[16];
@@ -277,6 +358,7 @@ static void mesh_callback_func(mesh_event_t * event)
             break;
         case MESH_EVT_STARTED:
             app_led_init();
+            //app_mesh_50Hz_check_enable();
             break;
         case MESH_EVT_STOPPED:
             system_sleep_enable();
@@ -437,6 +519,16 @@ static void mesh_callback_func(mesh_event_t * event)
     }
 }
 
+/*********************************************************************
+ * @fn      app_mesh_led_init
+ *
+ * @brief   init mesh model, set callback function, set feature supported by
+ *          this application, add models, etc.
+ *
+ * @param   None.
+ *
+ * @return  None.
+ */
 void app_mesh_led_init(void)
 {
 #if 0   //generate 50Hz for debug
@@ -464,7 +556,7 @@ void app_mesh_led_init(void)
     }
 
     app_mesh_store_info_timer_init();
-    os_timer_init(&app_mesh_50Hz_check_timer, app_mesh_50Hz_check_timer_handler, NULL);
+    //os_timer_init(&app_mesh_50Hz_check_timer, app_mesh_50Hz_check_timer_handler, NULL);
 
 #if ALI_MESH_VERSION == 1
     app_key_binding_count = 0;

@@ -42,22 +42,22 @@ static void app_led_set_state(uint8_t index)
 
     if(app_led_state[index].on_off_state == 0)
     {
-        gpio_porta_write(gpio_porta_read() & (~(1<<(app_led_pwm_map[index]))));
-        system_set_port_mux(GPIO_PORT_A, (enum system_port_bit_t)app_led_pwm_map[index], PORT_FUNC_GPIO);
+        gpio_portd_write(gpio_portd_read() & (~(1<<(app_led_pwm_map[index]))));
+        system_set_port_mux(GPIO_PORT_D, (enum system_port_bit_t)app_led_pwm_map[index], PORT_FUNC_GPIO);
     }
     else
     {
         if(app_led_state[index].level == 0xFFFF)
         {
-            gpio_porta_write(gpio_porta_read() | (1<<(app_led_pwm_map[index])));
-            system_set_port_mux(GPIO_PORT_A, (enum system_port_bit_t)app_led_pwm_map[index], PORT_FUNC_GPIO);
+            gpio_portd_write(gpio_portd_read() | (1<<(app_led_pwm_map[index])));
+            system_set_port_mux(GPIO_PORT_D, (enum system_port_bit_t)app_led_pwm_map[index], PORT_FUNC_GPIO);
         }
         else
         {
             app_led_calc_pwm_count(&high_duty, app_led_state[index].level);
             pwm_update((enum pwm_channel_t)app_led_pwm_map[index], FREQUENCY_SET, high_duty);
             pwm_start((enum pwm_channel_t)app_led_pwm_map[index]);
-            system_set_port_mux(GPIO_PORT_A, (enum system_port_bit_t)app_led_pwm_map[index], PORT_FUNC_PWM);
+            system_set_port_mux(GPIO_PORT_D, (enum system_port_bit_t)app_led_pwm_map[index], PORT_FUNC_PWM);
         }
     }
 
@@ -79,16 +79,20 @@ static void app_led_set_state(uint8_t index)
 void app_led_init(void)
 {
     /* set LED output to low level */
-    gpio_porta_write(gpio_porta_read() & 0xcf);
-    system_set_port_mux(GPIO_PORT_A, GPIO_BIT_4, PORTA4_FUNC_A4);
-    system_set_port_mux(GPIO_PORT_A, GPIO_BIT_5, PORTA5_FUNC_A5);
-    gpio_set_dir(GPIO_PORT_A, GPIO_BIT_4, GPIO_DIR_OUT);
-    gpio_set_dir(GPIO_PORT_A, GPIO_BIT_5, GPIO_DIR_OUT);
-    system_set_port_pull(GPIO_PA4, true);
-	system_set_port_pull(GPIO_PA5, true);
+    gpio_portd_write(gpio_portd_read() & 0xcf);
+    system_set_port_mux(GPIO_PORT_D, GPIO_BIT_4, PORTD4_FUNC_D4);
+    system_set_port_mux(GPIO_PORT_D, GPIO_BIT_5, PORTD5_FUNC_D5);
+    gpio_set_dir(GPIO_PORT_D, GPIO_BIT_4, GPIO_DIR_OUT);
+    gpio_set_dir(GPIO_PORT_D, GPIO_BIT_5, GPIO_DIR_OUT);
+    system_set_port_pull(GPIO_PD4, true);
+	system_set_port_pull(GPIO_PD5, true);
+
+    /* set lightness control PA2 */
+    system_set_port_mux(GPIO_PORT_A, GPIO_BIT_2, PORTA2_FUNC_PWM2);
+    pwm_init(PWM_CHANNEL_2, 8000, 90);
 
     /* confirm this pin is controlled by CPU */
-	pmu_set_pin_to_CPU(GPIO_PORT_A, (1<<GPIO_BIT_4)|(1<<GPIO_BIT_5));
+	pmu_set_pin_to_CPU(GPIO_PORT_D, (1<<GPIO_BIT_4)|(1<<GPIO_BIT_5));
 
     memset(app_led_state, 0, sizeof(app_led_state));
 

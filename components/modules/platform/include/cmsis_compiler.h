@@ -45,6 +45,12 @@
  * GNU Compiler
  */
 #elif defined ( __GNUC__ )
+#ifndef __STATIC_INLINE
+#define __STATIC_INLINE     static inline
+#endif
+#ifndef   __ASM
+#define __ASM               asm
+#endif
 #include "cmsis_gcc.h"
 
 

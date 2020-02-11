@@ -1,0 +1,169 @@
+# Options:
+#   VERBOSE=1 (default is 0) - print each executed command
+VERBOSE ?= 0
+
+MK := mkdir
+RM := rm -rf
+
+# echo suspend
+ifeq ($(VERBOSE),1)
+  NO_ECHO :=
+else
+  NO_ECHO := @
+endif
+
+ifneq (,$(filter clean, $(MAKECMDGOALS)))
+
+OTHER_GOALS := $(filter-out clean, $(MAKECMDGOALS))
+ifneq (, $(OTHER_GOALS))
+$(info Cannot make anything in parallel with "clean".)
+$(info Execute "$(MAKE) clean \
+  $(foreach goal, $(OTHER_GOALS),&& $(MAKE) $(goal))" instead.)
+$(error Cannot continue)
+else
+.PHONY: clean
+clean:
+	$(RM) $(OUTPUT_DIRECTORY)
+endif # ifneq(, $(OTHER_GOALS))
+
+else # ifneq (,$(filter clean, $(MAKECMDGOALS)))
+
+PLATFORM_SUFFIX := $(if $(filter Windows%,$(OS)),windows,posix)
+TOOLCHAIN_CONFIG_FILE := $(TEMPLATE_PATH)/Makefile.$(PLATFORM_SUFFIX)
+include $(TOOLCHAIN_CONFIG_FILE)
+
+# $1 path
+define quote
+'$(subst ','\'',$(1))'
+endef
+
+# Toolchain commands
+CC      := $(call quote,$(GNU_INSTALL_ROOT)$(GNU_PREFIX)-gcc)
+AS      := $(call quote,$(GNU_INSTALL_ROOT)$(GNU_PREFIX)-as)
+AR      := $(call quote,$(GNU_INSTALL_ROOT)$(GNU_PREFIX)-ar) -r
+LD      := $(call quote,$(GNU_INSTALL_ROOT)$(GNU_PREFIX)-ld)
+NM      := $(call quote,$(GNU_INSTALL_ROOT)$(GNU_PREFIX)-nm)
+OBJDUMP := $(call quote,$(GNU_INSTALL_ROOT)$(GNU_PREFIX)-objdump)
+OBJCOPY := $(call quote,$(GNU_INSTALL_ROOT)$(GNU_PREFIX)-objcopy)
+SIZE    := $(call quote,$(GNU_INSTALL_ROOT)$(GNU_PREFIX)-size)
+$(if $(shell $(CC) --version),,$(info Cannot find: $(CC).) \
+  $(info Please set values in: "$(abspath $(TOOLCHAIN_CONFIG_FILE))") \
+  $(info according to the actual configuration of your system.) \
+  $(error Cannot continue))
+
+# Use ccache on linux if available
+CCACHE := $(if $(filter Windows%,$(OS)),, \
+               $(if $(wildcard /usr/bin/ccache),ccache))
+CC     := $(CCACHE) $(CC)
+
+# $1 type of item
+# $2 items paths to check
+define ensure_exists_each
+$(foreach item, $(2), \
+  $(if $(wildcard $(item)),, $(warning Cannot find $(1): $(item))))
+endef
+
+INC_PATHS = $(call target_specific, INC_PATHS, $($@_TGT))
+
+# $1 object file
+# $2 source file
+# $3 include paths container file
+# $4 target name
+define bind_obj_with_src
+$(eval $(1)     := $(2)) \
+$(eval $(1)_INC := $(3)) \
+$(eval $(1)_TGT := $(4)) \
+$(eval $(1): Makefile | $(dir $(1)).)
+endef
+
+# $1 target name
+# $2 source file name
+# Note: this additional .o for .s files is a workaround for issues with make 4.1
+#       from MinGW (it does nothing to remake .s.o files when a rule for .S.o
+#       files is defined as well).
+define get_object_file_name
+$(OUTPUT_DIRECTORY)/$(strip $(1))/$(notdir $(2:%.s=%.s.o)).o
+endef
+
+# $1 target name
+# $2 include paths container file
+# $3 list of source files
+define get_object_files
+$(call ensure_exists_each,source file, $(3)) \
+$(foreach src_file, $(3), \
+  $(eval obj_file := $(call get_object_file_name, $(1), $(src_file))) \
+  $(eval DEPENDENCIES += $(obj_file:.o=.d)) \
+  $(call bind_obj_with_src, $(obj_file), $(src_file), $(2), $(1)) \
+  $(obj_file))
+endef
+
+# $1 variable name
+# $2 target name
+define target_specific
+$($(addsuffix _$(strip $(2)), $(1)))
+endef
+
+# $1 list of include folders
+define get_inc_paths
+$(call ensure_exists_each,include folder,$(1)) \
+$(foreach folder,$(1),-I$(folder))
+endef
+
+# $1 target name
+# $2 include paths container file
+# $3 build goal name
+define prepare_build
+$(eval DEPENDENCIES :=) \
+$(eval $(3): \
+  $(call get_object_files, $(1), $(2), \
+    $(SRC_FILES) $(call target_specific, SRC_FILES, $(1)))) \
+$(eval -include $(DEPENDENCIES)) \
+$(eval INC_PATHS_$(strip $(1)) := \
+  $(call get_inc_paths, \
+    $(INC_FOLDERS) $(call target_specific, INC_FOLDERS, $(1))))
+endef
+
+# $1 target name
+define define_target
+$(eval OUTPUT_FILE := $(OUTPUT_DIRECTORY)/$(strip $(1))) \
+$(eval $(1): $(OUTPUT_FILE).out $(OUTPUT_FILE).bin $(OUTPUT_FILE).txt \
+           ; @echo DONE $(strip $(1))) \
+$(call prepare_build, $(1), $(OUTPUT_FILE).inc, $(OUTPUT_FILE).out)
+endef
+
+.PHONY: $(TARGETS) all
+
+all: $(TARGETS)
+
+# Create build directories
+$(OUTPUT_DIRECTORY):
+	$(MK) $@
+$(OUTPUT_DIRECTORY)/%/.: | $(OUTPUT_DIRECTORY)
+	cd $(OUTPUT_DIRECTORY) && $(MK) $*
+
+# Create object files from C source files
+%.c.o:
+	$(info Compiling: $($@))
+	$(NO_ECHO)$(CC) -MP -MD  -c -o $@ $($@) $(CFLAGS) $(INC_PATHS)
+
+# Create object files from assembly source files
+%.S.o %.s.o.o:
+	$(info Compiling: $($@))
+	$(NO_ECHO)$(CC) -MP -MD  -x assembler-with-cpp -c -o $@ $($@) $(ASMFLAGS)
+
+# Link object files
+%.out: 
+	$(NO_ECHO)$(CC) $(LDFLAGS) $^ $(LIB_FILES) -Wl,-Map=$(@:.out=.map) -o $@
+	$(NO_ECHO)$(SIZE) $@
+
+# Create binary .bin file from the .out file
+%.bin: %.out
+	$(info Generate: $@)
+	$(NO_ECHO)$(OBJCOPY) -O binary $< $@
+
+# Create disassembling .txt file from the .out file
+%.txt: %.out
+	$(info Generate: $@)
+	$(NO_ECHO)$(OBJDUMP) -S $< > $@
+	
+endif # ifneq (,$(filter clean, $(MAKECMDGOALS)))
