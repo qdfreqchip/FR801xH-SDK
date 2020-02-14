@@ -1,6 +1,8 @@
 #ifndef _DRIVER_PMU_REGS_H
 #define _DRIVER_PMU_REGS_H
 
+#include "co_math.h"
+
 #define PMU_REG_ADKEY_ALDO_CTRL     0x01
 
 #define PMU_REG_ALDO_BG_CTRL        0x03
@@ -27,6 +29,55 @@
 
 #define PMU_REG_RCOSC_CTRL          0x1d
 
+#define PMU_REG_ADC_CTRL0           0x1e
+#define PMU_REG_ADC_BUF_TO_SAM_EN   (CO_BIT(5)) // buffer to sample core enable
+
+#define PMU_REG_ADC_CTRL1           0x1f
+#define PMU_REG_ADC_CLK_SEL_MSK     0x03
+#define PMU_REG_ADC_DIV_TO_SAM_EN   (CO_BIT(3)) // dividor to sample core enable
+#define PMU_REG_ADC_EN              (CO_BIT(4))
+#define PMU_REG_ADC_IN_BUF_EN       (CO_BIT(5)) // input buffer enable
+
+#define PMU_REG_ADC_CTRL2           0x20
+
+#define PMU_REG_ADC_CTRL3           0x21
+#define PMU_REG_ADC_DIV_EN          (CO_BIT(4)) // input dividor enable
+
+#define PMU_REG_ADC_CTRL4           0x22
+#define PMU_REG_ADC_DIV_RES_CTL_MSK 0x0f    /* dividor total resistor value control
+                                               BIT0: 12*105
+                                               BIT1: 12*415
+                                               BIT2: 12*7.25K
+                                               BIT3: 12*30K */
+#define PMU_REG_ADC_DIV_CTL_MSK     0x30    /* 0:1/4; 1:1/3; 2:1/2; 3:2/3 */
+#define PMU_REG_ADC_INT_REF_EN      (CO_BIT(6)) // internal reference enable
+#define PMU_REG_ADC_PAD_TO_BUF_EN   (CO_BIT(7)) // pad to buffer renable
+
+#define PMU_REG_ADC_CTRL5           0x23
+#define PMU_REG_ADC_PAD_TO_DIV_EN   (CO_BIT(0)) // pad to dividor enable
+#define PMU_REG_ADC_PAD_TO_SAM_EN   (CO_BIT(1)) // pad direct to sample core enable
+#define PMU_REG_ADC_PAD_EN          (CO_BIT(2)) // sample from pad enable
+#define PMU_REG_ADC_PD              (CO_BIT(7)) // ADC module power up
+
+#define PMU_REG_ADC_CTRL6           0x24
+#define PMU_REG_ADC_PD_CTL_PO       (CO_BIT(0)) // ADC module power is controlled by PMU_REG_ADC_PD or not
+#define PMU_REG_ADC_PWR_EN          (CO_BIT(1)) // ADC module power enable
+#define PMU_REG_ADC_PWR_SEL         (CO_BIT(2)) // ADC module AVDD select, 1: ALDO, 0: battery
+#define PMU_REG_ADC_REF_SEL_MSK     0x30    /* reference selection
+                                               0: internel reference
+                                               2: power of ADC module */
+#define PMU_REG_ADC_INT_REF_CFG     0xc0    /* internal reference configuration
+                                               0:1.2v, 1:1.3v, 2:1.4v, 3:1.5v*/
+
+#define PMU_REG_ADC_CTRL7           0x25
+
+#define PMU_REG_ADC_CTRL8           0x26
+#define PMU_REG_ADC_BAT_CTL         (CO_BIT(2))
+#define PMU_REG_ADC_BAT_EN          (CO_BIT(3))
+#define PMU_REG_ADC_BAT_TO_BUF_EN   (CO_BIT(4))
+#define PMU_REG_ADC_BAT_TO_SAM_EN   (CO_BIT(5))
+#define PMU_REG_ADC_VBE_TO_BUF_EN   (CO_BIT(6))
+
 #define PMU_REG_PWR_CTRL            0x27
 
 #define PMU_REG_FLASH_POR_CTRL      0x28
@@ -34,7 +85,7 @@
 #define PMU_REG_SLEEP_CTRL          0x36
 #define PMU_STANDBY_EN              (CO_BIT(0))
 #define PMU_SHUTDOWN_EN             (CO_BIT(1))
-#define PMU_SHUTDOWN_MODE1_EN       (CO_BIT(2))   //0: shutdown gpio without power, 1: shutdown gpio with power
+#define PMU_SHUTDOWN_MODE1_EN       (CO_BIT(2))   // 0: shutdown gpio without power, 1: shutdown gpio with power
 #define PMU_OOL_CLK_DIV_MSK         0xF0
 
 #define PMU_REG_CLK_CONFIG          0x37

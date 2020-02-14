@@ -408,7 +408,7 @@ void gap_set_advertising_rsp_data(uint8_t *p_rsp_data, uint8_t rsp_data_len);
  *
  * @brief   Start advertising.
  *
- * @param   None
+ * @param   duration    - Advertising duration (in unit of 10ms). 0 means that advertising continues
  *
  * @return  None.
  */

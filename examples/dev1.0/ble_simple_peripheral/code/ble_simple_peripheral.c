@@ -217,7 +217,7 @@ static void sp_start_adv(void)
 	gap_set_advertising_rsp_data(scan_rsp_data, sizeof(scan_rsp_data));
     // Start advertising
 	co_printf("Start advertising...\r\n");
-	gap_start_advertising(NULL);
+	gap_start_advertising(0);
 }
 
 /*********************************************************************

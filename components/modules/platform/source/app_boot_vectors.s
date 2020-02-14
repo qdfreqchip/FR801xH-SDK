@@ -75,7 +75,7 @@ __initial_sp    EQU     0x40004000
                 DCD     PendSV_Handler            ; PendSV Handler
                 DCD     SysTick_Handler     ; SysTick Handler
                     
-                DCD     rwble_isr_patch                 ; 0
+                DCD     rwble_isr_patch               ; 0
                 DCD     timer0_isr_ram                ; 1
                 DCD     timer1_isr_ram                ; 2
                 DCD     uart0_isr_ram                 ; 3
@@ -87,7 +87,7 @@ __initial_sp    EQU     0x40004000
                 DCD     i2s_isr_ram               ; 9
                 DCD     exti_isr_ram              ; 10
                 DCD     pmu_isr_ram               ; 11
-                DCD     0                         ; 12
+                DCD     adc_isr                   ; 12
                 DCD     pdm_isr				      ; 13
                 DCD     0                         ; 14
                 DCD     0                         ; 15
@@ -114,7 +114,6 @@ pmu_isr_ram   PROC
                 B pmu_isr_ram_C
                 ENDP
 
-				ALIGN		;default as area align
 SVC_Handler     PROC
                 IMPORT  svc_exception_handler
              	LDR	R1, [SP, #0x14]   
@@ -126,6 +125,11 @@ SVC_Handler     PROC
                 STR     R0, [SP, #0x1C]
                 POP     {PC}
                 ENDP		
-				
+
+adc_isr         PROC
+                EXPORT  adc_isr           [WEAK]
+                B       .
+                ENDP
+                
 				END
 					

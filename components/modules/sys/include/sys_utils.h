@@ -21,7 +21,7 @@
 
 #define TO_LITTLE_EDN_16(x) ( (x&0xff)<<8 | (x&0xff00)>>8 )
 
-__INLINE void show_reg(uint8_t *data,uint32_t len,uint8_t dbg_on)
+__STATIC __INLINE void show_reg(uint8_t *data,uint32_t len,uint8_t dbg_on)
 {
     uint32_t i=0;
     if(len == 0 || (dbg_on==0)) return;
