@@ -1,18 +1,32 @@
-/***************************************************************************
- *            adpcm.h
- *
- *  Fri Nov 27 15:25:26 2009
- *  Copyright  2009  zmx
- *  <zmx@<host>>
- ****************************************************************************/
+/**
+ * Copyright (c) 2019, Freqchip
+ * 
+ * All rights reserved.
+ * 
+ * 
+ */
+ 
 #ifndef ADPCM_MS_H
 #define ADPCM_MS_H
 
+/*
+ * INCLUDES
+ */
 #include <stdint.h>
 #include <stdio.h>
 
+/*
+ * MACROS
+ */
+
+/*
+ * CONSTANTS 
+ */
 #define BLKSIZE 1024
 
+/*
+ * TYPEDEFS 
+ */
 typedef struct ADPCMChannelStatus
 {
     int predictor;
@@ -36,6 +50,18 @@ typedef struct ADPCMContext
     int block_align ;
     ADPCMChannelStatus status[2];
 } ADPCMContext;
+
+/*
+ * GLOBAL VARIABLES 
+ */
+
+/*
+ * LOCAL VARIABLES 
+ */
+
+/*
+ * LOCAL FUNCTIONS
+ */
 
 static inline int av_clip(int a, int amin, int amax)
 {

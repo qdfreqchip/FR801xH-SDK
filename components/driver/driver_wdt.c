@@ -1,3 +1,14 @@
+/**
+ * Copyright (c) 2019, Freqchip
+ *
+ * All rights reserved.
+ *
+ *
+ */
+ 
+/*
+ * INCLUDES
+ */
 #include <stdint.h>
 
 #include "co_log.h"
@@ -5,6 +16,9 @@
 #include "sys_utils.h"
 #include "driver_wdt.h"
 
+/*
+ * MACROS 
+ */
 #undef LOG_LEVEL_MODULE
 #define LOG_LEVEL_MODULE        LOG_LEVEL_ERROR
 

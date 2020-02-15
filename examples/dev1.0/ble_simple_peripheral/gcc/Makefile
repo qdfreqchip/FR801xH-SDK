@@ -65,7 +65,7 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/modules/peripherals/gyro
 
 # Libraries common to all targets
-LIB_FILES += -lfr8010h_stack
+LIB_FILES += -lfr8010h_stack -lgyro_alg
 
 # Optimization flags
 OPT = -Os -g
@@ -88,7 +88,7 @@ ASMFLAGS += -mthumb
 LDFLAGS += $(OPT)
 LDFLAGS += -mthumb
 LDFLAGS += -mcpu=cortex-m3
-LDFLAGS +=  -T$(LINKER_SCRIPT) -L$(SDK_ROOT)/components/ble/library
+LDFLAGS +=  -T$(LINKER_SCRIPT) -L$(SDK_ROOT)/components/ble/library -L$(SDK_ROOT)/components/modules/peripherals/gyro
 LDFLAGS += $(SDK_ROOT)/components/ble/library/syscall_gcc.txt
 # let linker dump unused sections
 LDFLAGS += -Wl,--gc-sections

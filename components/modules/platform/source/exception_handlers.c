@@ -270,7 +270,7 @@ UsageFault_Handler_C (ExceptionStackFrame* frame __attribute__((unused)),
 
 #endif
 
-void __attribute__ ((section(".after_vectors"),weak))
+void __attribute__ ((section(".after_vectors")))
 SVC_Handler (void)
 {
     asm volatile(
@@ -323,7 +323,7 @@ SysTick_Handler (void)
   ;
 }
 
-void __attribute__ ((section(".after_vectors"),weak))
+void __attribute__ ((section(".after_vectors")))
 pmu_isr_ram (void)
 {
     asm volatile(

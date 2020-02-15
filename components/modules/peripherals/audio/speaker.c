@@ -1,3 +1,14 @@
+/**
+ * Copyright (c) 2019, Freqchip
+ * 
+ * All rights reserved.
+ * 
+ * 
+ */
+
+/*
+ * INCLUDES
+ */
 #include "speaker.h"
 #include "driver_codec.h"
 #include "driver_i2s.h"
@@ -8,82 +19,42 @@
 #include <stdio.h>
 #include <string.h>
 #include "driver_pmu.h"
-//#include "encode.h"
 #include "decoder.h"
 #include "os_mem.h"
 #include "driver_system.h"
 #include "driver_gpio.h"
+
+/*
+ * MACROS
+ */
 #define PA_ENABLE      gpio_porta_write(gpio_porta_read() | (1<<GPIO_BIT_1) )//gpio_set_pin_value(GPIO_PORT_A, GPIO_BIT_1, 1)
 #define PA_DISABLE     gpio_porta_write(gpio_porta_read() & ~(1<<GPIO_BIT_1) )//gpio_set_pin_value(GPIO_PORT_A, GPIO_BIT_1, 0)
 
+/*
+ * CONSTANTS 
+ */
 
-static volatile struct i2s_reg_t *i2s_reg = (struct i2s_reg_t *)I2S_BASE;
+/*
+ * TYPEDEFS 
+ */
+
+/*
+ * GLOBAL VARIABLES 
+ */
 volatile uint8_t audio_data[I2S_FIFO_DEPTH*2];
 uint8_t audio_data_len=0;
 uint8_t audio_data_update =0;
 uint8_t TimerCnt=0;
 
-#ifdef MIC_ENABLE
+/*
+ * LOCAL VARIABLES 
+ */
+static volatile struct i2s_reg_t *i2s_reg = (struct i2s_reg_t *)I2S_BASE;
 
-/*********************************************************************
- * @fn		mic_start
- *
- * @brief	Turn on the microphone.
- *
- * @param	None
- *
- * @return	None.
+/*
+ * LOCAL FUNCTIONS
  */
 
-void mic_start(void)
-{
- //   ool_write(0x0b, ool_read(0x0b) | 0x40);
-   
-    encode_start();
-    pmu_codec_power_enable();//codec Power on
-    codec_disable_dac();
-	codec_enable_adc();
-    i2s_start();
-    NVIC_EnableIRQ(I2S_IRQn);
-}
-
-/*********************************************************************
- * @fn		mic_stop
- *
- * @brief	Turn off the microphone.
- *
- * @param	None
- *
- * @return	None.
- */
-void mic_stop(void)
-{
-    NVIC_DisableIRQ(I2S_IRQn);
-	pmu_codec_power_disable();//codec Power off
-    i2s_stop();
-	codec_disable_adc();
-    encode_stop();
- //   ool_write(0x0b, ool_read(0x0b) & (~0x40));
-}
-
-/*********************************************************************
- * @fn		mic_init
- *
- * @brief	Initialize the microphone
- *
- * @param	None
- *
- * @return	None.
- */
-void mic_init(void){
-	codec_init(CODEC_SAMPLE_RATE_8000);
-	codec_disable_dac();
-	codec_enable_adc();
-	i2s_init(I2S_DIR_RX,16000,1);//Mic 
-	NVIC_SetPriority(I2S_IRQn, 2);
-	mic_stop();
-}
-#endif
 
 /*********************************************************************
  * @fn		speaker_init
@@ -135,7 +106,7 @@ void speaker_start_hw(void)
  */
 void speaker_stop_hw(void)
 {
-	pmu_codec_power_disable();          
+	pmu_codec_power_disable();    
 	PA_DISABLE;						
 	codec_disable_dac();				
     i2s_stop();							
@@ -169,18 +140,6 @@ void PA_init_pins(void)
  */
 __attribute__((section("ram_code"))) void i2s_isr_ram(void)
 {
-#if 0
-	uint16_t i2s_adc_data[I2S_FIFO_DEPTH/2];
-
-    if((i2s_reg->status.rx_half_full)&&(i2s_reg->mask.rx_half_full)) {//codec_ADC
-			co_printf("M");
-			for(uint32_t i=0; i<(I2S_FIFO_DEPTH/2); i++) {
-					 i2s_adc_data[i] = i2s_reg->data;
-				}
-	//	encode_store_pcm_data(data, I2S_FIFO_DEPTH/2);
-    }
-#endif
-
 	uint32_t last = 0;
     if((i2s_reg->status.tx_half_empty)&&(i2s_reg->mask.tx_half_empty))//codec_DAC
     {

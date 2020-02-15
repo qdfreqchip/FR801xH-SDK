@@ -1,4 +1,15 @@
+/**
+ * Copyright (c) 2019, Freqchip
+ * 
+ * All rights reserved.
+ * 
+ * 
+ */
 //***********gyro driver**************
+
+/*
+ * INCLUDES
+ */
 #include <stdio.h>
 #include <stdint.h>
 
@@ -8,6 +19,7 @@
 #include "gyro_alg.h"
 #include "driver_system.h"
 #include "sys_utils.h"
+
 #ifdef FOR_GYRO_DRIVER
 os_timer_t gyroscope_loop_timer;
 uint32_t gyroscope_loop_count = 0;

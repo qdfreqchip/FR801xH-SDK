@@ -1,6 +1,13 @@
+/**
+ * Copyright (c) 2019, Freqchip
+ * 
+ * All rights reserved.
+ * 
+ * 
+ */
+
 /*
  * INCLUDE FILES
- ****************************************************************************************
  */
 #include <stdio.h>
 #include <string.h>

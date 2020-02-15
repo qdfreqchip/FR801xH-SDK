@@ -20,16 +20,14 @@
 #include "driver_flash.h"
 #include "decoder.h"
 
+/*
+ * MACROS 
+ */
 #define SPEAKER_DBG     FR_DBG_ON
 #define SPEAKER_LOG     FR_LOG(SPEAKER_DBG)
 
-
 /*
- * MACROS (宏定义)
- */
-
-/*
- * CONSTANTS (常量定义)
+ * CONSTANTS 
  */
 
 
@@ -65,18 +63,18 @@ uint8_t speaker_audio_rx_value[SPEAKER_AUDIO_RX_VALUE_LEN] = {0};
 
 
 /*
- * TYPEDEFS (类型定义)
+ * TYPEDEFS 
  */
 
 /*
- * GLOBAL VARIABLES (全局变量)
+ * GLOBAL VARIABLES 
  */
 uint8_t speaker_svc_id = 0;
 extern os_timer_t timer_refresh;// 用于刷新寄存器数据以及显示等
 
 
 /*
- * LOCAL VARIABLES (本地变量)
+ * LOCAL VARIABLES 
  */
 static gatt_service_t speaker_svc;
 

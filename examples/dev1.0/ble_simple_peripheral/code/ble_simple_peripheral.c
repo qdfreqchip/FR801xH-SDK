@@ -6,7 +6,7 @@
  * 
  */
  
- /*
+/*
  * INCLUDES (包含头文件)
  */
 #include <stdbool.h>
@@ -30,12 +30,13 @@
 
 
 /*
- * MACROS (宏定义)
+ * MACROS
  */
 
 /*
- * CONSTANTS (常量定义)
+ * CONSTANTS 
  */
+const unsigned	char * lcd_show_workmode[MODE_MAX] = {"PICTURE_UPDATE","SENSOR_DATA","SPEAKER_FROM_FLASH"};
 
 // GAP - Advertisement data (max size = 31 bytes, though this is
 // best kept short to conserve power while advertisting)
@@ -67,35 +68,33 @@ static uint8_t scan_rsp_data[] =
 };
 
 /*
- * TYPEDEFS (类型定义)
+ * TYPEDEFS 
  */
 
 /*
- * GLOBAL VARIABLES (全局变量)
+ * GLOBAL VARIABLES 
  */
 
 os_timer_t timer_refresh;// 用于刷新传感器数据以及显示等
 uint8_t App_Mode = PICTURE_UPDATE;//工作模式  可以通过KEY1切换
-uint8_t picture_idx = 0;//图片刷新序号
-
 
 /*
- * LOCAL VARIABLES (本地变量)
+ * LOCAL VARIABLES 
  */
-
-
  
 /*
- * LOCAL FUNCTIONS (本地函数)
+ * LOCAL FUNCTIONS
  */
 static void sp_start_adv(void);
+
 /*
- * EXTERN FUNCTIONS (外部函数)
+ * EXTERN FUNCTIONS
  */
 uint8_t CAPB18_data_get(float *temperature,float *air_press);
 uint8_t demo_CAPB18_APP(void);
+
 /*
- * PUBLIC FUNCTIONS (全局函数)
+ * PUBLIC FUNCTIONS
  */
 
 /** @function group ble peripheral device APIs (ble外设相关的API)

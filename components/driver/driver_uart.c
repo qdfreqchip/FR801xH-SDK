@@ -1,3 +1,14 @@
+/**
+ * Copyright (c) 2019, Freqchip
+ *
+ * All rights reserved.
+ *
+ *
+ */
+
+/*
+ * INCLUDES
+ */
 #include <stdint.h>
 #include "driver_plf.h"
 #include "driver_uart.h"

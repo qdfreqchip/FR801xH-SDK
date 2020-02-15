@@ -5,6 +5,7 @@
  * 
  * 
  */
+
 #ifndef BLE_SIMPLE_PERIPHERAL_H
 #define BLE_SIMPLE_PERIPHERAL_H
  
@@ -20,12 +21,8 @@
 
 /*
  * CONSTANTS (常量定义)
- */
-#define SP_TASK_EVT_NOTI    0x0001
-
-
-
-#define SYSTEM_MODE     
+ */    
+extern const unsigned	char * lcd_show_workmode[];
 
 /*
  * TYPEDEFS (类型定义)
@@ -48,7 +45,7 @@ enum WORK_MODE
  * GLOBAL VARIABLES (全局变量)
  */
 extern 	uint8_t App_Mode;
-extern uint8_t picture_idx;
+
 
 
 /*

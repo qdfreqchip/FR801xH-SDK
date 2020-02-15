@@ -1,7 +1,17 @@
+/**
+ * Copyright (c) 2019, Freqchip
+ * 
+ * All rights reserved.
+ * 
+ * 
+ */
+
+/*
+ * INCLUDES
+ */
 #include "decoder.h"
 #include "driver_plf.h"
 #include "core_cm3.h"
-//#include "encode.h"
 #include "os_task.h"
 #include "os_msg_q.h"
 #include "speaker.h"
@@ -12,7 +22,25 @@
 #include "adpcm_ms.h"
 #include "user_task.h"
 
+/*
+ * MACROS
+ */
+#define DEC_DBG FR_DBG_OFF
+#define DEC_LOG FR_LOG(DEC_DBG)
 
+/*
+ * CONSTANTS 
+ */
+#define DECODER_STORE_TYPE_RAM      0
+#define DECODER_STORE_TYPE_FLASH    1
+ 
+/*
+ * TYPEDEFS 
+ */
+
+/*
+ * GLOBAL VARIABLES 
+ */
 sbc_store_info_t sbc_sotre_env = {0};
 uint8_t *sbc_buff = NULL;
 speaker_env_t speaker_env = {0};
@@ -22,13 +50,24 @@ uint8_t stop_flag = 0;
 uint8_t decodeTASKState = DECODER_STATE_IDLE;//º¯Êýdecoder_play_next_frame_handler ÖÐµÄ×´Ì¬
 uint8_t Flash_data_state = true;
 
+/*
+ * LOCAL VARIABLES 
+ */
 
 
-#define DECODER_STORE_TYPE_RAM      0
-#define DECODER_STORE_TYPE_FLASH    1
+/*
+ * LOCAL FUNCTIONS
+ */
 
-#define DEC_DBG FR_DBG_OFF
-#define DEC_LOG FR_LOG(DEC_DBG)
+/*
+ * EXTERN FUNCTIONS
+ */
+
+/*
+ * PUBLIC FUNCTIONS
+ */
+
+
 /*********************************************************************
  * @fn		decoder_calc_adpcm_ms_frame_len
  *
@@ -41,7 +80,6 @@ uint8_t Flash_data_state = true;
 
 uint16_t decoder_calc_adpcm_ms_frame_len(uint8_t **header_org)
 {
-//    struct adpcm_fmt_t *fmt;
     uint32_t len;
     uint8_t *header = *header_org;
     uint16_t frame_size;
@@ -203,7 +241,6 @@ void decoder_start(uint32_t start, uint32_t end, uint32_t tot_data_len, uint16_t
  *         
  * @return	None.
  */
-
 void decoder_play_next_frame(void)
 {
    
@@ -226,7 +263,6 @@ void decoder_play_next_frame(void)
  *         
  * @return	None.
  */
-
 void decoder_stop(void)
 {
     DEC_LOG("decoder_stop\r\n");
@@ -250,7 +286,6 @@ void decoder_stop(void)
  *         
  * @return	None.
  */
-
 void test_end_speaker(void)
 {
     decoder_stop();
@@ -267,7 +302,6 @@ void test_end_speaker(void)
  *         
  * @return	None.
  */
-
 void test_speaker_from_flash(void)
 {
 
@@ -424,18 +458,14 @@ void  decoder_play_next_frame_handler(void *arg)
 
                 if((*Task_state )== DECODER_STATE_BUFFERING)
                 {
-					DEC_LOG("x*******");
 					if (decoder_env.pcm_buffer_counter > 2)
                     {
-                       // ke_state_set(TASK_DECODER, DECODER_STATE_PLAYING);
-                       DEC_LOG("I*******");
-						decodeTASKState = DECODER_STATE_PLAYING;
+                 		decodeTASKState = DECODER_STATE_PLAYING;
                         NVIC_EnableIRQ(I2S_IRQn);//
 						
                     }
                     else
                     {
-						DEC_LOG("N*******");
 						decoder_play_next_frame();
 						
                     }
@@ -447,26 +477,19 @@ void  decoder_play_next_frame_handler(void *arg)
                     decoder_env.data_processed_len += decoder_env.frame_len;
                     if( (decoder_env.tot_data_len - decoder_env.data_processed_len) < (1024) )
                     {
-						DEC_LOG("h*******");
 						decoder_half_processed();
                     }
 
                     if( (decoder_env.tot_data_len - decoder_env.data_processed_len)  < decoder_env.frame_len )
                     {
                         if(decoder_hold_flag == false)
-                        {
-                            //printf("y");
-                           // ke_state_set(TASK_DECODER, DECODER_STATE_WAITING_END);
-                           DEC_LOG("y*******");
-							decodeTASKState = DECODER_STATE_WAITING_END;
-                            //ke_timer_set(DECODER_EVENT_WAIT_END_TO, TASK_DECODER, 3);
+                        {                 
+                        	decodeTASKState = DECODER_STATE_WAITING_END;                          
                         }
                     }
                     if(decoder_env.current_pos >= decoder_env.data_end)
                     {
-                        //printf("z");
-                        DEC_LOG("z*******");
-                        decoder_env.current_pos = decoder_env.data_start;
+                       decoder_env.current_pos = decoder_env.data_start;
                     }
                 }
 
@@ -492,7 +515,6 @@ void  decoder_play_next_frame_handler(void *arg)
                 {
                     decoder_stop();
                     stop_flag = 1;
-                    //ke_timer_set(APP_PLAY_TONE_INTERVAL, TASK_APP, 100);
                 }
             }
             break;

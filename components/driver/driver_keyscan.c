@@ -1,3 +1,14 @@
+/**
+ * Copyright (c) 2019, Freqchip
+ *
+ * All rights reserved.
+ *
+ *
+ */
+
+/*
+ * INCLUDES
+ */
 #include <stdint.h>
 
 #include "co_log.h"
@@ -6,6 +17,9 @@
 #include "driver_keyscan.h"
 #include "driver_pmu.h"
 
+/*
+ * MACROS 
+ */
 #undef LOG_LEVEL_MODULE
 #define LOG_LEVEL_MODULE        LOG_LEVEL_INFO
 

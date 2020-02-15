@@ -1,5 +1,14 @@
+/**
+ * Copyright (c) 2019, Freqchip
+ * 
+ * All rights reserved.
+ * 
+ * 
+ */
 
-
+/*
+ * INCLUDES
+ */
 #include "lcd.h"
 #include "oledfont.h"
 #include "bmp.h"
@@ -11,11 +20,18 @@
 #include "driver_gpio.h"
 #include "driver_iomux.h"
 #include "driver_pmu.h"
-#include "ble_simple_peripheral.h"
-#include "driver_flash.h"
 
+/*
+ * MACROS
+ */
 
+/*
+ * CONSTANTS 
+ */
 
+/*
+ * TYPEDEFS 
+ */
 
 enum
 {
@@ -32,10 +48,29 @@ enum
 #define LCD_RES_LOW    gpio_porta_write(gpio_porta_read() & ~(1<<GPIO_BIT_0) )// gpio_set_pin_value(GPIO_PORT_A, GPIO_BIT_0, 0)
 #define LCD_RES_HIGH   gpio_porta_write(gpio_porta_read() | (1<<GPIO_BIT_0) )// gpio_set_pin_value(GPIO_PORT_A, GPIO_BIT_0, 1)
 
+/*
+ * GLOBAL VARIABLES 
+ */
+
 uint16_t BACK_COLOR;   //背景色
 uint8_t dc_value = DC_CMD;   //cmd
+uint8_t picture_idx = 0;//图片刷新序号
 
-const unsigned  char * lcd_show_workmode[MODE_MAX] = {"PICTURE_UPDATE","SENSOR_DATA","SPEAKER_FROM_FLASH"};
+/*
+ * LOCAL VARIABLES 
+ */
+ 
+/*
+ * LOCAL FUNCTIONS
+ */
+
+/*
+ * EXTERN FUNCTIONS
+ */
+
+/*
+ * PUBLIC FUNCTIONS
+ */
 
 
 
@@ -685,37 +720,16 @@ void LCD_Clear_quick(uint16_t Color)
 }
 
 
-/******************************************************************LCD APP***************************************************************************/
-
-#include "os_timer.h"
-//os_timer_t timerA;
-uint16_t ColorSet[6]= {BLUE,GBLUE,LIGHTBLUE,DARKBLUE,GRAYBLUE,LBBLUE};
-uint8_t ColorTurn=0;
-/*
-void timerA_fn(void *arg)
-{
-    // handle_tft_pic();
-    int32_t temperature, humidity;
-
-    ColorTurn++;
-    ColorTurn %=6;
-    for(uint8_t i=0; i<6; i++)
-    {
-        LCD_ShowChinese(10+35*i,0,i,32,ColorSet[(ColorTurn+i)%6]);
-    }
-}
-*/
-
 /*********************************************************************
 * @fn		lcd_show_logo
 *
 * @brief	Display logo and working mode
 *
-* @param	mode - working mode
+* @param	mode_str - a string for the name of the working mode
 *			
 * @return	None.
 */
-void lcd_show_logo(uint8_t mode)
+void lcd_show_logo(const uint8_t*  mode_str)
 {
 	uint8_t LCD_ShowStringBuff[30] = {0};
 	BACK_COLOR=WHITE;
@@ -726,7 +740,7 @@ void lcd_show_logo(uint8_t mode)
 
 	sprintf((char *)LCD_ShowStringBuff,"Mode:");
 	LCD_ShowString(5,75,LCD_ShowStringBuff,BLACK);
-	LCD_ShowString(50, 75, lcd_show_workmode[mode], BLACK);
+	LCD_ShowString(50, 75, mode_str, BLACK);
 	
 
 }
@@ -744,13 +758,7 @@ void demo_LCD_APP(void)
 {
     
     Lcd_Init();
-	LCD_DisPIC((uint32_t )gImage_logo240x240);
-	picture_idx = 1;     
-
-//    os_timer_init(&timerA,timerA_fn,NULL);//每1s更新一次温湿度
-//    os_timer_start(&timerA,1000,1);
-
-
+	LCD_DisPIC(picture_idx++);     
 }
 
 /*********************************************************************
@@ -758,22 +766,25 @@ void demo_LCD_APP(void)
 *
 * @brief	Display a picture with a resolution of 240x240
 *
-* @param	flash_addr - Pointer to picture data
+* @param	pic_idx - The serial number of the picture
 *			
 * @return	None.
 */
-void LCD_DisPIC(uint32_t flash_addr)
+void LCD_DisPIC(uint8_t pic_idx)
 {
-//    uint8_t i;
-    LCD_Address_Set(0, 0, 240, 240);
-//    uint32_t pos =0;
- //   system_set_cache_config(0x60, 10);
-    LCD_DriverWriteDataBuf((uint8_t *)( flash_addr), 480*240);
-//    LCD_DriverWriteDataBuf((uint8_t *)(0x01000000 + flash_addr), 480*240);
-
-//    system_set_cache_config(0x61, 10);
-
-
+	LCD_Address_Set(0, 0, 240, 240);
+	if(pic_idx == 0){
+			LCD_DriverWriteDataBuf((uint8_t *)( gImage_logo240x240), 480*240);
+	}else if(pic_idx == 1){
+		LCD_DriverWriteDataBuf((uint8_t *)( gImage_erweima240x240), 480*240);
+	}else if(pic_idx == 2){
+		LCD_Clear_quick(RED);
+	}else if(pic_idx == 3){
+		LCD_Clear_quick(GREEN);
+	}else if(pic_idx == 4){
+		LCD_Clear_quick(BLUE);
+	}
+  
 }
 
 

@@ -27,3 +27,4 @@ K2       PD6
 TXD     PA2
 RXD     PA3
 
+4. gcc toolchain is not ready for this project.

@@ -10,7 +10,7 @@
 #define SPEAKER_SERVICE_H
 
 /*
- * INCLUDES (包含头文件)
+ * INCLUDES 
  */
 #include <stdio.h>
 #include <string.h>
@@ -20,11 +20,11 @@
 
 
 /*
- * MACROS (宏定义)
+ * MACROS
  */
 
 /*
- * CONSTANTS (常量定义)
+ * CONSTANTS 
  */
 // Simple Profile attributes index. 
 enum

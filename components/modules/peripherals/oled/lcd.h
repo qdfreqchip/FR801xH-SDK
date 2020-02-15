@@ -3,6 +3,8 @@
 
 #include "stdlib.h"	  
 #include <stdint.h>
+#include <stdio.h>
+
 
 #define USE_HORIZONTAL 0  //设置横屏或者竖屏显示 0或1为竖屏 2或3为横屏
 #define TITLE_OFFSET 20
@@ -31,6 +33,8 @@
 #define OLED_DATA 1	//写数据
 
 extern  uint16_t BACK_COLOR;   //背景色
+extern uint8_t picture_idx;
+
 
 void LCD_Address_Set(uint16_t x1,uint16_t y1,uint16_t x2,uint16_t y2);
 void Lcd_Init(void); 
@@ -49,8 +53,8 @@ void LCD_ShowNum(uint16_t x,uint16_t y,uint16_t num,uint8_t len,uint16_t color);
 void LCD_ShowNum1(uint16_t x,uint16_t y,float num,uint8_t len,uint16_t color);
 void LCD_ShowPicture(uint16_t x1,uint16_t y1,uint16_t x2,uint16_t y2);
 void demo_LCD_APP(void);
-void lcd_show_logo(uint8_t mode);
-void LCD_DisPIC(uint32_t flash_addr);
+void lcd_show_logo(const uint8_t*  mode_str);
+void LCD_DisPIC(uint8_t pic_idx);
 void LCD_Clear_quick(uint16_t Color);
 __attribute__((section("ram_code"))) void tft_write_pic_data_to_flash(void);
 

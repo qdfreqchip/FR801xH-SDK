@@ -19,7 +19,7 @@
 #include "sys_utils.h"
 
 /*
- * MACROS (�궨��)
+ * MACROS 
  */
 #define IIC_TRAN_START      0x100
 #define IIC_TRAN_STOP       0x200
@@ -28,7 +28,7 @@
 #define IIC1_REG_BASE           ((volatile struct iic_reg_t *)I2C1_BASE)
 
 /*
- * TYPEDEFS (���Ͷ���)
+ * TYPEDEFS 
  */
 struct iic_data_t
 {
@@ -130,7 +130,7 @@ struct iic_reg_t
 };
 
 /*
- * LOCAL VARIABLES (���ر���)
+ * LOCAL VARIABLES 
  */
 /// how many 10us will be taken on IIC bus for one byte
 static uint16_t iic_byte_period[IIC_CHANNEL_MAX] = {10, 10};

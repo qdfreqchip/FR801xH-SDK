@@ -1,14 +1,24 @@
-/***************************************************************************
- *            adpcm.c
- *
- *  Fri Nov 27 15:25:03 2009
- *  Copyright  2009  zmx
- *  <zmx@<host>>
- ****************************************************************************/
+/**
+ * Copyright (c) 2019, Freqchip
+ * 
+ * All rights reserved.
+ * 
+ * 
+ */
+ 
+/*
+ * INCLUDES
+ */
 #include "adpcm_ms.h"
 
 
+/*
+ * MACROS
+ */
 
+/*
+ * CONSTANTS 
+ */
 static int AdaptationTable[] =
 {
     230, 230, 230, 230, 307, 409, 512, 614,
@@ -25,7 +35,16 @@ static int AdaptCoeff2[] =
     0, -256, 0, 64, 0, -208, -232
 };
 
-
+/*********************************************************************
+ * @fn		adpcm_ms_expand_nibble
+ *
+ * @brief	.
+ *
+ * @param	c       -
+ *          nibble  -
+ *
+ * @return	short   -.
+ */
 short adpcm_ms_expand_nibble(ADPCMChannelStatus *c, char nibble)
 {
     int predictor;
@@ -42,6 +61,19 @@ short adpcm_ms_expand_nibble(ADPCMChannelStatus *c, char nibble)
 }
 
 
+/*********************************************************************
+ * @fn		adpcm_decode_frame
+ *
+ * @brief	.
+ *
+ * @param	c           -
+ *          pcm_buf     -
+ *          data_size   -
+ *          adpcm_buf   -
+ *          buf_size    -
+ *
+ * @return	short       -.
+ */
 int adpcm_decode_frame(ADPCMContext *c,
                        short *pcm_buf, int *data_size,
                        uint8_t *adpcm_buf, int buf_size)

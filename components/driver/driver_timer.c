@@ -18,15 +18,15 @@
 #include "driver_timer.h"
 
 /*
- * MACROS (�궨��)
+ * MACROS
  */
 
 /*
- * CONSTANTS (��������)
+ * CONSTANTS
  */
 
 /*
- * TYPEDEFS (���Ͷ���)
+ * TYPEDEFS
  */
 struct timer_lvr_t
 {
@@ -65,23 +65,23 @@ struct timer
 };
 
 /*
- * GLOBAL VARIABLES (ȫ�ֱ���)
+ * GLOBAL VARIABLES
  */
 
 /*
- * LOCAL VARIABLES (���ر���)
+ * LOCAL VARIABLES
  */
 
 /*
- * LOCAL FUNCTIONS (���غ���)
+ * LOCAL FUNCTIONS
  */
 
 /*
- * EXTERN FUNCTIONS (�ⲿ����)
+ * EXTERN FUNCTIONS
  */
 
 /*
- * PUBLIC FUNCTIONS (ȫ�ֺ���)
+ * PUBLIC FUNCTIONS
  */
 
 /*********************************************************************
