@@ -9,6 +9,21 @@
 #ifndef _DRIVER_PWM_H
 #define _DRIVER_PWM_H
 
+/*
+ * INCLUDES 
+ */
+
+/*
+ * MACROS 
+ */
+
+/*
+ * CONSTANTS 
+ */
+
+/*
+ * TYPEDEFS 
+ */
 enum pwm_channel_t {
     PWM_CHANNEL_0,
     PWM_CHANNEL_1,
@@ -18,6 +33,26 @@ enum pwm_channel_t {
     PWM_CHANNEL_5,
     PWM_CHANNEL_MAX,
 };
+
+/*
+ * GLOBAL VARIABLES 
+ */
+
+/*
+ * LOCAL VARIABLES 
+ */
+
+/*
+ * LOCAL FUNCTIONS 
+ */
+
+/*
+ * EXTERN FUNCTIONS 
+ */
+
+/*
+ * PUBLIC FUNCTIONS 
+ */
 
 /*********************************************************************
  * @fn      pwm_init

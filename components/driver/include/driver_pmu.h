@@ -8,6 +8,9 @@
 #ifndef _DRIVER_PMU_H
 #define _DRIVER_PMU_H
 
+/*
+ * INCLUDES 
+ */
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -17,6 +20,9 @@
 #include "driver_pmu_regs.h"
 #include "driver_frspim.h"
 
+/*
+ * MACROS 
+ */
 #define ool_write(addr, data)       frspim_wr(FR_SPI_PMU_CHAN,(addr),1, (data))
 #define ool_read(addr)              (uint8_t)frspim_rd(FR_SPI_PMU_CHAN,(addr),1)
 
@@ -26,6 +32,17 @@
 #define ool_write32(addr,data)      frspim_wr(FR_SPI_PMU_CHAN,(addr),4, (data))
 #define ool_read32(addr)            (uint32_t)frspim_rd(FR_SPI_PMU_CHAN,(addr),4)
 
+/*
+ * CONSTANTS 
+ */
+#define PMU_ALDO_OUT_3_3            0xe0
+#define PMU_ALDO_OUT_2_9            0xc0
+#define PMU_ALDO_OUT_2_5            0xa0
+#define PMU_ALDO_OUT_1_8            0x30
+
+/*
+ * TYPEDEFS 
+ */
 enum pmu_sys_pow_mode_t
 {
     PMU_SYS_POW_BUCK,
@@ -44,11 +61,6 @@ enum pmu_lp_clk_src_t
     PMU_LP_CLK_SRC_IN_RC,
 };
 
-#define PMU_ALDO_OUT_3_3            0xe0
-#define PMU_ALDO_OUT_2_9            0xc0
-#define PMU_ALDO_OUT_2_5            0xa0
-#define PMU_ALDO_OUT_1_8            0x30
-
 enum pmu_isr_enable_t
 {
     PMU_ISR_BIT_BAT =            CO_BIT(0),
@@ -66,6 +78,26 @@ enum pmu_isr_enable_t
     PMU_ISR_BIT_ADKEY1_LOW =     CO_BIT(12),
     PMU_ISR_BIT_ADKEY1_HIGH =    CO_BIT(13),
 };
+
+/*
+ * GLOBAL VARIABLES 
+ */
+
+/*
+ * LOCAL VARIABLES 
+ */
+
+/*
+ * LOCAL FUNCTIONS 
+ */
+
+/*
+ * EXTERN FUNCTIONS 
+ */
+
+/*
+ * PUBLIC FUNCTIONS 
+ */
 
 /*********************************************************************
  * @fn      pmu_set_pin_to_PMU

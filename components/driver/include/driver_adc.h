@@ -68,11 +68,6 @@ enum adc_trans_source_t {
     ADC_TRANS_SOURCE_PAD,
 };
 
-enum adc_trans_mode_t {
-    ADC_TRANS_MODE_LOOP,
-    ADC_TRANS_MODE_FIXED,
-};
-
 struct adc_cfg_t {
     enum adc_trans_source_t src;
 
@@ -135,7 +130,8 @@ void adc_disable(void);
  *          configurations set when calling adc_init.
  *
  * @param   src     - @ref adc_trans_source_t.
- *          channels- value of indicated channels are needed.
+ *          channels- value of indicated channels are needed, should not contain 
+ *                    disabled channel.
  *          buffer  - the sample results will be stored in sequence.
  *       
  * @return  None.
@@ -146,8 +142,9 @@ void adc_get_result(enum adc_trans_source_t src, uint8_t channels, uint16_t *buf
  * @fn      adc_init
  *
  * @brief   initiate ADC with parameters stored in cfg.
- *          !!!!!!!!!!!!!!!!!!!!!!!!
- *          currently the adc module only supports enable one channel at the same time.
+ *          The adc module works in low sample rate mode (1K) if more than
+ *          one channels are enabled, otherwise higher sample rate (1M) will
+ *			be used default.
  *
  * @param   cfg - ADC configurations
  *       

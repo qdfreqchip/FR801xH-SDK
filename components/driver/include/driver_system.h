@@ -8,10 +8,35 @@
 #ifndef _DRIVER_SYSTEM_H
 #define _DRIVER_SYSTEM_H
 
+/*
+ * INCLUDES 
+ */
 #include <stdint.h>
 
 #include "driver_iomux.h"
 
+/*
+ * MACROS 
+ */
+
+/*
+ * CONSTANTS 
+ */
+#define SYSTEM_PORT_MUX_MSK     0xF
+#define SYSTEM_PORT_MUX_LEN     4
+
+#define SYSTEM_ONKEY_MAP_EXI11_POS  CO_BIT(7)
+#define SYSTEM_ONKEY_MAP_EXI10_POS  CO_BIT(6)
+#define SYSTEM_ONKEY_MAP_EXI9_POS   CO_BIT(5)
+#define SYSTEM_ONKEY_MAP_EXI8_POS   CO_BIT(4)
+#define SYSTEM_ONKEY_MAP_EXI3_POS   CO_BIT(3)
+#define SYSTEM_ONKEY_MAP_EXI2_POS   CO_BIT(2)
+#define SYSTEM_ONKEY_MAP_EXI1_POS   CO_BIT(1)
+#define SYSTEM_ONKEY_MAP_EXI0_POS   CO_BIT(0)
+
+/*
+ * TYPEDEFS 
+ */
 struct system_osc_pll_cfg_t
 {
     uint32_t bg_pd:1;
@@ -84,18 +109,6 @@ struct system_codec_mode_t
     uint32_t reserved:26;
 };
 
-#define SYSTEM_PORT_MUX_MSK     0xF
-#define SYSTEM_PORT_MUX_LEN     4
-
-#define SYSTEM_ONKEY_MAP_EXI11_POS  CO_BIT(7)
-#define SYSTEM_ONKEY_MAP_EXI10_POS  CO_BIT(6)
-#define SYSTEM_ONKEY_MAP_EXI9_POS   CO_BIT(5)
-#define SYSTEM_ONKEY_MAP_EXI8_POS   CO_BIT(4)
-#define SYSTEM_ONKEY_MAP_EXI3_POS   CO_BIT(3)
-#define SYSTEM_ONKEY_MAP_EXI2_POS   CO_BIT(2)
-#define SYSTEM_ONKEY_MAP_EXI1_POS   CO_BIT(1)
-#define SYSTEM_ONKEY_MAP_EXI0_POS   CO_BIT(0)
-
 struct system_led_cntl_t
 {
     uint32_t led0_en:1;
@@ -147,7 +160,7 @@ struct system_regs_t
     uint32_t port_pull;                                 //0x20
     uint32_t qspi_pull;                                 //0x24
     uint32_t port_mux[4];                               //0x28
-    uint32_t ext_int_mux;                             //0x38
+    uint32_t ext_int_mux;                               //0x38
     uint32_t reserved2[7];
     struct system_charger_state_t charger_state;        //0x58
     uint32_t reserved3;
@@ -155,7 +168,26 @@ struct system_regs_t
     struct system_keyscan_ctrl_t key_scan_ctrl;
 };
 
+/*
+ * GLOBAL VARIABLES 
+ */
 extern volatile struct system_regs_t *const system_regs;
+
+/*
+ * LOCAL VARIABLES 
+ */
+
+/*
+ * LOCAL FUNCTIONS 
+ */
+
+/*
+ * EXTERN FUNCTIONS 
+ */
+
+/*
+ * PUBLIC FUNCTIONS 
+ */
 
 /*********************************************************************
  * @fn      system_get_pclk

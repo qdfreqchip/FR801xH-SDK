@@ -9,7 +9,7 @@
 #define _DRIVER_GPIO_H
 
 /*
- * INCLUDES (包含头文件)
+ * INCLUDES
  */
 #include <stdint.h>
 
@@ -18,7 +18,7 @@
 #include "driver_iomux.h"
 
 /*
- * MACROS (宏定义)
+ * MACROS
  */
 #define GPIO_PORTA_DATA         (GPIOAB_BASE + 0x00)
 #define GPIO_PORTB_DATA         (GPIOAB_BASE + 0x04)

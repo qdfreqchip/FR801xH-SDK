@@ -1,19 +1,17 @@
 /**
- ****************************************************************************************
+ * Copyright (c) 2019, Freqchip
  *
- * @file app_ht.h
- *
- * @brief Health Thermometer Application entry point
- *
- * Copyright (C) RivieraWaves 2009-2015
+ * All rights reserved.
  *
  *
- ****************************************************************************************
  */
 
 #ifndef OS_MEM_H_
 #define OS_MEM_H_
 
+/*
+ * INCLUDES 
+ */
 #include <stdint.h>
 
 /*********************************************************************

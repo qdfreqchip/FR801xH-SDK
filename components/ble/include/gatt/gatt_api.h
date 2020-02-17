@@ -9,16 +9,16 @@
 #define GATT_API_H
 
 /*
-* INCLUDES (包含头文件)
+* INCLUDES 
 */
 #include <stdint.h>
 
 /*
- * MACROS (宏定义)
+ * MACROS 
  */
 
 /*
- * CONSTANTS (常量定义)
+ * CONSTANTS 
  */
 #define MAX_PEER_SVC_NUM    (10)
 #define MAX_CLEINT_ATT_NUM  (50)
@@ -54,7 +54,7 @@
 
 #define GATT_SVC_ID_FAIL                0xff
 /*
- * TYPEDEFS (类型定义)
+ * TYPEDEFS 
  */
 
 /**
@@ -162,8 +162,6 @@ typedef struct
     gatt_msg_handler_t      gatt_msg_handler;   //!< Read request callback function. 
 } gatt_client_t;
 
-
-
 /**
 * BLE client write format.
 */
@@ -173,8 +171,9 @@ typedef struct
     uint8_t     client_id;      //!< Service ID among all services in current system. 
     uint8_t     att_idx;        //!< Attribute id number in its service attribute table. 
     uint8_t     *p_data;        //!< Data pointer to be written
-    uint16_t     data_len;       //!< Data length to be written
+    uint16_t    data_len;       //!< Data length to be written
 } gatt_client_write_t;
+
 /**
 * BLE client read format.
 */
@@ -205,7 +204,7 @@ typedef struct
     uint8_t     svc_id;         //!< Service ID among all services in current system. 
     uint8_t     att_idx;        //!< Attribute id number in its service attribute table. 
     uint8_t     *p_data;        //!< Data to be sent as notification.
-    uint16_t     data_len;       //!< Data length
+    uint16_t    data_len;       //!< Data length
 } gatt_ntf_t;
 
 /**
@@ -217,28 +216,28 @@ typedef struct
     uint8_t     svc_id;         //!< Service ID among all services in current system. 
     uint8_t     att_idx;        //!< Attribute id number in its service attribute table. 
     uint8_t     *p_data;        //!< Data to be sent as indication.
-    uint16_t     data_len;       //!< Data length
+    uint16_t    data_len;       //!< Data length
 } gatt_ind_t;
 
 
 /*
- * GLOBAL VARIABLES (全局变量)
+ * GLOBAL VARIABLES 
  */
 
 /*
- * LOCAL VARIABLES (本地变量)
+ * LOCAL VARIABLES 
  */
 
 /*
- * LOCAL FUNCTIONS (本地函数)
+ * LOCAL FUNCTIONS 
  */
 
 /*
- * EXTERN FUNCTIONS (外部函数)
+ * EXTERN FUNCTIONS 
  */
 
 /*
- * PUBLIC FUNCTIONS (全局函数)
+ * PUBLIC FUNCTIONS 
  */
 
 /** @function group ble peripheral device APIs (ble外设相关的API)
@@ -406,6 +405,7 @@ void gatt_indication(gatt_ind_t ind_att);
  * @return  None.
  */
 void gatt_mtu_exchange_req(uint8_t conidx);
+
 /****************************************************************************************
  * @brief Gets the negotiated MTU. This function gets the negotiated MTU.
  *

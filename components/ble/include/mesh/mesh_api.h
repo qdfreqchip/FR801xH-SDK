@@ -19,7 +19,7 @@
 #include "gap_api.h"
 
 /*
- * MACROS (宏定义)
+ * MACROS 
  */
 
 /** @defgroup MODEL_VENDOR_MODE, model is from SIG or vendor specific.
@@ -29,11 +29,11 @@
 #define MODEL_TYPE_VENDOR           1   //!< Vender specific model type.
 
 /*
- * CONSTANTS (常量定义)
+ * CONSTANTS 
  */
 
 /*
- * TYPEDEFS (类型定义)
+ * TYPEDEFS 
  */
 // Mesh event type define 
 enum mesh_event_type_t 
@@ -159,7 +159,7 @@ typedef struct
     uint32_t        opcode;             //!< Mesh message operation code (can be 1, 2 or 3 octet operation code) 
     uint16_t        src;                //!< Source address of the message (Required for a response) 
     uint16_t        msg_len;            //!< Message length     
-    const uint8_t  *msg;                //!< Message content 
+    const uint8_t   *msg;               //!< Message content 
 } mesh_model_msg_ind_t;
 
 /// Network key information entry structure if network key is not being updated
@@ -264,40 +264,40 @@ typedef struct mesh_update_ind
 // Mesh event structure
 typedef struct
 {
-    enum mesh_event_type_t type;            //!< Mesh event type, see @mesh_event_type_t
+    enum mesh_event_type_t      type;                   //!< Mesh event type, see @mesh_event_type_t
     union
     {
-        mesh_prov_result_ind_t prov_result; //!< Provision result, see @mesh_prov_result_ind_t
-        mesh_update_ind_t *update_ind;      //!< Mesh status update indication message.
-        mesh_model_msg_ind_t model_msg;     //!< Mesh model message.
-        uint8_t compo_data_req_page;        //!< Mesh composition data request page.
-        gap_evt_adv_report_t adv_report;    //!< ADV report from adv bearer.
+        mesh_prov_result_ind_t  prov_result;            //!< Provision result, see @mesh_prov_result_ind_t
+        mesh_update_ind_t       *update_ind;            //!< Mesh status update indication message.
+        mesh_model_msg_ind_t 	model_msg;              //!< Mesh model message.
+        uint8_t                 compo_data_req_page;	//!< Mesh composition data request page.
+        gap_evt_adv_report_t 	adv_report;             //!< ADV report from adv bearer.
     } param;
 } mesh_event_t;
 
 // Mesh model struct.
 typedef struct
 {
-    uint32_t        model_id;       //!< Model ID of the model to be added.
-    uint8_t         model_vendor;   //!< If it is SIG model or vendor specific model. @MODEL_VENDOR_MODE
-    uint8_t         element_idx;    //!< Element index in the mesh device.
-    void (*msg_handler)(const mesh_model_msg_ind_t*); //!< Model message handler.
+    uint32_t        model_id;                           //!< Model ID of the model to be added.
+    uint8_t         model_vendor;                       //!< If it is SIG model or vendor specific model. @MODEL_VENDOR_MODE
+    uint8_t         element_idx;                        //!< Element index in the mesh device.
+    void (*msg_handler)(const mesh_model_msg_ind_t*);   //!< Model message handler.
 } mesh_model_t;
 
 // Gap callback function define for mesh event handling.
 typedef void(* mesh_callback_func_t)(mesh_event_t * event);
 
 /*
- * GLOBAL VARIABLES (全局变量)
+ * GLOBAL VARIABLES 
  */
 
 /*
- * LOCAL VARIABLES (本地变量)
+ * LOCAL VARIABLES 
  */
 
 
 /*
- * PUBLIC FUNCTIONS (全局函数)
+ * PUBLIC FUNCTIONS 
  */
 
 /*********************************************************************

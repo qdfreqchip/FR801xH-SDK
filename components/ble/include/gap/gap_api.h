@@ -9,200 +9,26 @@
 #define GAP_API_H
 
 /*
- * INCLUDES (包含头文件)
+ * INCLUDES 
  */
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
 
 /*
- * MACROS (宏定义)
+ * MACROS 
  */
-
-
 
 /*
- * TYPEDEFS (类型定义)
- */
-
-/** @defgroup GAP_EVT_TYPE_DEFINES for application layer callbacks
- * @{
- */
-typedef enum
-{
-    GAP_EVT_ALL_SVC_ADDED,          //!< All GATT servcie added
-
-    GAP_EVT_SLAVE_CONNECT,          //!< Connected as slave role
-    GAP_EVT_MASTER_CONNECT,         //!< Connected as master role
-    GAP_EVT_DISCONNECT,             //!< Disconnected
-    GAP_EVT_LINK_PARAM_REJECT,      //!< Parameter update rejected
-    GAP_EVT_LINK_PARAM_UPDATE,      //!< Parameter update successful
-    GAP_EVT_ADV_END,                //!< Advertising ended
-    GAP_EVT_SCAN_END,               //!< Scanning ended
-    GAP_EVT_ADV_REPORT,             //!< Find a BLE device
-    GAP_EVT_CONN_END,               //!< Connecion procedure canceled
-    GAP_EVT_PEER_FEATURE,           //!< Got peer device supported features
-    GAP_EVT_MTU,                    //!< MTU exchange event
-    GAP_EVT_LINK_RSSI,              //!< Got peer device RSSI value
-
-    GAP_SEC_EVT_MASTER_AUTH_REQ,    //!< Authentication request
-    GAP_SEC_EVT_MASTER_ENCRYPT,     //!< Encryted as master role
-    GAP_SEC_EVT_SLAVE_ENCRYPT,      //!< Enrypted as slave role
-} gap_event_type_t;
-
-// BD ADDR 
-typedef struct 
-{
-    uint8_t  addr[6];           //!< 6-byte array address value
-}mac_addr_t;
-
-// GAP BD ADDR strucrue, includes address type
-typedef struct
-{
-    mac_addr_t addr;            //!< BD Address of device
-    uint8_t addr_type;          //!< Address type of the device 0=public/1=private random
-}gap_mac_addr_t;
-
-// Connected peer devcie link parameters
-typedef struct 
-{
-    uint8_t     conidx;         //!< Connection index
-    mac_addr_t  peer_addr;      //!< BDADDR of peer device
-    uint8_t     addr_type;      //!< Peer device address type
-    uint16_t    con_interval;   //!< Connection interval
-    uint16_t    con_latency;    //!< Slave latency
-    uint16_t    sup_to;         //!< Supervision timeout
-}conn_peer_param_t;
-
-// Link disconnected event & reason
-typedef struct 
-{
-    uint8_t conidx;             //!< Connection index
-    uint8_t reason;             //!< Reason of disconnection
-}gap_evt_disconnect_t;
-
-// Link parameter update reject event
-typedef struct 
-{
-    uint8_t conidx;             //!< Connection index
-    uint8_t status;             //!< Parameter reject status
-}gap_evt_link_param_reject_t;
-
-// Link parameter update success event
-typedef struct
-{
-    uint8_t     conidx;         //!< Connection index
-    uint16_t    con_interval;   //!< Connection interval
-    uint16_t    con_latency;    //!< Connection latency value
-    uint16_t    sup_to;         //!< Supervision timeout
-}gap_evt_link_param_update_t;
-
-// Scan result, find remote advertising devide
-typedef struct 
-{
-    uint8_t evt_type;               //!< Bit field providing information about the received report (@see GAP_SCAN_EVT_TYPE_DEFINES)
-    gap_mac_addr_t src_addr;        //!< Target address (in case of a directed advertising report)
-    int8_t tx_pwr;                  //!< TX power (in dBm)
-    int8_t rssi;                    //!< RSSI (between -127 and +20 dBm)
-    uint16_t length;                //!< Report length
-    uint8_t *data;                  //!< Report data
-}gap_evt_adv_report_t;
-
-// Connected peer device supported features
-typedef struct 
-{
-    uint8_t conidx;                 //!< Connection index
-    uint8_t features[8];            //!< Features bitmask
-}gap_evt_peer_feature_t;
-
-// Connected peer device MTU size
-typedef struct
-{
-    uint8_t conidx;                 //!< Connection index
-    uint16_t value;                 //!< MTU size
-}gattc_mtu_t;
-
-// Authentication request from master
-typedef struct 
-{
-    uint8_t conidx;                 //!< Connection index
-    uint8_t auth;                   //!< Authentication level (@see gap_auth)
-}gap_sec_evt_master_auth_req_t;
-
-// GAT event structure
-typedef struct
-{
-    gap_event_type_t type;                                      //!< GAP event type
-    union
-    {
-        conn_peer_param_t               slave_connect;          //!< Peer slave device connection parameters
-        conn_peer_param_t               master_connect;         //!< Peer master device connection parameters
-        gap_evt_disconnect_t            disconnect;             //!< Disconnect event
-        gap_evt_link_param_reject_t     link_reject;            //!< Parameter reject event
-        gap_evt_link_param_update_t     link_update;            //!< Parameter update success event
-        uint8_t                         adv_end_status;         //!< Advertising end status
-        uint8_t                         scan_end_status;        //!< Scanning end status
-        gap_evt_adv_report_t            *adv_rpt;               //!< Scanning results
-        uint8_t                         conn_end_reason;        //!< Connection end reason
-        gap_evt_peer_feature_t          peer_feature;           //!< Peer device supported features
-        gattc_mtu_t                     mtu;                    //!< MTU size
-        int8_t                          link_rssi;              //!< Peer device RSSI value
-
-        gap_sec_evt_master_auth_req_t   auth_req;               //!< Master authentication request
-        uint8_t                         master_encrypt_conidx;  //!< Connection index of encrypted link, role as master
-        uint8_t                         slave_encrypt_conidx;   //!< Connection index of encrypted link, role as slave
-    } param;
-} gap_event_t;
-
-// Gap callback function define
-typedef void(* gap_callback_func_t)(gap_event_t * event);
-
-
-// Gap advertising parameters
-typedef struct
-{
-    uint8_t     adv_mode;           //!< Advertising mode, connectable/none-connectable, see @ GAP_ADV_MODE_DEFINES
-    uint8_t     adv_addr_type;      //!< see @ GAP_ADDR_TYPE_DEFINES
-    gap_mac_addr_t peer_mac_addr;   //!< peer mac addr,used for direction adv
-    uint8_t     phy_mode;           //!< reseverd
-    uint16_t    adv_intv_min;       //!< Minimum advertising interval, (in unit of 625us). Must be greater than 20ms
-    uint16_t    adv_intv_max;       //!< Maximum advertising interval, (in unit of 625us). Must be greater than 20ms
-    uint8_t     adv_chnl_map;       //!< Advertising channal map, 37, 38, 39, see @ GAP_ADVCHAN_DEFINES
-    uint8_t     adv_filt_policy;    //!< Advertising filter policy, see @ GAP_ADV_FILTER_MODE_DEFINES
-} gap_adv_param_t;
-
-// Gap scan parameters
-typedef struct
-{
-    uint8_t     scan_mode;           //!< scan mode, see @ GAP_SCAN_MODE_DEFINES
-    uint8_t     dup_filt_pol;        //!< scan duplicated pkt filter enbale, 0, donot filter; 1 filter duplicated pkt
-    uint16_t    scan_intv;           //!< scan interval, (in unit of 625us). range [4,16384]
-    uint16_t    scan_window;         //!< scan window, (in unit of 625us). must <= scan_intv, range [4,16384]
-    uint16_t    duration;            //Scan duration (in unit of 10ms). 0 means that the controller will scan continuously until host stop it
-} gap_scan_param_t;
-
-// Gap security parameters
-typedef struct
-{
-    bool     mitm;               //!< Man In The Middle mode enalbe/disable
-    bool     ble_secure_conn;    //!< BLE Secure Simple Pairing, also called Secure Connection mode.
-    uint8_t  io_cap;             //!< IO capbilities, see @ GAP_IO_CAP_DEFINES
-    uint8_t  pair_init_mode;     //!< If initialize pairing procesure or not, see @ GAP_PAIRING_MODE_DEFINES
-    bool     bond_auth;          //!< Bond_auth enable/disable,if true, then will distribute encryption key,and will check this key_req when bonding. 
-    uint32_t password;
-} gap_security_param_t;
-
-
-/*
- * CONSTANTS (常量定义)
+ * CONSTANTS 
  */
 /** @defgroup GAP_ADV_MODE_DEFINES
  * @{
  */
-#define GAP_ADV_MODE_UNDIRECT   0x01
-#define GAP_ADV_MODE_DIRECT     0x02
-#define GAP_ADV_MODE_NON_CONN_NON_SCAN  0x03
-#define GAP_ADV_MODE_NON_CONN_SCAN  0x04
+#define GAP_ADV_MODE_UNDIRECT   		0x01
+#define GAP_ADV_MODE_DIRECT     		0x02
+#define GAP_ADV_MODE_NON_CONN_NON_SCAN          0x03
+#define GAP_ADV_MODE_NON_CONN_SCAN  	        0x04
 
 /** @defgroup GAP_ADDR_TYPE_DEFINES GAP address type define
  * @{
@@ -215,10 +41,10 @@ typedef struct
 /** @defgroup GAP_ADVCHAN_DEFINES GAP Advertisement Channel Map
  * @{
  */
-#define GAP_ADV_CHAN_37  0x01  //!< Advertisement Channel 37
-#define GAP_ADV_CHAN_38  0x02  //!< Advertisement Channel 38
-#define GAP_ADV_CHAN_39  0x04  //!< Advertisement Channel 39
-#define GAP_ADV_CHAN_ALL (GAP_ADV_CHAN_37 | GAP_ADV_CHAN_38 | GAP_ADV_CHAN_39) //!< All Advertisement Channels Enabled
+#define GAP_ADV_CHAN_37  0x01                                                   //!< Advertisement Channel 37
+#define GAP_ADV_CHAN_38  0x02                                                   //!< Advertisement Channel 38
+#define GAP_ADV_CHAN_39  0x04                                                   //!< Advertisement Channel 39
+#define GAP_ADV_CHAN_ALL (GAP_ADV_CHAN_37 | GAP_ADV_CHAN_38 | GAP_ADV_CHAN_39)  //!< All Advertisement Channels Enabled
 
 /** @defgroup GAP_ADV_FILTER_MODE_DEFINES
  * @{
@@ -334,24 +160,197 @@ typedef struct
 #define GAP_APPEARE_HID_DIGITAL_PEN             0x03C7 //!< HID Digital Pen
 #define GAP_APPEARE_HID_BARCODE_SCANNER         0x03C8 //!< HID Barcode Scanner
 /** @} End GAP_APPEARANCE_VALUES */
+
 /*
- * GLOBAL VARIABLES (全局变量)
+ * TYPEDEFS 
+ */
+
+/** @defgroup GAP_EVT_TYPE_DEFINES for application layer callbacks
+ * @{
+ */
+typedef enum
+{
+    GAP_EVT_ALL_SVC_ADDED,          //!< All GATT servcie added
+
+    GAP_EVT_SLAVE_CONNECT,          //!< Connected as slave role
+    GAP_EVT_MASTER_CONNECT,         //!< Connected as master role
+    GAP_EVT_DISCONNECT,             //!< Disconnected
+    GAP_EVT_LINK_PARAM_REJECT,      //!< Parameter update rejected
+    GAP_EVT_LINK_PARAM_UPDATE,      //!< Parameter update successful
+    GAP_EVT_ADV_END,                //!< Advertising ended
+    GAP_EVT_SCAN_END,               //!< Scanning ended
+    GAP_EVT_ADV_REPORT,             //!< Find a BLE device
+    GAP_EVT_CONN_END,               //!< Connecion procedure canceled
+    GAP_EVT_PEER_FEATURE,           //!< Got peer device supported features
+    GAP_EVT_MTU,                    //!< MTU exchange event
+    GAP_EVT_LINK_RSSI,              //!< Got peer device RSSI value
+
+    GAP_SEC_EVT_MASTER_AUTH_REQ,    //!< Authentication request
+    GAP_SEC_EVT_MASTER_ENCRYPT,     //!< Encryted as master role
+    GAP_SEC_EVT_SLAVE_ENCRYPT,      //!< Enrypted as slave role
+} gap_event_type_t;
+
+// BD ADDR 
+typedef struct 
+{
+    uint8_t  addr[6];           //!< 6-byte array address value
+}mac_addr_t;
+
+// GAP BD ADDR strucrue, includes address type
+typedef struct
+{
+    mac_addr_t 	addr;            //!< BD Address of device
+    uint8_t 	addr_type;       //!< Address type of the device 0=public/1=private random
+}gap_mac_addr_t;
+
+// Connected peer devcie link parameters
+typedef struct 
+{
+    uint8_t     conidx;         //!< Connection index
+    mac_addr_t  peer_addr;      //!< BDADDR of peer device
+    uint8_t     addr_type;      //!< Peer device address type
+    uint16_t    con_interval;   //!< Connection interval
+    uint16_t    con_latency;    //!< Slave latency
+    uint16_t    sup_to;         //!< Supervision timeout
+}conn_peer_param_t;
+
+// Link disconnected event & reason
+typedef struct 
+{
+    uint8_t conidx;             //!< Connection index
+    uint8_t reason;             //!< Reason of disconnection
+}gap_evt_disconnect_t;
+
+// Link parameter update reject event
+typedef struct 
+{
+    uint8_t conidx;             //!< Connection index
+    uint8_t status;             //!< Parameter reject status
+}gap_evt_link_param_reject_t;
+
+// Link parameter update success event
+typedef struct
+{
+    uint8_t     conidx;         //!< Connection index
+    uint16_t    con_interval;   //!< Connection interval
+    uint16_t    con_latency;    //!< Connection latency value
+    uint16_t    sup_to;         //!< Supervision timeout
+}gap_evt_link_param_update_t;
+
+// Scan result, find remote advertising devide
+typedef struct 
+{
+    uint8_t 		evt_type;		//!< Bit field providing information about the received report (@see GAP_SCAN_EVT_TYPE_DEFINES)
+    gap_mac_addr_t 	src_addr;		//!< Target address (in case of a directed advertising report)
+    int8_t              tx_pwr;			//!< TX power (in dBm)
+    int8_t              rssi;			//!< RSSI (between -127 and +20 dBm)
+    uint16_t 		length;			//!< Report length
+    uint8_t 		*data;			//!< Report data
+}gap_evt_adv_report_t;
+
+// Connected peer device supported features
+typedef struct 
+{
+    uint8_t conidx;                 //!< Connection index
+    uint8_t features[8];            //!< Features bitmask
+}gap_evt_peer_feature_t;
+
+// Connected peer device MTU size
+typedef struct
+{
+    uint8_t 	conidx;		//!< Connection index
+    uint16_t 	value;		//!< MTU size
+}gattc_mtu_t;
+
+// Authentication request from master
+typedef struct 
+{
+    uint8_t conidx;                 //!< Connection index
+    uint8_t auth;                   //!< Authentication level (@see gap_auth)
+}gap_sec_evt_master_auth_req_t;
+
+// GAT event structure
+typedef struct
+{
+    gap_event_type_t                    type;                   //!< GAP event type
+    union
+    {
+        conn_peer_param_t               slave_connect;          //!< Peer slave device connection parameters
+        conn_peer_param_t               master_connect;         //!< Peer master device connection parameters
+        gap_evt_disconnect_t            disconnect;             //!< Disconnect event
+        gap_evt_link_param_reject_t     link_reject;            //!< Parameter reject event
+        gap_evt_link_param_update_t     link_update;            //!< Parameter update success event
+        uint8_t                         adv_end_status;         //!< Advertising end status
+        uint8_t                         scan_end_status;        //!< Scanning end status
+        gap_evt_adv_report_t            *adv_rpt;               //!< Scanning results
+        uint8_t                         conn_end_reason;        //!< Connection end reason
+        gap_evt_peer_feature_t          peer_feature;           //!< Peer device supported features
+        gattc_mtu_t                     mtu;                    //!< MTU size
+        int8_t                          link_rssi;              //!< Peer device RSSI value
+
+        gap_sec_evt_master_auth_req_t   auth_req;               //!< Master authentication request
+        uint8_t                         master_encrypt_conidx;  //!< Connection index of encrypted link, role as master
+        uint8_t                         slave_encrypt_conidx;   //!< Connection index of encrypted link, role as slave
+    } param;
+} gap_event_t;
+
+// Gap callback function define
+typedef void(* gap_callback_func_t)(gap_event_t * event);
+
+
+// Gap advertising parameters
+typedef struct
+{
+    uint8_t     	adv_mode;               //!< Advertising mode, connectable/none-connectable, see @ GAP_ADV_MODE_DEFINES
+    uint8_t     	adv_addr_type;          //!< see @ GAP_ADDR_TYPE_DEFINES
+    gap_mac_addr_t 	peer_mac_addr;          //!< peer mac addr,used for direction adv
+    uint8_t     	phy_mode;               //!< reseverd
+    uint16_t    	adv_intv_min;           //!< Minimum advertising interval, (in unit of 625us). Must be greater than 20ms
+    uint16_t    	adv_intv_max;           //!< Maximum advertising interval, (in unit of 625us). Must be greater than 20ms
+    uint8_t     	adv_chnl_map;           //!< Advertising channal map, 37, 38, 39, see @ GAP_ADVCHAN_DEFINES
+    uint8_t     	adv_filt_policy;        //!< Advertising filter policy, see @ GAP_ADV_FILTER_MODE_DEFINES
+} gap_adv_param_t;
+
+// Gap scan parameters
+typedef struct
+{
+    uint8_t     scan_mode;           //!< scan mode, see @ GAP_SCAN_MODE_DEFINES
+    uint8_t     dup_filt_pol;        //!< scan duplicated pkt filter enbale, 0, donot filter; 1 filter duplicated pkt
+    uint16_t    scan_intv;           //!< scan interval, (in unit of 625us). range [4,16384]
+    uint16_t    scan_window;         //!< scan window, (in unit of 625us). must <= scan_intv, range [4,16384]
+    uint16_t    duration;            //!< Scan duration (in unit of 10ms). 0 means that the controller will scan continuously until host stop it
+} gap_scan_param_t;
+
+// Gap security parameters
+typedef struct
+{
+    bool     mitm;              //!< Man In The Middle mode enalbe/disable
+    bool     ble_secure_conn;   //!< BLE Secure Simple Pairing, also called Secure Connection mode.
+    uint8_t  io_cap;            //!< IO capbilities, see @ GAP_IO_CAP_DEFINES
+    uint8_t  pair_init_mode;    //!< If initialize pairing procesure or not, see @ GAP_PAIRING_MODE_DEFINES
+    bool     bond_auth;         //!< Bond_auth enable/disable,if true, then will distribute encryption key,and will check this key_req when bonding. 
+    uint32_t password;          //!< Password.
+} gap_security_param_t;
+
+
+/*
+ * GLOBAL VARIABLES 
  */
 
 /*
- * LOCAL VARIABLES (本地变量)
+ * LOCAL VARIABLES 
  */
 
 /*
- * LOCAL FUNCTIONS (本地函数)
+ * LOCAL FUNCTIONS 
  */
 
 /*
- * EXTERN FUNCTIONS (外部函数)
+ * EXTERN FUNCTIONS 
  */
 
 /*
- * PUBLIC FUNCTIONS (全局函数)
+ * PUBLIC FUNCTIONS 
  */
 
 
@@ -573,7 +572,35 @@ uint16_t gap_get_dev_appearance(void);
  */
 uint8_t gap_get_connect_num(void);
 
+/*********************************************************************
+ * @fn      gap_get_link_rssi
+ *
+ * @brief   Get link RSSI value.
+ *
+ * @param   conidx  - connection index.
+ *
+ * @return  None.
+ */
+void gap_get_link_rssi(uint8_t conidx);
 
+/**********************************************************************
+ * @fn      gap_conn_param_update
+ *
+ * @brief   Send connection parameters update request from ble peripheral device.
+ *
+ * @param   conidx                  - connection index of the connection.
+ *
+ *          min_intv                - minimum connection interval. unit: 1.25ms
+ *
+ *          max_intv                - maximum connection interval, in normal case can be set same as min_intv. unit: 1.25ms
+ *
+ *          slave_latency           - slave latency, number of connection events that slave would like to skip.
+ *
+ *          supervision_timeout     - timeout before connection is dropped. unit: 10ms
+ *
+ * @return  None.
+ */
+void gap_conn_param_update(uint8_t conidx, uint16_t min_intv, uint16_t max_intv, uint16_t slave_latency, uint16_t supervision_timeout);
 
 /*********************************************************************
  * @fn      gap_bond_manager_init
@@ -679,35 +706,6 @@ bool gap_security_get_bond_status(void);
  */
 void gap_security_req(uint8_t conidx);
 
-/*********************************************************************
- * @fn      gap_get_link_rssi
- *
- * @brief   Get link RSSI value.
- *
- * @param   conidx  - connection index.
- *
- * @return  None.
- */
-void gap_get_link_rssi(uint8_t conidx);
-
-/**********************************************************************
- * @fn      gap_conn_param_update
- *
- * @brief   Send connection parameters update request from ble peripheral device.
- *
- * @param   conidx                  - connection index of the connection.
- *
- *          min_intv                - minimum connection interval. unit: 1.25ms
- *
- *          max_intv                - maximum connection interval, in normal case can be set same as min_intv. unit: 1.25ms
- *
- *          slave_latency           - slave latency, number of connection events that slave would like to skip.
- *
- *          supervision_timeout     - timeout before connection is dropped. unit: 10ms
- *
- * @return  None.
- */
-void gap_conn_param_update(uint8_t conidx, uint16_t min_intv, uint16_t max_intv, uint16_t slave_latency, uint16_t supervision_timeout);
 
 #endif // end of #ifndef GAP_API_H
 
