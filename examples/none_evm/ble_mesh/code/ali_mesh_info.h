@@ -1,8 +1,25 @@
+/**
+ * Copyright (c) 2019, Freqchip
+ *
+ * All rights reserved.
+ *
+ *
+ */
 #ifndef _ALI_MESH_INFO_H_
 #define _ALI_MESH_INFO_H_
 
+/*
+ * INCLUDES 
+ */
 #include <stdbool.h>
 
+/*
+ * MACROS 
+ */
+
+/*
+ * CONSTANTS 
+ */
 /* flash space used to store ble mesh secret key, such as public key, private key, etc. */
 #define MESH_SECRET_KEY_ADDR                0x32000
 /* flash space used to store mesh network information, such as app key, network key, etc. */

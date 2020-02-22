@@ -1,6 +1,21 @@
+/**
+ * Copyright (c) 2019, Freqchip
+ * 
+ * All rights reserved.
+ * 
+ * 
+ */
+
 #ifndef _MESH_MODEL_MSG_H
 #define _MESH_MODEL_MSG_H
 
+/*
+ * INCLUDES
+ */
+
+/*
+ * CONSTANTS
+ */
 #define MESH_MODEL_ID_ONOFF                 0x1000
 #define MESH_MODEL_ID_LIGHTNESS             0x1300
 #define MESH_MODEL_ID_LIGHTCRL              0x1303
@@ -40,6 +55,14 @@
 #define MESH_LIGHTNESS_STATUS_MIN_SIZE      2
 #define MESH_LIGHTNESS_STATUS_FULL_SIZE     5
 
+/*
+ * TYPEDEFS
+ */
+/** @defgroup BLE_MESH_MESSAGE_DEFINES for application layer use
+ * @{
+ */
+
+// Generic OnOff Set
 struct mesh_gen_onoff_model_set_t
 {
     uint8_t onoff;
@@ -48,6 +71,7 @@ struct mesh_gen_onoff_model_set_t
     uint8_t delay;
 };
 
+// General OnOff Status
 struct mesh_gen_onoff_model_status_t
 {
     uint8_t present_onoff;
@@ -55,6 +79,7 @@ struct mesh_gen_onoff_model_status_t
     uint8_t remain;
 } __attribute__((packed)) ;
 
+// Light Lightness Set
 struct mesh_lightness_model_set_t
 {
     uint16_t level;
@@ -63,6 +88,7 @@ struct mesh_lightness_model_set_t
     uint8_t delay;
 };
 
+// Light Lightness Status
 struct mesh_lightness_model_status_t
 {
     uint16_t current_level;
@@ -70,14 +96,7 @@ struct mesh_lightness_model_status_t
     uint8_t remain;
 } __attribute__((packed)) ;
 
-struct mesh_hsl_model_status_t
-{
-    uint16_t hsl_lightness;
-    uint16_t hsl_hue;
-    uint16_t hsl_saturation;
-    uint8_t remain;
-} __attribute__((packed));
-
+// Light HSL Set
 struct mesh_hsl_model_set_t
 {
     uint16_t lightness;
@@ -88,6 +107,16 @@ struct mesh_hsl_model_set_t
     uint8_t delay;
 } __attribute__((packed)) ;
 
+// Light HSL Status
+struct mesh_hsl_model_status_t
+{
+    uint16_t hsl_lightness;
+    uint16_t hsl_hue;
+    uint16_t hsl_saturation;
+    uint8_t remain;
+} __attribute__((packed));
+
+// Light CTL Set
 struct mesh_CTL_model_set_t
 {
     uint16_t lightness;
@@ -98,6 +127,7 @@ struct mesh_CTL_model_set_t
     uint8_t delay;
 };
 
+// Light CTL Status
 struct mesh_CTL_model_status_t
 {
     uint16_t current_lightness;
@@ -107,6 +137,7 @@ struct mesh_CTL_model_status_t
     uint8_t remain;
 } __attribute__((packed)) ;
 
+// Vendor Model Set
 struct mesh_vendor_model_set_t
 {
     uint8_t tid;
@@ -114,6 +145,7 @@ struct mesh_vendor_model_set_t
     uint8_t attr_parameter[];
 } __attribute__((packed)) ;
 
+// Vendor Model Status
 struct mesh_vendor_model_status_t
 {
     uint8_t tid;
@@ -121,6 +153,7 @@ struct mesh_vendor_model_status_t
     uint8_t attr_parameter[];
 } __attribute__((packed)) ;
 
+// Vendor Model Set new
 struct mesh_vendor_model_set_new_t
 {
     uint8_t tid;
@@ -128,6 +161,7 @@ struct mesh_vendor_model_set_new_t
     uint8_t attr_parameter[];
 } __attribute__((packed)) ;
 
+// Vendor Model Status new
 struct mesh_vendor_model_status_new_t
 {
     uint8_t tid;
@@ -135,7 +169,7 @@ struct mesh_vendor_model_status_new_t
     uint8_t attr_parameter[];
 } __attribute__((packed)) ;
 
-
+// Vendor Model Indication
 struct mesh_vendor_model_indication_t
 {
     uint8_t tid;

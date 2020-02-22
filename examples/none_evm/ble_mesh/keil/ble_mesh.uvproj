@@ -79,8 +79,8 @@
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>1</RunUserProg2>
-            <UserProg1Name>fromelf.exe  --text  -c -o ble_mesh.txt  Objects/ble_mesh.axf</UserProg1Name>
-            <UserProg2Name>fromelf.exe  --bin -o ble_mesh.bin  Objects/ble_mesh.axf</UserProg2Name>
+            <UserProg1Name>fromelf.exe  --text  -c -o Output/ble_mesh.txt  Objects/ble_mesh.axf</UserProg1Name>
+            <UserProg2Name>fromelf.exe  --bin -o Output/ble_mesh.bin  Objects/ble_mesh.axf</UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
             <nStopA1X>0</nStopA1X>
@@ -437,11 +437,6 @@
               <FileName>app_at.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\code\app_at.c</FilePath>
-            </File>
-            <File>
-              <FileName>prf_server.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\code\prf_server.c</FilePath>
             </File>
             <File>
               <FileName>proj_main.c</FileName>

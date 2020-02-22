@@ -1,6 +1,13 @@
+/**
+ * Copyright (c) 2019, Freqchip
+ * 
+ * All rights reserved.
+ * 
+ * 
+ */
+
 /*
- * INCLUDE FILES
- ****************************************************************************************
+ * INCLUDES
  */
 #include <stdio.h>
 #include <string.h>
@@ -16,8 +23,6 @@
 #include "jump_table.h"
 
 #include "user_task.h"
-#include "prf_server.h"
-#include "prf_client.h"
 
 #include "driver_plf.h"
 #include "driver_system.h"
@@ -28,12 +33,49 @@
 
 #include "ali_mesh_info.h"
 
+/*
+ * MACROS
+ */
+
+/*
+ * CONSTANTS
+ */
+
+/*
+ * TYPEDEFS
+ */
+
+/*
+ * GLOBAL VARIABLES
+ */
 uint8_t slave_link_conidx;
 uint8_t master_link_conidx;
 uint8_t tick = 1;
 
+/*
+ * LOCAL VARIABLES
+ */
+
+/*
+ * EXTERN FUNCTIONS
+ */
+
+/*
+ * PUBLIC FUNCTIONS
+ */
+
 void app_mesh_led_init(void);
 
+/*********************************************************************
+ * @fn      proj_ble_gap_evt_func
+ *
+ * @brief   Application layer GAP event callback function. Handles GAP evnets.
+ *
+ * @param   event - GAP events from BLE stack.
+ *       
+ *
+ * @return  None.
+ */
 void proj_ble_gap_evt_func(gap_event_t *event)
 {
     switch(event->type)
@@ -129,8 +171,11 @@ __attribute__((section("ram_code"))) void user_entry_before_sleep_imp(void)
 {
     uart_putc_noint_no_wait(UART1, 's');
 
+    //pmu_set_pin_to_PMU(GPIO_PORT_D, (1<<GPIO_BIT_4) | (1<<GPIO_BIT_5));
+    //pmu_set_pin_to_PMU(GPIO_PORT_A, (1<<GPIO_BIT_2));
+
     /* process in normal procedure after wakeup */
-    ool_write(PMU_REG_SYSTEM_STATUS, 0xaa);
+    ool_write(PMU_REG_SYSTEM_STATUS, 0xc6);
 
     /* sleep forever */
     ool_write32(PMU_REG_SLP_VAL_0, 0);
@@ -172,10 +217,6 @@ __attribute__((section("ram_code"))) void user_entry_after_sleep_imp(void)
 
     uart_putc_noint_no_wait(UART1, 'w');
 
-    co_delay_100us(500);
-    ool_write(PMU_REG_SYSTEM_STATUS, PMU_SYS_PO_MAGIC);
-    platform_reset();
-
     NVIC_EnableIRQ(PMU_IRQn);
 }
 
@@ -215,28 +256,67 @@ void user_entry_before_ble_init(void)
         system_set_port_mux(GPIO_PORT_A, GPIO_BIT_5, PORTA5_FUNC_UART0_TXD);
     }
 
+    /* set CPU start delay afte wakeup */
+    ool_write(PMU_REG_BUCK_ON_DLY, 0xc0);
+    ool_write(PMU_REG_WKUP_PWO_DLY, 0xfc);
+    ool_write(PMU_REG_WKUP_PMUFSM_CHG_DLY, 0xfd);
+    ool_write(PMU_REG_BT_TIMER_WU_IRQ_PROTECT, 0xfe);
+
     /* set BUCK voltage to higher level */
     ool_write(PMU_REG_BUCK_CTRL1, 0x65);
     /* set DLDO voltage to higher level */
     ool_write(PMU_REG_DLDO_CTRL, 0x72);
 
+    /* 
+     * RC will be disabled if vbat is lower than a threshold, set the threshold
+     * to maximum value.
+     */
     ool_write(0x1c, ool_read(0x1c) | 0x74);
-        
-#if 0
-    system_set_port_mux(GPIO_PORT_D, GPIO_BIT_4, PORTD4_FUNC_D4);
-    gpio_portd_write(gpio_portd_read() & 0xef);
-    gpio_set_dir(GPIO_PORT_D, GPIO_BIT_4, GPIO_DIR_OUT);
-    uint32_t delay = 13000;    // 1.3s~2.0s
-    while(1)
-    {
-        gpio_portd_write(gpio_portd_read() & 0xef);
-        co_delay_100us(delay);
-        gpio_portd_write(gpio_portd_read() | 0x10);
+
+    /* lower RC frequency */
+    ool_write(0x1c, 0x74);
+    ool_write(0x1b, 0x00);
+
+    /*
+    pmu_set_pin_dir(GPIO_PORT_D, (1<<GPIO_BIT_4) | (1<<GPIO_BIT_5), GPIO_DIR_OUT);
+    pmu_set_pin_dir(GPIO_PORT_A, (1<<GPIO_BIT_2), GPIO_DIR_OUT);
+    pmu_set_gpio_value(GPIO_PORT_D, (1<<GPIO_BIT_4) | (1<<GPIO_BIT_5), 0);
+    pmu_set_gpio_value(GPIO_PORT_A, (1<<GPIO_BIT_2), 0);
+    pmu_set_pin_to_CPU(GPIO_PORT_D, (1<<GPIO_BIT_4) | (1<<GPIO_BIT_5));
+    pmu_set_pin_to_CPU(GPIO_PORT_A, (1<<GPIO_BIT_2));*/
+
+#if 0   //generate 50Hz for debug
+    system_set_port_mux(GPIO_PORT_C, GPIO_BIT_6, PORTC6_FUNC_C6);
+    system_set_port_mux(GPIO_PORT_C, GPIO_BIT_7, PORTC7_FUNC_C7);
+    system_set_port_pull(GPIO_PC7, true);
+    gpio_set_dir(GPIO_PORT_C, GPIO_BIT_6, GPIO_DIR_OUT);
+    gpio_set_dir(GPIO_PORT_C, GPIO_BIT_7, GPIO_DIR_IN);
+    gpio_portc_write(gpio_portc_read() & 0xbf);
+    while(1) {
+        while((gpio_portc_read() & 0x80) == 0);
+        gpio_portc_write(gpio_portc_read() | 0x40);
+        co_delay_100us(100);
+        gpio_portc_write(gpio_portc_read() & 0xbf);
+        co_delay_100us(100);
+    }
+#endif
+
+#if 1   // simulate switch on-off
+    uint32_t counter;
+    system_set_port_mux(GPIO_PORT_C, GPIO_BIT_6, PORTC6_FUNC_C6);
+    gpio_set_dir(GPIO_PORT_C, GPIO_BIT_6, GPIO_DIR_OUT);
+#define COUNTER_BEGIN       13000   // unit: 100us
+#define COUNTER_END         18000   // unit: 100us
+#define COUNTER_STEP        200    // unit: 100us
+    counter = COUNTER_BEGIN;
+    while(1) {
+        gpio_portc_write(gpio_portc_read() | 0x40);
         co_delay_100us(20000);
-        delay += 500;
-        if(delay >= 20000)
-        {
-            delay = 5000;
+        gpio_portc_write(gpio_portc_read() & 0xbf);
+        co_delay_100us(counter);
+        counter += COUNTER_STEP;
+        if(counter > COUNTER_END) {
+            counter = COUNTER_BEGIN;
         }
     }
 #endif
@@ -258,6 +338,13 @@ void user_entry_after_ble_init(void)
 {
     co_printf("user_entry_after_ble_init\r\n");
 
+    if(ool_read(PMU_REG_SYSTEM_STATUS) == 0xc6) {
+        co_printf("wake up+++++++++++++++++++++++++\r\n");
+    }
+    else {
+        co_printf("Normal--------------------------\r\n");
+    }
+
     // User task initialization, for buttons.
     user_task_init();
     
@@ -268,7 +355,6 @@ void user_entry_after_ble_init(void)
 
     gap_set_cb_func(proj_ble_gap_evt_func);
 
-    //prf_server_create();
     app_mesh_led_init();
 
     mac_addr_t addr;

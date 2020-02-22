@@ -1,3 +1,14 @@
+/**
+ * Copyright (c) 2019, Freqchip
+ * 
+ * All rights reserved.
+ * 
+ * 
+ */
+
+/*
+ * INCLUDES
+ */
 #include <stdint.h>
 #include <stddef.h>
 #include <string.h>
@@ -9,6 +20,17 @@
 #include "mesh_api.h"
 #include "ali_mesh_info.h"
 
+/*
+ * MACROS
+ */
+
+/*
+ * CONSTANTS
+ */
+
+/*
+ * TYPEDEFS
+ */
 typedef struct app_mesh_user_data
 {
     uint8_t magic_start[4];
@@ -20,6 +42,14 @@ typedef struct app_mesh_user_data
     uint8_t magic_end[4];
 } app_mesh_user_data_t;
 
+
+/*
+ * GLOBAL VARIABLES
+ */
+
+/*
+ * LOCAL VARIABLES
+ */
 /* 
  * use a timer to do mesh network information storage to avoid
  * execute flash operation too frequently.

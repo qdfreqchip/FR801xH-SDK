@@ -1,3 +1,14 @@
+/**
+ * Copyright (c) 2019, Freqchip
+ *
+ * All rights reserved.
+ *
+ *
+ */
+
+/*
+ * INCLUDES 
+ */
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -15,10 +26,40 @@
 #include "driver_system.h"
 #include "driver_pmu.h"
 
+/*
+ * MACROS 
+ */
+
+/*
+ * CONSTANTS 
+ */
 #define ALI_MESH_VERSION                1
 
 #define ALI_MESH_50HZ_CHECK_IO          GPIO_PD6
 
+/*
+ * this is an ali mesh key sample: 0000009c,78da076b60cb,ee7751e0dad7483eb1c7391310b4a951
+ * these information should be read from flash in actual product.
+ */
+static const uint8_t ali_mesh_key_bdaddr[] = {0xcb, 0x60, 0x6b, 0x07, 0xda, 0x78};
+static const uint8_t ali_mesh_key_pid[] = {0x9c, 0x00, 0x00, 0x00};
+static const uint8_t ali_mesh_key_secret[] = {0x51, 0xa9, 0xb4, 0x10, 0x13, 0x39, 0xc7, 0xb1, 0x3e, 0x48, 0xd7, 0xda, 0xe0, 0x51, 0x77, 0xee};
+
+/*
+ * TYPEDEFS 
+ */
+
+/*
+ * GLOBAL VARIABLES 
+ */
+
+/*
+ * LOCAL VARIABLES 
+ */
+
+/*
+ * LOCAL FUNCTIONS 
+ */
 static void app_mesh_recv_gen_onoff_led_msg(mesh_model_msg_ind_t const *ind);
 static void app_mesh_recv_gen_onoff_fan_msg(mesh_model_msg_ind_t const *ind);
 static void app_mesh_recv_lightness_msg(mesh_model_msg_ind_t const *ind);
@@ -29,14 +70,8 @@ static void app_mesh_recv_vendor_msg(mesh_model_msg_ind_t const *ind);
 void app_mesh_50Hz_check_timer_handler(void * arg);
 void app_mesh_50Hz_check_enable(void);
 
-/*
- * this is an ali mesh key sample: 0000009c,78da076b60cb,ee7751e0dad7483eb1c7391310b4a951
- * these information should be read from flash in actual product.
- */
-static const uint8_t ali_mesh_key_bdaddr[] = {0xcb, 0x60, 0x6b, 0x07, 0xda, 0x78};
-static const uint8_t ali_mesh_key_pid[] = {0x9c, 0x00, 0x00, 0x00};
-static const uint8_t ali_mesh_key_secret[] = {0x51, 0xa9, 0xb4, 0x10, 0x13, 0x39, 0xc7, 0xb1, 0x3e, 0x48, 0xd7, 0xda, 0xe0, 0x51, 0x77, 0xee};
 
+// Mesh model define
 static mesh_model_t light_models[] = 
 {
     [0] = {
@@ -358,7 +393,7 @@ static void mesh_callback_func(mesh_event_t * event)
             break;
         case MESH_EVT_STARTED:
             app_led_init();
-            //app_mesh_50Hz_check_enable();
+            app_mesh_50Hz_check_enable();
             break;
         case MESH_EVT_STOPPED:
             system_sleep_enable();
@@ -390,15 +425,15 @@ static void mesh_callback_func(mesh_event_t * event)
             break;
         case MESH_EVT_UPDATE_IND:
 #if ALI_MESH_VERSION == 1
-			if(event->param.update_ind->upd_type == MESH_UPD_TYPE_APP_KEY_UPDATED) // message type is app key update
-			{
-			    mesh_appkey_t *appkey = (mesh_appkey_t *)event->param.update_ind->data;
-			    app_key_binding_id = appkey->appkey_id;
-				mesh_model_bind_appkey(light_models[app_key_binding_count].model_id,
-                                        light_models[app_key_binding_count].element_idx,
-                                        app_key_binding_id);
-                app_key_binding_count++;
-			}
+            if(event->param.update_ind->upd_type == MESH_UPD_TYPE_APP_KEY_UPDATED) // message type is app key update
+            {
+              mesh_appkey_t *appkey = (mesh_appkey_t *)event->param.update_ind->data;
+              app_key_binding_id = appkey->appkey_id;
+              mesh_model_bind_appkey(light_models[app_key_binding_count].model_id,
+                                      light_models[app_key_binding_count].element_idx,
+                                      app_key_binding_id);
+              app_key_binding_count++;
+            }
 #else   // ALI_MESH_VERSION == 1
             #if 0
             if(event->param.update_ind->upd_type == MESH_UPD_TYPE_SUBS_LIST) // message type is app key update
@@ -531,21 +566,6 @@ static void mesh_callback_func(mesh_event_t * event)
  */
 void app_mesh_led_init(void)
 {
-#if 0   //generate 50Hz for debug
-    system_set_port_mux(GPIO_PORT_C, GPIO_BIT_6, PORTC6_FUNC_C6);
-    system_set_port_mux(GPIO_PORT_C, GPIO_BIT_7, PORTC7_FUNC_C7);
-    system_set_port_pull(GPIO_PC7, true);
-    gpio_set_dir(GPIO_PORT_C, GPIO_BIT_6, GPIO_DIR_OUT);
-    gpio_set_dir(GPIO_PORT_C, GPIO_BIT_7, GPIO_DIR_IN);
-    gpio_portc_write(gpio_portc_read() & 0xbf);
-    while(1) {
-        while((gpio_portc_read() & 0x80) == 0);
-        gpio_portc_write(gpio_portc_read() | 0x40);
-        co_delay_100us(100);
-        gpio_portc_write(gpio_portc_read() & 0xbf);
-        co_delay_100us(100);
-    }
-#endif
     mesh_set_cb_func(mesh_callback_func);
     
     mesh_init(MESH_FEATURE_RELAY, MESH_INFO_STORE_ADDR);
@@ -556,7 +576,7 @@ void app_mesh_led_init(void)
     }
 
     app_mesh_store_info_timer_init();
-    //os_timer_init(&app_mesh_50Hz_check_timer, app_mesh_50Hz_check_timer_handler, NULL);
+    os_timer_init(&app_mesh_50Hz_check_timer, app_mesh_50Hz_check_timer_handler, NULL);
 
 #if ALI_MESH_VERSION == 1
     app_key_binding_count = 0;
