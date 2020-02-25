@@ -178,9 +178,10 @@ void pmu_set_pin_pull(enum system_port_t port, uint8_t bits, bool flag);
  *
  * @brief   set value of IOs which are controlled by PMU.
  *          example usage:
- *          pmu_set_gpio_value(GPIO_PORT_A, 0x55)
+ *          pmu_set_gpio_value(GPIO_PORT_A, (1<<GPIO_BIT0)|((1<<GPIO_BIT1), 1)
  *
  * @param   port    - which group the io belongs to, @ref system_port_t
+ *          bits    - the numbers of io
  *          value   - 1: set the IO to high, 0: set the IO to low.
  *
  * @return  None.
@@ -196,7 +197,6 @@ void pmu_set_gpio_value(enum system_port_t port, uint8_t bits, uint8_t value);
  *
  * @param   port    - which group the io belongs to, @ref system_port_t
  *          bit     - the number of io
- *
  *
  * @return  1: the IO is high, 0: the IO is low..
  */

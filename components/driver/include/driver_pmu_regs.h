@@ -642,6 +642,8 @@ read is keyscan_status
 #define PMU_REG_BAT_DEB_LEN             0xce    // {N, 5'd0} * deb_clock
 #define PMU_REG_LVD_DEB_LEN             0xcf    // {N, 5'd0} * deb_clock
 
+#define PMU_REG_BUCK_ON_DLY             0xd6    // default value is 0x04
+
 #define PMU_REG_BUCK_OFF_DLY            0xd9
 
 #define PMU_REG_PWO_SLP_DLY             0xdc    // sleep start to sleep active delay, N * pmu_sys_clock

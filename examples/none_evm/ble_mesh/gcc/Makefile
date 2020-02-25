@@ -13,7 +13,6 @@ SRC_FILES += \
               $(PROJ_DIR)/ali_mesh_info.c \
               $(PROJ_DIR)/ali_mesh_led_driver.c \
               $(PROJ_DIR)/app_at.c \
-              $(PROJ_DIR)/prf_server.c \
               $(PROJ_DIR)/proj_main.c \
               $(PROJ_DIR)/user_task.c \
               $(SDK_ROOT)/components/modules/button/button.c \
