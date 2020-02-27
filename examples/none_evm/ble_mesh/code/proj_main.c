@@ -149,7 +149,7 @@ void user_custom_parameters(void)
     __jump_table.firmware_version = 0x00010000;
     __jump_table.system_clk = SYSTEM_SYS_CLK_48M;
 
-    __jump_table.diag_port = 0x83000000;
+    __jump_table.diag_port = 0x00000000;
 
     jump_table_set_static_keys_store_offset(MESH_SECRET_KEY_ADDR);
 }
@@ -301,7 +301,7 @@ void user_entry_before_ble_init(void)
     }
 #endif
 
-#if 1   // simulate switch on-off
+#if 0   // simulate switch on-off
     uint32_t counter;
     system_set_port_mux(GPIO_PORT_C, GPIO_BIT_6, PORTC6_FUNC_C6);
     gpio_set_dir(GPIO_PORT_C, GPIO_BIT_6, GPIO_DIR_OUT);

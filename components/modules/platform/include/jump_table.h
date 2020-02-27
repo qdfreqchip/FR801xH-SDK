@@ -93,6 +93,7 @@ enum rtos_entry_type_t
     RTOS_ENTRY_TYPE_STACK_PUSH,
     RTOS_ENTRY_TYPE_STACK_YIELD,
     RTOS_ENTRY_TYPE_WAKEUP_RESTORE,
+    RTOS_ENTRY_TYPE_POST_GATT_MSG,
 };
 
 struct bd_addr_
@@ -165,7 +166,7 @@ extern void (*low_power_save_entry)(uint8_t);
 extern void (*low_power_restore_entry)(uint8_t);
 extern void (*user_entry_before_sleep)(void);
 extern void (*user_entry_after_sleep)(void);
-extern void (*rtos_entry)(uint8_t type);
+extern void (*rtos_entry)(uint8_t type, void *arg);
 
 void jump_table_set_static_keys_store_offset(uint32_t offset);
 uint8_t jump_table_get_static_keys(uint8_t type, uint8_t *data);

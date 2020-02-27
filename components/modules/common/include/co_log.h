@@ -3,7 +3,7 @@
 
 #include "co_printf.h"
 
-#define LOG_ENABLE              0//1
+#define LOG_ENABLE              0
 
 #define LOG_LEVEL_NONE          0
 #define LOG_LEVEL_ERROR         1

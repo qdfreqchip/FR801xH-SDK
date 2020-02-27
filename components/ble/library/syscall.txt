@@ -563,7 +563,7 @@
 0x0000a2a5 T ke_event_get
 0x0000a2cd T ke_event_get_all
 0x0000a2d9 T ke_event_init
-0x0000a2e5 T ke_event_schedule
+0x0000a2e5 T ble_stack_schedule
 0x0000a329 T ke_event_set
 0x0000a369 T ke_flush
 0x0000a3a5 T ke_free

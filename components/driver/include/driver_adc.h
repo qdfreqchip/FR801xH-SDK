@@ -29,12 +29,12 @@
         memset((void*)&cfg, 0, sizeof(cfg));
         cfg.src = ADC_TRANS_SOURCE_PAD;
         cfg.ref_sel = ADC_REFERENCE_AVDD;
-        cfg.channels = ascii_strn2val((const char *)&data[0], 16, 2);
+        cfg.channels = 0x01;
         cfg.route.pad_to_sample = 1;
         adc_init(&cfg);
         adc_enable(NULL, NULL, 0);
 
-        adc_get_result(ADC_TRANS_SOURCE_VBAT, 0x01, &result);
+        adc_get_result(ADC_TRANS_SOURCE_PAD, 0x01, &result);
  */
 
 enum adc_reference_t {
