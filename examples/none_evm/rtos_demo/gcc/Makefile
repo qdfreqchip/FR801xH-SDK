@@ -19,7 +19,6 @@ SRC_FILES += \
   $(SDK_ROOT)/components/driver/driver_codec.c \
   $(SDK_ROOT)/components/driver/driver_efuse.c \
   $(SDK_ROOT)/components/driver/driver_exti.c \
-  $(SDK_ROOT)/components/driver/driver_flash_ssp.c \
   $(SDK_ROOT)/components/driver/driver_i2s.c \
   $(SDK_ROOT)/components/driver/driver_iic.c \
   $(SDK_ROOT)/components/driver/driver_keyscan.c \
