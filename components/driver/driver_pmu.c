@@ -38,7 +38,7 @@ uint16_t pmu_get_isr_state(void);
  */
 static void pmu_set_debounce_clk(uint16_t div)
 {
-    //Debounce period = pmu_clk_period * (1 + 1) * 2 = 0.24ms
+    //Debounce period = pmu_clk_period * div * 2
     ool_write(PMU_REG_BT_WKUP_CTRL, (ool_read(PMU_REG_BT_WKUP_CTRL) & (~PMU_DEB_CLK_DIV_MSK)) | (div<<PMU_DEB_CLK_DIV_POS));
     ool_write(PMU_REG_CLK_CTRL, ool_read(PMU_REG_CLK_CTRL) | PMU_DEB_CLK_EN);   //enalbe debounce clk
 }
@@ -86,7 +86,11 @@ static void pmu_adkey_set_debounce_cnt(uint8_t cnt)
 static void pmu_bat_full_set_debounce_cnt(uint8_t cnt)
 {
     ool_write(PMU_REG_BAT_DEB_LEN, cnt);   // {0x5d, 5'h0} = 2976
-    ool_write(PMU_REG_LVD_BAT_DEB_CFG, ool_read(PMU_REG_LVD_BAT_DEB_CFG) | PMU_BAT_DEB_SEL);    //enalbe debounce
+    ool_write(PMU_REG_LVD_BAT_DEB_CFG, ool_read(PMU_REG_LVD_BAT_DEB_CFG) & (~PMU_BAT_DEB_SEL));  // reset debounce block
+
+    /* release reset when enable irq */
+    //co_delay_10us(12);
+    //ool_write(PMU_REG_LVD_BAT_DEB_CFG, ool_read(PMU_REG_LVD_BAT_DEB_CFG) | PMU_BAT_DEB_SEL);    //enalbe debounce
 }
 
 /*********************************************************************
@@ -102,7 +106,11 @@ static void pmu_bat_full_set_debounce_cnt(uint8_t cnt)
 static void pmu_lvd_set_debounce_cnt(uint8_t cnt)
 {
     ool_write(PMU_REG_LVD_DEB_LEN, cnt);   // {0x5d, 5'h0} = 2976
-    ool_write(PMU_REG_LVD_BAT_DEB_CFG, ool_read(PMU_REG_LVD_BAT_DEB_CFG) | PMU_LVD_DEB_SEL);    //enalbe debounce
+    ool_write(PMU_REG_LVD_BAT_DEB_CFG, ool_read(PMU_REG_LVD_BAT_DEB_CFG) & (~PMU_LVD_DEB_SEL));  // reset debounce block
+
+    /* release reset when enable irq */
+    //co_delay_10us(12);
+    //ool_write(PMU_REG_LVD_BAT_DEB_CFG, ool_read(PMU_REG_LVD_BAT_DEB_CFG) | PMU_LVD_DEB_SEL);    //enalbe debounce
 }
 
 /*********************************************************************
@@ -117,7 +125,12 @@ static void pmu_lvd_set_debounce_cnt(uint8_t cnt)
  */
 static void pmu_chg_dec_set_debounce_cnt(uint8_t cnt)
 {
-    ool_write(PMU_REG_ACOK_DEB_NEW_CFG, ( (cnt&0x1f)<<PMU_ACOK_DEB_NEW_LEN_POS ) | PMU_ACOK_DEB_NEW_SEL);  // {0x06, 5'h0} = 192
+    ool_write(PMU_REG_ACOK_DEB_NEW_CFG, ool_read(PMU_REG_ACOK_DEB_NEW_CFG) & (~PMU_ACOK_DEB_NEW_SEL));  // reset debounce block
+    ool_write(PMU_REG_ACOK_DEB_NEW_CFG, (cnt&0x1f)<<PMU_ACOK_DEB_NEW_LEN_POS );  // {0x06, 5'h0} = 192
+
+    /* release reset when enable irq */
+    //co_delay_10us(12);
+    //ool_write(PMU_REG_ACOK_DEB_NEW_CFG, ool_read(PMU_REG_ACOK_DEB_NEW_CFG) | (PMU_ACOK_DEB_NEW_SEL));  // release debounce block
 }
 
 /*********************************************************************
@@ -414,12 +427,12 @@ void pmu_sub_init(void)
     ool_write(PMU_REG_ISO_CTRL, 0x02);
 
     /* debounce settings */
-    pmu_set_debounce_clk(1);
+    pmu_set_debounce_clk(16);   // set debounce clock to 1kHz
     pmu_onkey_set_debounce_cnt(9);
     pmu_adkey_set_debounce_cnt(9);
-    pmu_bat_full_set_debounce_cnt(0x5d);
-    pmu_lvd_set_debounce_cnt(0x5d);
-    pmu_chg_dec_set_debounce_cnt(6);
+    pmu_bat_full_set_debounce_cnt(2);
+    pmu_lvd_set_debounce_cnt(2);
+    pmu_chg_dec_set_debounce_cnt(2);
     
 #ifndef CFG_FPGA_TEST
     #if 0
@@ -476,6 +489,16 @@ void pmu_enable_irq(uint16_t irqs)
     if((irqs >> 8) & 0xff) {
         pmu_enable_isr2((irqs >> 8) & 0xff);
     }
+
+    if(irqs & (PMU_ISR_BIT_ACOK|PMU_ISR_BIT_ACOFF)) {
+        ool_write(PMU_REG_ACOK_DEB_NEW_CFG, ool_read(PMU_REG_ACOK_DEB_NEW_CFG) | (PMU_ACOK_DEB_NEW_SEL));  // release debounce block
+    }
+    if(irqs & PMU_ISR_BIT_BAT) {
+        ool_write(PMU_REG_LVD_BAT_DEB_CFG, ool_read(PMU_REG_LVD_BAT_DEB_CFG) | PMU_BAT_DEB_SEL);    // release debounce block
+    }
+    if(irqs & PMU_ISR_BIT_LVD) {
+        ool_write(PMU_REG_LVD_BAT_DEB_CFG, ool_read(PMU_REG_LVD_BAT_DEB_CFG) | PMU_LVD_DEB_SEL);    // release debounce block
+    }
 }
 
 /*********************************************************************
@@ -509,7 +532,7 @@ void pmu_disable_irq(uint16_t irqs)
 void pmu_clear_isr_state(uint16_t state_map)
 {
     ool_write16(PMU_REG_ISR_CLR, state_map);
-    cpu_delay_100us(1);
+    co_delay_100us(1);
     //co_delay_10us(12);
     ool_write16(PMU_REG_ISR_CLR, 0);
 }

@@ -226,7 +226,7 @@ enum PMU_ON_OFF_MODE_T
 #define PMU_BT_WKUP_OSCMASK         (CO_BIT(1))     // 0: enable protect mode in sleep mode, 1: disable
 #define PMU_GPIO_MONITOR_EN         (CO_BIT(2))     // enable gpio status compare with gpio last in reg PMU_REG_PORTA_LAST
 #define PMU_DEB_CLK_DIV_POS         3               // base clock is pmu system clock
-#define PMU_DEB_CLK_DIV_MSK         0xf8            // freq = pmu_sys_clk / ((N+1)*2)
+#define PMU_DEB_CLK_DIV_MSK         0xf8            // freq = pmu_sys_clk / (N*2)
 
 #define PMU_REG_CALI_CTRL           0x55
 #define PMU_CALI_EN                 CO_BIT(0)
