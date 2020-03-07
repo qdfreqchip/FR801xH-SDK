@@ -190,10 +190,14 @@ typedef enum
     GAP_SEC_EVT_SLAVE_ENCRYPT,      //!< Enrypted as slave role
 } gap_event_type_t;
 
+#define MAC_ADDR_LEN         6
+/// Maximal length of the Device Name value
+#define LOCAL_NAME_MAX_LEN      (18)
+
 // BD ADDR 
 typedef struct 
 {
-    uint8_t  addr[6];           //!< 6-byte array address value
+    uint8_t  addr[MAC_ADDR_LEN];           //!< 6-byte array address value
 }mac_addr_t;
 
 // GAP BD ADDR strucrue, includes address type
@@ -541,6 +545,17 @@ bool gap_get_encryption_status(uint8_t conidx);
 void gap_set_dev_name(uint8_t *p_name,uint8_t len);
 
 /*********************************************************************
+ * @fn      gap_get_dev_name
+ *
+ * @brief   Get the local device name.
+ *
+ * @param   p_name  - buff buff to load local name.
+ *
+ * @return  length of the local name .
+ */
+uint8_t gap_get_dev_name(uint8_t* p_name);
+
+/*********************************************************************
  * @fn      gap_set_dev_appearance
  *
  * @brief   Set the local device apperance.
@@ -607,10 +622,12 @@ void gap_conn_param_update(uint8_t conidx, uint16_t min_intv, uint16_t max_intv,
  *
  * @brief   Initialize bonding manager. For bonding features when security is needed.
  *
- * @param   flash_addr      -
- *          svc_flash_addr  -
- *          max_dev_num     -
- *          enable          -
+ * @param   flash_addr      - Flash page addr where peer device bond information is stored, 
+ *                            should be integer multiple of 0x1000
+ *          svc_flash_addr  - Flash page addr where peer device services information is stored, 
+ *                            should be integer multiple of 0x1000
+ *          max_dev_num     - Max supported number of peer devices
+ *          enable          - Enable bit of bond manager fucntion. True -Enalbe; False-Disable
  *
  * @return  None.
  */
@@ -706,6 +723,16 @@ bool gap_security_get_bond_status(void);
  */
 void gap_security_req(uint8_t conidx);
 
+/**********************************************************************
+ * @fn      gap_get_latest_conn_parameter
+ *
+ * @brief   Get the latest connection parameters.
+ *
+ * @param   None
+ *
+ * @return  Point to buff of the lastest conn parameter.
+ */
+conn_peer_param_t *gap_get_latest_conn_parameter(void);
 
 #endif // end of #ifndef GAP_API_H
 

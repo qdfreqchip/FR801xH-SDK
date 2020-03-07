@@ -13,6 +13,9 @@
 #include "os_msg_q.h"
 
 #define TASK_ID_FAIL (0xff)
+
+#define TASK_ID_NONE (0xff)
+
 enum os_event_hdl_result
 {
     EVT_CONSUMED = 0, ///< consumed, msg and ext are freed by the kernel

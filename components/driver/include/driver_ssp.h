@@ -122,7 +122,8 @@ void ssp_wait_send_end(void);
  * @param   bit_width   - trans or recv bits witdh
  *          frame_type  -
  *          ms          - indicate ssp controller working mode
- *          bit_rate    - ssp bus frame clock
+ *          bit_rate    - ssp bus frame clock, min_bus_clk = 184HZ, when prescale=254,cpu_clk = 12M;
+ *                        max_bus_clk = 24MHZ, when prescale=2,cpu_clk = 48M; 						
  *          prescale    - ssp controller prescale
  *          ssp_cs_ctrl - if cs is controlled by software, this parameter
  *                        should be corresponding function.

@@ -22,6 +22,7 @@
 /*
  * MACROS (宏定义)
  */
+#define CFG_CON                     20
 
 /*
  * CONSTANTS (常量定义)
@@ -464,35 +465,6 @@ const gatt_attribute_t hid_profile_att_table[] =
                                                     NULL,
                                                 },
 };
-
-/*********************************************************************
- * @fn      hid_gatt_write_cb
- *
- * @brief   Simple Profile user application handles write request in this callback.
- *          应用层在这个回调函数里面处理写的请求。
- *
- * @param   write_buf   - the buffer for write
- *                        写操作的数据.
- *
- *          len         - the length of write buffer.
- *                        写缓冲区的长度.
- *          att_idx     - index of the attribute value in it's attribute table.
- *                        Attribute的偏移量.
- *
- * @return  写请求的长度.
- */
-static uint16_t hid_gatt_write_cb(uint8_t *write_buf, uint16_t len, uint16_t att_idx)
-{
-    switch(att_idx)
-    {
-        case HID_BOOT_KEY_IN_CCCD_IDX:
-            break;
-
-        default:
-            break;
-    }
-    return len;
-}
 
 
 /*********************************************************************

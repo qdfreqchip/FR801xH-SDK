@@ -12,8 +12,8 @@
 #include "driver_wdt.h"
 #include "driver_uart.h"
 
-#include "qspi.h"
-#include "co_utils.h"
+//#include "qspi.h"
+//#include "co_utils.h"
 #include "gatt_api.h"
 #include "gap_api.h"
 

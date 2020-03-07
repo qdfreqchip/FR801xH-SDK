@@ -22,6 +22,7 @@
 /*
  * MACROS (宏定义)
  */
+#define CFG_CON                     20
 
 /*
  * CONSTANTS (常量定义)

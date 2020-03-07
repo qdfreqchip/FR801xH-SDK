@@ -32,8 +32,10 @@ uint8_t pressed_cnt = 0;           //for multi click
 
 void button_toggle_detected(uint32_t curr_button)
 {
-    curr_button_before_anti_shake = curr_button & button_io_mask;
-    os_timer_start(&button_anti_shake_timer, 10, false);
+    if(button_io_mask != 0) {
+        curr_button_before_anti_shake = curr_button & button_io_mask;
+        os_timer_start(&button_anti_shake_timer, 10, false);
+    }
 }
 
 void button_int_isr(uint32_t changed_button)

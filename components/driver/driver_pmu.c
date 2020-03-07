@@ -372,7 +372,7 @@ void pmu_sub_init(void)
 
     /* set PKVDD voltage to 0.85v */
 #ifndef CFG_FPGA_TEST
-    ool_write(PMU_REG_PKVDD_CTRL2, (ool_read(PMU_REG_PKVDD_CTRL2) & 0xF0) | 0x05);
+    ool_write(PMU_REG_PKVDD_CTRL2, (ool_read(PMU_REG_PKVDD_CTRL2) & 0xF0) | 0x09);
 #else
     ool_write(PMU_REG_PKVDD_CTRL2, (ool_read(PMU_REG_PKVDD_CTRL2) & 0xF0) | 0x04);
 #endif
@@ -400,7 +400,8 @@ void pmu_sub_init(void)
     ool_write(PMU_REG_WAKEUP_SRC, PMU_WAKEUP_SRC_B0 | PMU_IRQ_WAKEUP_EN);
 
     ool_write(PMU_REG_BT_SLP_CTRL, PMU_BT_WKUP_PMU_EN | PMU_BT_CTRL_PMU_EN | PMU_BT_OSC_SLP_EN);
-    
+
+#if 0
     /* sleep and wakeup timing settings */
 #ifndef CFG_FPGA_TEST	
     ool_write(PMU_REG_WKUP_PWO_DLY, 0x40);
@@ -411,7 +412,8 @@ void pmu_sub_init(void)
     ool_write(PMU_REG_WKUP_PMUFSM_CHG_DLY, 0x19);
     ool_write(PMU_REG_BT_TIMER_WU_IRQ_PROTECT, 0x20);
 #endif
-	
+#endif
+
     ool_write(PMU_REG_BUCK_OFF_DLY, 0x00);
     ool_write(PMU_REG_GPIO_PDVDD_ON, 0x09);
     ool_write(PMU_REG_GPIO_PKVDDH_OFF, 0x0a);
@@ -458,7 +460,7 @@ void pmu_sub_init(void)
     /* Enable PMU SIGNAL diagport output, only for debug usage */
 #if 0
 #if 1
-        ool_write(PMU_REG_PORTA_SEL, 0x00);
+        ool_write(PMU_REG_PORTA_SEL, 0x0c);
         ool_write(PMU_REG_PORTA_OEN, 0x00);
         ool_write16(PMU_REG_PORTA_MUX_L, 0xAAAA);
 #endif
@@ -467,6 +469,12 @@ void pmu_sub_init(void)
         ool_write(PMU_REG_PORTB_OEN, 0x00);
         ool_write16(PMU_REG_PORTB_MUX_L, 0xAAAA);
 #endif
+#if 1
+        ool_write(PMU_REG_PORTD_SEL, 0xef);
+        ool_write(PMU_REG_PORTD_OEN, 0x00);
+        ool_write16(PMU_REG_PORTD_MUX_L, 0xAAAA);
+#endif
+
         ool_write(PMU_REG_DIAG_SEL, 0x08);
 #endif
 

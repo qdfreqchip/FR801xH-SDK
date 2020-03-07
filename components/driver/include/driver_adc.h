@@ -14,6 +14,8 @@
         cfg.src = ADC_TRANS_SOURCE_VBAT;
         cfg.ref_sel = ADC_REFERENCE_INTERNAL;
         cfg.int_ref_cfg = ADC_INTERNAL_REF_1_2;
+        cfg.clk_sel = ADC_SAMPLE_CLK_24M_DIV13;
+        cfg.clk_div = 0x3f;
         adc_init(&cfg);
         adc_enable(NULL, NULL, 0);
 
@@ -31,6 +33,8 @@
         cfg.ref_sel = ADC_REFERENCE_AVDD;
         cfg.channels = 0x01;
         cfg.route.pad_to_sample = 1;
+        cfg.clk_sel = ADC_SAMPLE_CLK_24M_DIV13;
+        cfg.clk_div = 0x3f;
         adc_init(&cfg);
         adc_enable(NULL, NULL, 0);
 
@@ -68,7 +72,12 @@ enum adc_trans_source_t {
     ADC_TRANS_SOURCE_PAD,
 };
 
-struct adc_cfg_t {
+enum adc_sample_clk_t {
+    ADC_SAMPLE_CLK_64K_DIV13 = 0x00,
+    ADC_SAMPLE_CLK_24M_DIV13 = 0x02,
+};
+
+struct adc_cfg_t { 
     enum adc_trans_source_t src;
 
     /* this field is used if src==ADC_TRANS_SOURCE_PAD */
@@ -87,6 +96,14 @@ struct adc_cfg_t {
     /* the following two parameters are available when pad_to_div=1 */
     enum adc_dividor_total_res_t div_res;
     enum adc_dividor_cfg_t div_cfg;
+
+    /* 
+     * sample rate setting:
+     * sample_rate = 24M / (1+clk_div[3:0]) / 13 when clk_sel is ADC_SAMPLE_CLK_24M_DIV13
+     * sample_rate = 64K / (1+clk_div[5:4]) / 13 when clk_sel is ADC_SAMPLE_CLK_64K_DIV13
+     */
+    enum adc_sample_clk_t clk_sel;
+    uint8_t clk_div;    // clk_div[3:0] should be from 1 to 15, clk_div[5:4]should be from 1 to 3
 
     /* each bit of lower 4-bits represent one channel */
     uint8_t channels;

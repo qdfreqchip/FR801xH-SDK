@@ -16,11 +16,6 @@ enum adc_trans_mode_t {
     ADC_TRANS_MODE_FIXED,
 };
 
-enum adc_sample_clk_t {
-    ADC_SAMPLE_CLK_16K_DIV13 = 0x00,
-    ADC_SAMPLE_CLK_12M_DIV13 = 0x02,
-};
-
 struct adc_reg_ctrl_t {
     uint32_t adc_en:1;
     /* fifo should only be used in fixed channel mode */
@@ -91,19 +86,19 @@ static struct adc_env_t adc_env;
  *       
  * @return  None.
  */
-static void adc_set_sample_clock(enum adc_sample_clk_t clk)
+static void adc_set_sample_clock(enum adc_sample_clk_t clk, uint8_t div)
 {
     /* set ADC clock dividor */
     ool_write(PMU_REG_CLK_CONFIG, (ool_read(PMU_REG_CLK_CONFIG) & (~(PMU_CLK_ADC_OSCDIV_MSK|PMU_CLK_ADC_RCDIV_MSK)))\
-                                        | 0x11);
+                                        | div);
 
     /* set ADC clock selection */
     ool_write(PMU_REG_ADC_CTRL1, (ool_read(PMU_REG_ADC_CTRL1) & (~PMU_REG_ADC_CLK_SEL_MSK)) | clk);
-    if(clk == ADC_SAMPLE_CLK_12M_DIV13) {
+    if(clk == ADC_SAMPLE_CLK_24M_DIV13) {
         ool_write(PMU_REG_CLK_CTRL, (ool_read(PMU_REG_CLK_CTRL) & (~(PMU_SARADC_HIGH_CLK|PMU_SARADC_LOW_CLK)))  \
                                         | PMU_SARADC_HIGH_CLK);
     }
-    else if(clk == ADC_SAMPLE_CLK_16K_DIV13) {
+    else if(clk == ADC_SAMPLE_CLK_64K_DIV13) {
         ool_write(PMU_REG_CLK_CTRL, (ool_read(PMU_REG_CLK_CTRL) & (~(PMU_SARADC_HIGH_CLK|PMU_SARADC_LOW_CLK)))  \
                                         | PMU_SARADC_LOW_CLK);
     }
@@ -323,13 +318,13 @@ void adc_get_result(enum adc_trans_source_t src, uint8_t channels, uint16_t *buf
                 }
                 else {
                     data[prev_en_chan] = adc_regs->data[i].data;
-                    co_printf("data=0x%04x, chn=%d, src=%d.\r\n", data[prev_en_chan], prev_en_chan, i);
+                    //co_printf("data=0x%04x, chn=%d, src=%d.\r\n", data[prev_en_chan], prev_en_chan, i);
                 }
                 prev_en_chan = i;
             }
         }
         data[prev_en_chan] = adc_regs->data[first_en_chn].data;
-        co_printf("data=0x%04x, chn=%d, src=%d.\r\n", data[first_en_chn], prev_en_chan, first_en_chn);
+        //co_printf("data=0x%04x, chn=%d, src=%d.\r\n", data[first_en_chn], prev_en_chan, first_en_chn);
         
         for(uint8_t i=0; i<ADC_CHANNELS; i++) {
             if(channels & (1<<i)) {
@@ -364,14 +359,20 @@ void adc_init(struct adc_cfg_t *cfg)
         channels = 0x01;
     }
     adc_env.en_channels = channels;
-    
-    if(channels & (channels-1)) {
-        /* force adc works in low frequency mode if more than one channels are enabled */
-        adc_set_sample_clock(ADC_SAMPLE_CLK_16K_DIV13);
+
+    ool_write(PMU_REG_ADC_CTRL5, ool_read(PMU_REG_ADC_CTRL5) | 0x70);
+
+    if(cfg->clk_sel == ADC_SAMPLE_CLK_64K_DIV13) {
+        if((cfg->clk_div & 0x30) == 0 ) {
+            cfg->clk_div |= 0x30;
+        }
     }
     else {
-        adc_set_sample_clock(ADC_SAMPLE_CLK_12M_DIV13);
+        if((cfg->clk_div & 0x0f) == 0 ) {
+            cfg->clk_div |= 0x0f;
+        }
     }
+    adc_set_sample_clock(cfg->clk_sel, cfg->clk_div);
 
     adc_set_reference(cfg->ref_sel, cfg->int_ref_cfg);
 

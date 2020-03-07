@@ -50,6 +50,8 @@ char char_to_val(const char c);
 int str_to_val( const char str[], char base, char n);
 int ascii_strn2val( const char str[], char base, char n);
 
+void system_prevent_sleep_clear(void);
+void system_prevent_sleep_set(void);
 #endif  //_SYS_UTILS_H
 
 

@@ -54,6 +54,8 @@
 void keyscan_init(keyscan_param_t *param)
 {
     uint8_t tmp_bits = 0;
+
+    param->col_en &= (~(1<<8));
     
     /* release keyscan reset and enable clock for keyscan */
     ool_write(PMU_REG_RST_CTRL, ool_read(PMU_REG_RST_CTRL) | PMU_RST_KEYSCAN);
@@ -155,6 +157,9 @@ void keyscan_init(keyscan_param_t *param)
     
     /* settings for anti-shake and ghost key */
     ool_write(PMU_REG_KEYSCAN_GLICTH_CFG, 0xf2);
+
+    /* enable row pull up */
+    ool_write(PMU_REG_PORTD_PUL, param->row_en ^ 0xff);
 
     /* enable keyscan module and interrupt */
     ool_write(PMU_REG_KEYSCAN_CTRL, ool_read(PMU_REG_KEYSCAN_CTRL) | PMU_KEYSCAN_EN | PMU_KEYSCAN_IRQ_EN );

@@ -15,19 +15,33 @@
 #include <stdint.h>           // standard integer functions
 
 #include "driver_plf.h"
+
+/*address: 0x00*/
+struct uart_dll_t  /*Divisor Latch LSB*/
+{
+    uint32_t data:8;
+    uint32_t unused:24;
+};
+union uart_data_dll_t
+{
+    uint32_t data;   /*low byte works (recv buffer and trans holding register)*/
+    struct uart_dll_t dll;
+};
+
+
+/*address: 0x04*/
 /*
 Bit     Name    Type        Function Description
 7:4     RSVD    R           These bits are always cleared (Reserved bits).
-3       EMSI     W/R        ‚Äú1‚Äù: Enable Modem Status Interrupt (EMSI)
-                                    ‚Äú0‚Äù: Disable EMSI
-2       ERLSI   W/R         ‚Äú1‚Äù: Enable Receive Line Status Interrupt (ERLSI)
-                                    ‚Äú0‚Äù: Disable ERLSI
-1       ETI      W/R          ‚Äú1‚Äù: Enable THR Empty Interrupt (ETI)
-                                    ‚Äú0‚Äù: Disable ETI
-0       ERDI    W/R          ‚Äú1‚Äù: Enable Received Data Available Interrupt (ERDI)
-                                    ‚Äú0‚Äù: Disable ERDI
+3       EMSI     W/R        ‚Ä?‚Ä? Enable Modem Status Interrupt (EMSI)
+                                    ‚Ä?‚Ä? Disable EMSI
+2       ERLSI   W/R         ‚Ä?‚Ä? Enable Receive Line Status Interrupt (ERLSI)
+                                    ‚Ä?‚Ä? Disable ERLSI
+1       ETI      W/R          ‚Ä?‚Ä? Enable THR Empty Interrupt (ETI)
+                                    ‚Ä?‚Ä? Disable ETI
+0       ERDI    W/R          ‚Ä?‚Ä? Enable Received Data Available Interrupt (ERDI)
+                                    ‚Ä?‚Ä? Disable ERDI
 */
-/*address: 0x04*/
 struct uart_ier_t   /*Interrupt Enable Register*/
 {
     uint32_t erdi:1;
@@ -36,15 +50,21 @@ struct uart_ier_t   /*Interrupt Enable Register*/
     uint32_t emsi:1;
     uint32_t unused:28;
 };
+struct uart_dlm_t  /*Divisor Latch MSB*/
+{
+    uint32_t data:8;
+    uint32_t unused:24;
+};
+union uart_ier_dlm_t
+{
+    struct uart_ier_t ier;
+    struct uart_dlm_t dlm;
+};
 
+
+/*address: 0x08*/
 /*
 Bit     Name    Type    Function Description
-7:3     SIZE    RO          FIFO SIZE
-                                    BIT[7:3] BYTES
-                                    000          0
-                                    110         16
-                                    111         64
-                                    (Option Enhance)
 4       RSVD     RO        The reserved bit is always cleared (Reserved).
 3:0 Interrupt   RO       Bit 0: When interrupt is pending this bit is zero else it is one
         ID Bit                Bit 1~3: Interrupt ID
@@ -52,17 +72,15 @@ Bit     Name    Type    Function Description
                                 *           0001    No interrupt is pending
                                 1           0110    Receiver line status
                                 2           0100    Receiver data available
-                                2           1100    Character time-out indication
-                                3           0010    THR empty
-                                4           0000    Modem status
+                                3           1100    Character time-out indication
+                                4           0010    THR empty
+                                5           0000    Modem status
 */
-/*address: 0x08*/
 struct uart_iir_t   /*Interrupt Enable Register*/
 {
     uint32_t int_id:4;
     uint32_t unused:28;
 };
-
 
 /*
 Bit     Name        Type    Function Description
@@ -76,8 +94,8 @@ Bit     Name        Type    Function Description
                                         01 --- 2 character in the FIFO
                                         10 --- FIFO 1/4 full
                                         11 --- FIFO 1/2 full
-3       DMA          WO         ‚Äú0‚Äù TXRDYN,RXRDYN signal work in DMA mode 0
-        Mode                        ‚Äú1‚Äù TXRDYN,RXRDYN signal work in DMA mode 1
+3       DMA          WO         ‚Ä?‚Ä?TXRDYN,RXRDYN signal work in DMA mode 0
+        Mode                        ‚Ä?‚Ä?TXRDYN,RXRDYN signal work in DMA mode 1
 
 2      Tx FIFO      WO          When this bit is set, transmitter FIFO reset. The logic one
         Reset                        written to this bit is self clearing.
@@ -88,7 +106,6 @@ Bit     Name        Type    Function Description
         EN                             must be set when other FCR bits are written to or they are
                                          no programmed. Changing this bit to zero clears the FIFOs
 */
-/*address: 0x08*/
 #define FCR_RX_TRIGGER_00 0x00
 #define FCR_RX_TRIGGER_01 0x40
 #define FCR_RX_TRIGGER_10 0x80
@@ -100,11 +117,18 @@ Bit     Name        Type    Function Description
 #define FCR_TX_FIFO_RESET 0x04
 #define FCR_RX_FIFO_RESET 0x02
 #define FCR_FIFO_ENABLE   0x01
-
 struct uart_fcr_t   /*FIFO Control Register*/
 {
     uint32_t data;
 };
+union uart_iir_fcr_t
+{
+    struct uart_iir_t iir;
+    struct uart_fcr_t fcr;
+};
+
+
+/*address: 0x0C*/
 /*
 Bit     Name        Type    Function Description
 7       DLAB         W/R    Divisor Registers Access Bit.
@@ -141,7 +165,6 @@ Bit     Name        Type    Function Description
                                     11: 8 bits
 
 */
-/*address: 0x0C*/
 struct uart_lcr_t   /*Line Control Register*/
 {
     uint32_t word_len:2;
@@ -154,29 +177,29 @@ struct uart_lcr_t   /*Line Control Register*/
     uint32_t unused:24;
 };
 
+/*address: 0x10*/
 /*
 Bit     Name        Type    Function Description
 7:6     RSVD        00       These bits are always cleared (Reserved bits).
 5       AFE            W/R     Auto Flow control Enable
-                                        ‚Äú1‚Äù: Enable AFE
-                                        ‚Äú0‚Äù: Disable AFE
+                                        ‚Ä?‚Ä? Enable AFE
+                                        ‚Ä?‚Ä? Disable AFE
 4       LOOP         W/R      Loop Back Mode
                                         When set, this bit provides local loop back feature for
                                         diagnostic testing of the UART.
 3       OUT2        W/R       User Designated Output
-                                        ‚Äú1‚Äù: set OUT2n to ‚Äú0‚Äù, active
-                                        ‚Äú0‚Äù: set OUT2n to ‚Äú1‚Äù, normal
+                                        ‚Ä?‚Ä? set OUT2n to ‚Ä?‚Ä? active
+                                        ‚Ä?‚Ä? set OUT2n to ‚Ä?‚Ä? normal
 2       OUT1        W/R       User Designated Output
-                                        ‚Äú1‚Äù: set OUT1n to ‚Äú0‚Äù, active
-                                        ‚Äú0‚Äù: set OUT1n to ‚Äú1‚Äù, normal
+                                        ‚Ä?‚Ä? set OUT1n to ‚Ä?‚Ä? active
+                                        ‚Ä?‚Ä? set OUT1n to ‚Ä?‚Ä? normal
 1       RTS          W/R        Request to Send
-                                        ‚Äú1‚Äù: set RTSn to ‚Äú0‚Äù, active
-                                        ‚Äú0‚Äù: set RTSn to ‚Äú1‚Äù, normal
+                                        ‚Ä?‚Ä? set RTSn to ‚Ä?‚Ä? active
+                                        ‚Ä?‚Ä? set RTSn to ‚Ä?‚Ä? normal
 0       DTR         W/R         Data Terminal Ready
-                                        ‚Äú1‚Äù: set DTRn to ‚Äú0‚Äù, active
-                                        ‚Äú0‚Äù: set DTRn to ‚Äú1‚Äù, normal
+                                        ‚Ä?‚Ä? set DTRn to ‚Ä?‚Ä? active
+                                        ‚Ä?‚Ä? set DTRn to ‚Ä?‚Ä? normal
 */
-/*address: 0x10*/
 struct uart_mcr_t  /*Modem Control Register*/
 {
     uint32_t dtr:1;
@@ -187,6 +210,9 @@ struct uart_mcr_t  /*Modem Control Register*/
     uint32_t afe:1;
     uint32_t unused:26;
 };
+
+
+/*address: 0x14*/
 /*
 Bit     Name        Type    Function Description
 7       ERROR       RO      Error Flag
@@ -247,7 +273,6 @@ Bit     Name        Type    Function Description
                                     received and transferred into RBR or the FIFO. It is cleared
                                     by reading all data in the FIFO or RBR.
 */
-/*address: 0x14*/
 struct uart_lsr_t  /*Line Status Register*/
 {
     uint32_t data_ready:1;
@@ -260,6 +285,8 @@ struct uart_lsr_t  /*Line Status Register*/
     uint32_t unused2:24;
 };
 
+
+/*address: 0x18*/
 /*
 Bit     Name    Type    Function Description
 7       DCD     RO          Data Carrier Detect
@@ -293,7 +320,6 @@ Bit     Name    Type    Function Description
                                     ctsn has changed states since last time it was Read by the
                                     CPU.
 */
-/*address: 0x18*/
 struct uart_msr_t  /*Modem Status Register*/
 {
     uint32_t cts_change:1;
@@ -307,43 +333,6 @@ struct uart_msr_t  /*Modem Status Register*/
     uint32_t unused:24;
 };
 
-
-/*address: 0x00*/
-struct uart_dll_t  /*Divisor Latch LSB*/
-{
-    uint32_t data:8;
-    uint32_t unused:24;
-};
-/*address: 0x04*/
-struct uart_dlm_t  /*Divisor Latch MSB*/
-{
-    uint32_t data:8;
-    uint32_t unused:24;
-};
-
-
-/*address: 0x00*/
-union uart_data_dll_t
-{
-
-    uint32_t data;   /*low byte works (recv buffer and trans holding register)*/
-
-    struct uart_dll_t dll;
-};
-
-/*address: 0x04*/
-union uart_ier_dlm_t
-{
-    struct uart_ier_t ier;
-    struct uart_dlm_t dlm;
-};
-
-/*address: 0x08*/
-union uart_iir_fcr_t
-{
-    struct uart_iir_t iir;
-    struct uart_fcr_t fcr;
-};
 
 struct uart_reg_t
 {
@@ -384,6 +373,15 @@ struct uart_reg_t
 
 typedef void (*uart_int_callback) (void*, uint8_t);
 
+typedef struct
+{
+    uint32_t baud_rate;
+    uint8_t uart_idx;
+    uint8_t data_bit_num;
+    uint8_t pari;
+    uint8_t stop_bit;
+} uart_param_t;
+
 /*
  * FUNCTION
  */
@@ -411,6 +409,32 @@ void uart_init(uint32_t uart_addr, uint8_t bandrate);
  * @return  None.
  */
 void uart_finish_transfers(uint32_t uart_addr);
+
+/*********************************************************************
+ * @fn      uart_write
+ *
+ * @brief   get several byte from UART bus with block mode.
+ *
+ * @param   uart_addr   - which uart will be used, UART0 or UART1.
+ *          bufptr      - store position of data to be received
+ *          size        - length of data to be received
+ *
+ * @return  None.
+ */
+void uart_read(uint32_t uart_addr, uint8_t *buf, uint32_t size);
+
+/*********************************************************************
+ * @fn      uart_write
+ *
+ * @brief   send several byte to UART bus with block mode.
+ *
+ * @param   uart_addr   - which uart will be used, UART0 or UART1.
+ *          bufptr      - store position of data to be send
+ *          size        - length of data to be send
+ *
+ * @return  None.
+ */
+void uart_write(uint32_t uart_addr, const uint8_t *bufptr, uint32_t size);
 
 /*********************************************************************
  * @fn      uart_putc_noint

@@ -28,7 +28,7 @@
 
 
 // OTA Service UUID: 0xFE00
-static const uint8_t ota_svc_uuid[UUID_SIZE_2] = UUID16_ARR(OTA_SVC_UUID);
+static const uint8_t ota_svc_uuid[UUID_SIZE_16] = OTA_SVC_UUID;
 static uint8_t ota_svc_id = 0;
 
 static bool ota_link_ntf_enable = false;
@@ -62,14 +62,14 @@ const gatt_attribute_t ota_svc_att_table[OTA_ATT_NB] =
 {
     // Update Over The AIR Service Declaration
     [OTA_ATT_IDX_SERVICE] = { { UUID_SIZE_2, UUID16_ARR(GATT_PRIMARY_SERVICE_UUID) },
-        GATT_PROP_READ, UUID_SIZE_2, (uint8_t *)ota_svc_uuid
+        GATT_PROP_READ, UUID_SIZE_16, (uint8_t *)ota_svc_uuid
     },
 
     // OTA Information Characteristic Declaration
     [OTA_ATT_IDX_CHAR_DECLARATION_VERSION_INFO] = { { UUID_SIZE_2, UUID16_ARR(GATT_CHARACTER_UUID) },
         GATT_PROP_READ, 0, NULL
     },
-    [OTA_ATT_IDX_CHAR_VALUE_VERSION_INFO]= { { UUID_SIZE_2, UUID16_ARR(OTA_CHAR_UUID_VERSION_INFO) },
+    [OTA_ATT_IDX_CHAR_VALUE_VERSION_INFO]= { { UUID_SIZE_16, OTA_CHAR_UUID_VERSION_INFO },
         GATT_PROP_READ, sizeof(uint16_t), NULL
     },
 
@@ -77,7 +77,7 @@ const gatt_attribute_t ota_svc_att_table[OTA_ATT_NB] =
     [OTA_ATT_IDX_CHAR_DECLARATION_NOTI] = { { UUID_SIZE_2, UUID16_ARR(GATT_CHARACTER_UUID) },
         GATT_PROP_READ,0, NULL
     },
-    [OTA_ATT_IDX_CHAR_VALUE_NOTI] = { { UUID_SIZE_2, UUID16_ARR(OTA_CHAR_UUID_NOTI) },
+    [OTA_ATT_IDX_CHAR_VALUE_NOTI] = { { UUID_SIZE_16, OTA_CHAR_UUID_NOTI },
         GATT_PROP_READ | GATT_PROP_NOTI, OTAS_NOTIFY_DATA_SIZE, NULL
     },
     [OTA_ATT_IDX_CHAR_CFG_NOTI] = { { UUID_SIZE_2, UUID16_ARR(GATT_CLIENT_CHAR_CFG_UUID) },
@@ -91,7 +91,7 @@ const gatt_attribute_t ota_svc_att_table[OTA_ATT_NB] =
     [OTA_ATT_IDX_CHAR_DECLARATION_TX] = { { UUID_SIZE_2, UUID16_ARR(GATT_CHARACTER_UUID) },
         GATT_PROP_READ, 0, NULL
     },
-    [OTA_ATT_IDX_CHAR_VALUE_TX] = { { UUID_SIZE_2, UUID16_ARR(OTA_CHAR_UUID_TX) },
+    [OTA_ATT_IDX_CHAR_VALUE_TX] = { { UUID_SIZE_16, OTA_CHAR_UUID_TX },
         GATT_PROP_READ, OTAS_MAX_DATA_SIZE, NULL
     },
 
@@ -99,7 +99,7 @@ const gatt_attribute_t ota_svc_att_table[OTA_ATT_NB] =
     [OTA_ATT_IDX_CHAR_DECLARATION_RX] = { { UUID_SIZE_2, UUID16_ARR(GATT_CHARACTER_UUID) },
         GATT_PROP_READ, 0, NULL
     },
-    [OTA_ATT_IDX_CHAR_VALUE_RX] = { { UUID_SIZE_2, UUID16_ARR(OTA_CHAR_UUID_RX) },
+    [OTA_ATT_IDX_CHAR_VALUE_RX] = { { UUID_SIZE_16, OTA_CHAR_UUID_RX },
         GATT_PROP_WRITE, OTAS_MAX_DATA_SIZE, NULL
     },
 };
