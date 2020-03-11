@@ -204,4 +204,46 @@ void sha256_gen_auth_value(BYTE *pid, BYTE *bdaddr, BYTE *secret, BYTE *result)
         result[15-i] = buf[i];
     }
 }
+void sha256_gatt_gen_auth_value(BYTE*random,BYTE *pid, BYTE *bdaddr, BYTE *secret, BYTE *result)
+{
+    BYTE input_str[71];
+    BYTE str_index = 0, high, low;
+    SHA256_CTX ctx;
+    BYTE buf[SHA256_BLOCK_SIZE];
+    memcpy((void *)&input_str[str_index],random,16);
+
+    str_index += 16;
+    input_str[str_index ++] = ',';
+    for(BYTE i=0; i<4; i++)
+    {
+        high = pid[3-i] >> 4;
+        low = pid[3-i] & 0x0F;
+        input_str[str_index++] = hex2str[high];
+        input_str[str_index++] = hex2str[low];
+    }
+    input_str[str_index++] = ',';
+    for(BYTE i=0; i<6; i++)
+    {
+        high = bdaddr[5-i] >> 4;
+        low = bdaddr[5-i] & 0x0F;
+        input_str[str_index++] = hex2str[high];
+        input_str[str_index++] = hex2str[low];
+    }
+    input_str[str_index++] = ',';
+    for(BYTE i=0; i<16; i++)
+    {
+        high = secret[15-i] >> 4;
+        low = secret[15-i] & 0x0F;
+        input_str[str_index++] = hex2str[high];
+        input_str[str_index++] = hex2str[low];
+    }
+
+    sha256_init(&ctx);
+    sha256_update(&ctx, input_str, 71);
+    sha256_final(&ctx, buf);
+    for(BYTE i=0; i<16; i++)
+    {
+        result[i] = buf[i];
+    }
+}
 

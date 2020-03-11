@@ -21,16 +21,16 @@
  * CONSTANTS 
  */
 /* flash space used to store ble mesh secret key, such as public key, private key, etc. */
-#define MESH_SECRET_KEY_ADDR                0x32000
+#define MESH_SECRET_KEY_ADDR                0x61000
 /* flash space used to store mesh network information, such as app key, network key, etc. */
-#define MESH_INFO_STORE_ADDR                0x33000
+#define MESH_INFO_STORE_ADDR                0x62000
 /* flash space used to store user data information, such as on-off state, lightness, etc. */
-#define APP_MESH_USER_DATA_STORED_OFFSET    0x34000
+#define APP_MESH_USER_DATA_STORED_OFFSET    0x63000
 /* 
  * flash space used to store ali mesh information, this value should
  * be same with configuration in config tools.
  */
-#define APP_MESH_ALI_INFO_OFFSET            0x32000
+#define APP_MESH_ALI_INFO_OFFSET            0x60000
 #define APP_MESH_ALI_INFO_PID               (APP_MESH_ALI_INFO_OFFSET + 4)
 #define APP_MESH_ALI_INFO_ADDRESS           (APP_MESH_ALI_INFO_OFFSET + 8)
 #define APP_MESH_ALI_INFO_KEY               (APP_MESH_ALI_INFO_OFFSET + 14)

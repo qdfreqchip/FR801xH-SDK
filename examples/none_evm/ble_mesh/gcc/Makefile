@@ -12,6 +12,7 @@ SRC_FILES += \
   $(PROJ_DIR)/ali_mesh_led.c \
               $(PROJ_DIR)/ali_mesh_info.c \
               $(PROJ_DIR)/ali_mesh_led_driver.c \
+              $(PROJ_DIR)/ali_mesh_ota.c \
               $(PROJ_DIR)/app_at.c \
               $(PROJ_DIR)/proj_main.c \
               $(PROJ_DIR)/user_task.c \
@@ -34,7 +35,8 @@ SRC_FILES += \
               $(SDK_ROOT)/components/modules/platform/source/exception_handlers.c \
               $(SDK_ROOT)/components/modules/platform/source/app_boot_vectors.c \
               $(SDK_ROOT)/components/modules/patch/patch.c \
-              $(SDK_ROOT)/components/modules/sha256/sha256.c
+              $(SDK_ROOT)/components/modules/sha256/sha256.c \
+              $(SDK_ROOT)/components/modules/aes_cbc/aes_cbc.c
 
 # Include folders common to all targets
 INC_FOLDERS += \
@@ -47,6 +49,7 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/modules/lowpow/include \
   $(SDK_ROOT)/components/modules/button \
   $(SDK_ROOT)/components/modules/sha256 \
+  $(SDK_ROOT)/components/modules/aes_cbc \
   $(SDK_ROOT)/components/ble/include/gap \
   $(SDK_ROOT)/components/ble/include/gatt \
   $(SDK_ROOT)/components/ble/include/mesh \

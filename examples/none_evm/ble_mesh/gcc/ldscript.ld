@@ -31,8 +31,16 @@ SECTIONS
 {
     .jump_table : ALIGN(4)
     {
-        KEEP(*(jump_table))
-        *(jump_table)
+        KEEP(*(jump_table_0))
+        KEEP(*(jump_table_1))
+        KEEP(*(jump_table_2))
+        KEEP(*(jump_table_3))
+        KEEP(*(jump_table_4))
+        *(jump_table_0)
+        *(jump_table_1)
+        *(jump_table_2)
+        *(jump_table_3)
+        *(jump_table_4)
     } >FLASH
     
     /*

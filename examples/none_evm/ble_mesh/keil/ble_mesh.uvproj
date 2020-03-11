@@ -374,7 +374,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\components\ble\include;..\..\..\..\components\driver\include;..\..\..\..\components\modules\os\include;..\..\..\..\components\modules\sys\include;..\..\..\..\components\modules\platform\include;..\..\..\..\components\modules\common\include;..\..\..\..\components\modules\lowpow\include;..\..\..\..\components\modules\button;..\..\..\..\components\modules\sha256;..\..\..\..\components\ble\include\gap;..\..\..\..\components\ble\include\gatt;..\..\..\..\components\ble\include\mesh;..\..\..\..\components\ble\profiles\ble_ota;..\code</IncludePath>
+              <IncludePath>..\..\..\..\components\ble\include;..\..\..\..\components\driver\include;..\..\..\..\components\modules\os\include;..\..\..\..\components\modules\sys\include;..\..\..\..\components\modules\platform\include;..\..\..\..\components\modules\common\include;..\..\..\..\components\modules\lowpow\include;..\..\..\..\components\modules\button;..\..\..\..\components\modules\sha256;..\..\..\..\components\modules\aes_cbc;..\..\..\..\components\ble\include\gap;..\..\..\..\components\ble\include\gatt;..\..\..\..\components\ble\include\mesh;..\..\..\..\components\ble\profiles\ble_ota;..\code</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -408,7 +408,7 @@
             <ScatterFile>.\ble_5_0.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
-            <Misc>--feedback=feedback.txt ../../../../components/ble/library/syscall.txt --entry=app_main --keep=_jump_table --datacompressor=off</Misc>
+            <Misc>--feedback=feedback.txt ../../../../components/ble/library/syscall.txt --entry=app_main --keep=_jump_table_reserved --keep=_jump_table_version --keep=_jump_table_image --keep=_jump_table_middle --keep=_jump_table_last --datacompressor=off</Misc>
             <LinkerInputFile></LinkerInputFile>
             <DisabledWarnings></DisabledWarnings>
           </LDads>
@@ -452,6 +452,11 @@
               <FileName>button.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\components\modules\button\button.c</FilePath>
+            </File>
+            <File>
+              <FileName>ali_mesh_ota.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\code\ali_mesh_ota.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -577,6 +582,11 @@
               <FileName>sha256.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\components\modules\sha256\sha256.c</FilePath>
+            </File>
+            <File>
+              <FileName>aes_cbc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\components\modules\aes_cbc\aes_cbc.c</FilePath>
             </File>
           </Files>
         </Group>

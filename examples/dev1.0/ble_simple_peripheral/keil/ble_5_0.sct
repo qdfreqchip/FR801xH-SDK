@@ -4,7 +4,11 @@ ROM 0x01000000  0x80000
 {
     ER_TABLE +0
     {
-        *(jump_table)
+        *(jump_table_0)
+        *(jump_table_1)
+        *(jump_table_2)
+        *(jump_table_3)
+        *(jump_table_4)
     }
     
     ER_RO +0

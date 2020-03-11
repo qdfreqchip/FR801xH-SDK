@@ -25,6 +25,20 @@
 #include "driver_pmu.h"
 #include "driver_uart.h"
 #include "driver_rtc.h"
+/*
+ * LOCAL VARIABLES
+ */
+
+const struct jump_table_version_t _jump_table_version __attribute__((section("jump_table_3"))) = 
+{
+    .firmware_version = 0x00000000,
+};
+
+const struct jump_table_image_t _jump_table_image __attribute__((section("jump_table_1"))) =
+{
+    .image_type = IMAGE_TYPE_APP,
+    .image_size = 0x19000,      
+};
 
 uint8_t slave_link_conidx;
 uint8_t master_link_conidx;
@@ -193,9 +207,6 @@ void user_custom_parameters(void)
     __jump_table.addr.addr[3] = 0x01;
     __jump_table.addr.addr[4] = 0x01;
     __jump_table.addr.addr[5] = 0xc1;
-    
-    __jump_table.image_size = 0x19000;  // 100KB
-    __jump_table.firmware_version = 0x00010000;
     __jump_table.system_clk = SYSTEM_SYS_CLK_48M;
     
     /* enable FreeRTOS */

@@ -102,6 +102,71 @@ struct bd_addr_
     uint8_t  addr[6];
 };
 
+struct jump_table_reserved_t
+{
+    uint32_t reserved_data;
+};
+
+struct jump_table_image_t
+{
+    uint32_t image_size;
+    uint32_t image_type;
+};
+
+struct jump_table_middle_t
+{
+    void *entry;
+    //used to init ke_mem, prf_env, ke_task_env, need to be called in rwip_init function
+    void (*memory_init_app)(void);
+    uint32_t *stack_top_address;
+};
+
+struct jump_table_version_t
+{
+    uint32_t firmware_version;
+};
+
+struct jump_table_last_t
+{
+    uint16_t local_drift;
+    uint16_t sleep_algo_dur;    // unit: 312.5us, can be used to wakeup early (enlarge this value)
+    uint16_t twext;
+    //uint16_t twrm;
+    uint16_t twosc;
+
+    /*
+     * these parameters will be used several times.
+     */
+    uint8_t (*param_get)(uint8_t param_id, uint8_t * lengthPtr, void *buf);
+    uint8_t (*param_set)(uint8_t param_id, uint8_t length, uint8_t *buf);
+    uint32_t system_option;
+    uint32_t diag_port;
+    uint32_t slp_max_dur;
+    uint16_t max_adv_buffer_size;
+    uint16_t max_rx_buffer_size;
+    uint16_t max_tx_buffer_size;
+    uint16_t max_rx_time;
+    uint16_t max_tx_time;
+    uint16_t lp_cycle_sleep_delay;  // unit: pmu clock cycle, add lp_cycle_wakeup_delay to control minimum sleep time
+    uint16_t lp_clk_calib_cnt;
+    uint8_t sleep_delay_for_os;     // unit: ms
+    uint8_t prf_max;
+    uint8_t task_max;
+    uint8_t system_clk;
+    uint8_t handshake_to;
+    uint8_t boot_uart_pc_en_magic;  // when pc6 and pc7 are used for boot up, this byte need to be set to 0x55 for enable double check
+    uint8_t initial_qspi_bandrate;
+
+    uint8_t enable_activity_num;
+    uint8_t enable_adv_activity_num;
+    uint8_t enable_con_num;
+    uint8_t em_ble_rx_buf_num;
+    uint8_t em_ble_tx_buf_num;
+
+    struct bd_addr_ addr;
+    uint32_t checkword;
+};
+
 struct jump_table_t
 {
     /*

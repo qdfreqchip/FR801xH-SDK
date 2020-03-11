@@ -33,6 +33,17 @@
 #include "ble_simple_peripheral.h"
 #include "simple_gatt_service.h"
 
+const struct jump_table_version_t _jump_table_version __attribute__((section("jump_table_3"))) = 
+{
+    .firmware_version = 0x00000000,
+};
+
+const struct jump_table_image_t _jump_table_image __attribute__((section("jump_table_1"))) =
+{
+    .image_type = IMAGE_TYPE_APP,
+    .image_size = 0x19000,      
+};
+
 __attribute__((section("ram_code"))) void pmu_gpio_isr_ram(void)
 {
     uint32_t gpio_value = ool_read32(PMU_REG_GPIOA_V);
@@ -60,12 +71,8 @@ void user_custom_parameters(void)
     __jump_table.addr.addr[3] = 0xF0;
     __jump_table.addr.addr[4] = 0x80;
     __jump_table.addr.addr[5] = 0x10;
-    
-    __jump_table.image_size = 0x19000;  // 100KB
-    __jump_table.firmware_version = 0x00010000;
     __jump_table.system_clk = SYSTEM_SYS_CLK_48M;
 	__jump_table.system_option &= ~(SYSTEM_OPTION_SLEEP_ENABLE);//取消sleep模式
-
 	jump_table_set_static_keys_store_offset(0x7d000);
 }
 

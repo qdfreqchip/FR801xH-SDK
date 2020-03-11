@@ -56,15 +56,56 @@ uint8_t tick = 1;
  * LOCAL VARIABLES
  */
 
+const struct jump_table_version_t _jump_table_version __attribute__((section("jump_table_3"))) = 
+{
+    .firmware_version = 0x00000000,
+};
+
+const struct jump_table_image_t _jump_table_image __attribute__((section("jump_table_1"))) =
+{
+    .image_type = IMAGE_TYPE_APP,
+    .image_size = 0x30000,      
+};
+
+
 /*
  * EXTERN FUNCTIONS
  */
+extern  const uint8_t ali_mesh_key_bdaddr[];
+
 
 /*
  * PUBLIC FUNCTIONS
  */
 
 void app_mesh_led_init(void);
+void initial_static_memory(uint8_t act_num, 
+                                    uint8_t adv_act_num, 
+                                    uint8_t con_num, 
+                                    uint8_t rx_buf_num, 
+                                    uint16_t rx_buf_size, 
+                                    uint8_t tx_buf_num, 
+                                    uint16_t tx_buf_size,
+                                    uint16_t max_adv_size,
+                                    uint16_t stack_size);
+
+
+/*********************************************************************
+ * @fn      user_init_static_memory
+ *
+ * @brief   set memory.
+ *
+ * @param   None.
+ *       
+ *
+ * @return  None.
+ */
+
+void user_init_static_memory(void)
+{
+    initial_static_memory(6, 3, 2, 8, 251, 8, 251, 64, 0x1000);
+}
+
 
 /*********************************************************************
  * @fn      proj_ble_gap_evt_func
@@ -144,13 +185,9 @@ void proj_ble_gap_evt_func(gap_event_t *event)
 void user_custom_parameters(void)
 {
     app_mesh_ali_info_load_bdaddr(&__jump_table.addr.addr[0]);
-    
-    __jump_table.image_size = 0x19000;  // 100KB
-    __jump_table.firmware_version = 0x00010000;
+    //memcpy(&__jump_table.addr.addr[0],ali_mesh_key_bdaddr,6);
     __jump_table.system_clk = SYSTEM_SYS_CLK_48M;
-
     __jump_table.diag_port = 0x00000000;
-
     jump_table_set_static_keys_store_offset(MESH_SECRET_KEY_ADDR);
 }
 
@@ -349,7 +386,7 @@ void user_entry_after_ble_init(void)
     user_task_init();
     
     system_sleep_disable();
-    
+  
     // set local device name
     gap_set_dev_name("FR8010H", strlen("FR8010H"));
 

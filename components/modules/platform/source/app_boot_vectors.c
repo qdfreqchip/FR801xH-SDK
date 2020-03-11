@@ -62,6 +62,8 @@ void __attribute__ ((weak, alias ("Default_Handler")))
 pmu_isr_ram(void);
 void __attribute__ ((weak, alias ("Default_Handler")))
 pdm_isr(void);
+void __attribute__ ((weak, alias ("Default_Handler")))
+uart1_isr(void);
 
 // ----------------------------------------------------------------------------
 
@@ -109,7 +111,7 @@ pHandler __isr_vectors[] =
         timer0_isr_ram,
         timer1_isr_ram,
         uart0_isr_ram,
-        uart1_isr_ram,
+        uart1_isr,
         0,
         0,
         0,

@@ -41,9 +41,9 @@
  * this is an ali mesh key sample: 0000009c,78da076b60cb,ee7751e0dad7483eb1c7391310b4a951
  * these information should be read from flash in actual product.
  */
-static const uint8_t ali_mesh_key_bdaddr[] = {0xcb, 0x60, 0x6b, 0x07, 0xda, 0x78};
-static const uint8_t ali_mesh_key_pid[] = {0x9c, 0x00, 0x00, 0x00};
-static const uint8_t ali_mesh_key_secret[] = {0x51, 0xa9, 0xb4, 0x10, 0x13, 0x39, 0xc7, 0xb1, 0x3e, 0x48, 0xd7, 0xda, 0xe0, 0x51, 0x77, 0xee};
+uint8_t ali_mesh_key_bdaddr[] = {0xcb, 0x60, 0x6b, 0x07, 0xda, 0x78};
+uint8_t ali_mesh_key_pid[] = {0x9c, 0x00, 0x00, 0x00};
+uint8_t ali_mesh_key_secret[] = {0x51, 0xa9, 0xb4, 0x10, 0x13, 0x39, 0xc7, 0xb1, 0x3e, 0x48, 0xd7, 0xda, 0xe0, 0x51, 0x77, 0xee};
 
 /*
  * TYPEDEFS 
@@ -566,6 +566,9 @@ static void mesh_callback_func(mesh_event_t * event)
  */
 void app_mesh_led_init(void)
 {
+    app_mesh_ali_info_load_key(ali_mesh_key_secret);
+    app_mesh_ali_info_load_bdaddr(ali_mesh_key_bdaddr);
+    app_mesh_ali_info_load_pid(ali_mesh_key_pid);
     mesh_set_cb_func(mesh_callback_func);
     
     mesh_init(MESH_FEATURE_RELAY, MESH_INFO_STORE_ADDR);
@@ -574,7 +577,7 @@ void app_mesh_led_init(void)
     {
         mesh_add_model(&light_models[i]);
     }
-
+    
     app_mesh_store_info_timer_init();
     os_timer_init(&app_mesh_50Hz_check_timer, app_mesh_50Hz_check_timer_handler, NULL);
 
