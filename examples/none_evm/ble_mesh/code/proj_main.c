@@ -145,6 +145,10 @@ void proj_ble_gap_evt_func(gap_event_t *event)
         }
         break;
 
+        case GAP_EVT_ALL_SVC_ADDED:
+            ali_ota_start_advertising();
+            break;
+            
         case GAP_EVT_SLAVE_CONNECT:
         {
             co_printf("slave[%d],connect. link_num:%d\r\n",event->param.slave_connect.conidx,gap_get_connect_num());
@@ -163,6 +167,7 @@ void proj_ble_gap_evt_func(gap_event_t *event)
             show_ke_malloc();
 #endif
             //gap_start_advertising(0);
+            ali_ota_start_advertising();
         }
         break;
 
@@ -184,8 +189,11 @@ void proj_ble_gap_evt_func(gap_event_t *event)
  */
 void user_custom_parameters(void)
 {
-    app_mesh_ali_info_load_bdaddr(&__jump_table.addr.addr[0]);
-    //memcpy(&__jump_table.addr.addr[0],ali_mesh_key_bdaddr,6);
+    if(app_mesh_ali_info_check_valid())
+        app_mesh_ali_info_load_bdaddr(&__jump_table.addr.addr[0]);
+    else
+        memcpy(&__jump_table.addr.addr[0],ali_mesh_key_bdaddr,6);
+        
     __jump_table.system_clk = SYSTEM_SYS_CLK_48M;
     __jump_table.diag_port = 0x00000000;
     jump_table_set_static_keys_store_offset(MESH_SECRET_KEY_ADDR);
@@ -397,5 +405,7 @@ void user_entry_after_ble_init(void)
     mac_addr_t addr;
     gap_address_get(&addr);
     show_reg(&addr.addr[0], 6, 1);
+
+    ali_ota_server_create();
 }
 

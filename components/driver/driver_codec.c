@@ -108,4 +108,34 @@ void audio_speaker_codec_init(void)
 
 }
 
+void codec_adc_init(uint8_t sample_rate)
+{
+    codec_write(0x15, 0x7F);    //pd all
+    codec_write(0x0c, 0x1f);    //mic bias control
+    codec_write(0x0d, 0x03);    //LMIX RMIX PD
+    codec_write(0x0e, 0x3c);    //ADC control
+    codec_write(0x0f, 0xd1);
+    codec_write(0x10, 0x20);
+    codec_write(0x11, 0x20);
+    codec_write(0x12, 0xff);    //pd
+    codec_write(0x13, 0xff);    //mute
+    codec_write(0x14, 0xff);    //pd
+    codec_write(0x15, 0x3f);    //pd all
+    codec_write(0x16, 0x00);
+    codec_write(0x17, 0x07);
+	
+    codec_write(0x18, 0x18);//PGA  P/N exchange, P enable  N enable
+    codec_write(0x1a, 0x00);
+    codec_write(0x00, 0xa5);
+    codec_write(0x25, 0x02);
+    codec_write(0x19, 0x17);    //gain
+    
+    codec_write(0x09, 0x02);    //SLAVE_I2S
+    codec_write(0x40, 0x81);    //CODEC_STEREO
+    
+    codec_write(0x00, codec_read(0x00) & 0xfe);   
+    
+    codec_hw_set_freq(sample_rate);
+}
+
 

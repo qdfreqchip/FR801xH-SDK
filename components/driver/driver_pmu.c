@@ -444,10 +444,21 @@ void pmu_sub_init(void)
      * sleep mode.
      */
     pmu_port_set_mux(GPIO_PORT_B, GPIO_BIT_0, PMU_PORT_MUX_GPIO);
-    pmu_gpio_set_dir(GPIO_PORT_B, GPIO_BIT_0, GPIO_DIR_IN);
-    ool_write(PMU_REG_PORTB_PUL, ool_read(PMU_REG_PORTB_PUL) & 0xfe);
+    pmu_gpio_set_dir(GPIO_PORT_B, GPIO_BIT_0, GPIO_DIR_OUT);
+    pmu_port_set_mux(GPIO_PORT_B, GPIO_BIT_1, PMU_PORT_MUX_GPIO);
+    pmu_gpio_set_dir(GPIO_PORT_B, GPIO_BIT_1, GPIO_DIR_OUT);
+    pmu_port_set_mux(GPIO_PORT_B, GPIO_BIT_2, PMU_PORT_MUX_GPIO);
+    pmu_gpio_set_dir(GPIO_PORT_B, GPIO_BIT_2, GPIO_DIR_OUT);
+    pmu_port_set_mux(GPIO_PORT_B, GPIO_BIT_3, PMU_PORT_MUX_GPIO);
+    pmu_gpio_set_dir(GPIO_PORT_B, GPIO_BIT_3, GPIO_DIR_OUT);
+    pmu_port_set_mux(GPIO_PORT_B, GPIO_BIT_4, PMU_PORT_MUX_GPIO);
+    pmu_gpio_set_dir(GPIO_PORT_B, GPIO_BIT_4, GPIO_DIR_OUT);
+    pmu_port_set_mux(GPIO_PORT_B, GPIO_BIT_5, PMU_PORT_MUX_GPIO);
+    pmu_gpio_set_dir(GPIO_PORT_B, GPIO_BIT_5, GPIO_DIR_OUT);
+    ool_write(PMU_REG_PORTB_PUL, ool_read(PMU_REG_PORTB_PUL) & 0xc0);
     ool_write(PMU_REG_GPIOB_V, ool_read(PMU_REG_GPIOB_V) | 0x01);
-    ool_write(PMU_REG_PORTB_SEL, ool_read(PMU_REG_PORTB_SEL) & 0xfe);
+    ool_write(PMU_REG_GPIOB_V, ool_read(PMU_REG_GPIOB_V) & 0x3e);
+    ool_write(PMU_REG_PORTB_SEL, ool_read(PMU_REG_PORTB_SEL) | 0x3f);
     #endif
 
     /* LED1 is bounded with efuse power */

@@ -588,15 +588,22 @@ uint16_t gap_get_dev_appearance(void);
 uint8_t gap_get_connect_num(void);
 
 /*********************************************************************
- * @fn      gap_get_link_rssi
+ * @fn      gap_set_link_rssi_report
  *
- * @brief   Get link RSSI value.
+ * @brief   Used to enable or disable lower layer report Link RSSI in real time.
+ *          User layer should reimplement a function to receive rssi value.
+ *          This function will be called once a new rssi is generated after
+ *          report is enabled. This function sample is:
+ *          __attribute__((section("ram_code"))) void gap_rssi_ind(int8_t rssi, uint8_t conidx)
+ *          {
+ *              co_printf("rssi: link=%d, rssi=%d.\r\n", conidx, rssi);
+ *          }
  *
- * @param   conidx  - connection index.
+ * @param   enable  - connection index.
  *
  * @return  None.
  */
-void gap_get_link_rssi(uint8_t conidx);
+void gap_set_link_rssi_report(bool enable);
 
 /**********************************************************************
  * @fn      gap_conn_param_update

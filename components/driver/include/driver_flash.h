@@ -80,6 +80,18 @@ void flash_read(uint32_t offset, uint32_t length, uint8_t *buffer);
 void flash_erase(uint32_t offset, uint32_t size);
 
 /*********************************************************************
+ * @fn      flash_page_erase
+ *
+ * @brief   erase one page of flash, this function can only be used in
+ *          Puya flash.
+ *
+ * @param   offset  - page offset to be erased
+ *
+ * @return  None.
+ */
+uint8_t flash_page_erase(uint32_t offset);
+
+/*********************************************************************
 * @fn      qspi_flash_enable_quad
 *
 * @brief   enable the QUAD read mode.

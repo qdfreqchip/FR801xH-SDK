@@ -41,9 +41,9 @@
  * this is an ali mesh key sample: 0000009c,78da076b60cb,ee7751e0dad7483eb1c7391310b4a951
  * these information should be read from flash in actual product.
  */
-uint8_t ali_mesh_key_bdaddr[] = {0xcb, 0x60, 0x6b, 0x07, 0xda, 0x78};
-uint8_t ali_mesh_key_pid[] = {0x9c, 0x00, 0x00, 0x00};
-uint8_t ali_mesh_key_secret[] = {0x51, 0xa9, 0xb4, 0x10, 0x13, 0x39, 0xc7, 0xb1, 0x3e, 0x48, 0xd7, 0xda, 0xe0, 0x51, 0x77, 0xee};
+uint8_t ali_mesh_key_bdaddr[] = {0xd9,0xbb,0x6b,0x07,0xda,0x78};
+uint8_t ali_mesh_key_pid[] = {0x0e, 0x01, 0x00, 0x00};
+uint8_t ali_mesh_key_secret[] = {0x92,0x37,0x41,0x48,0xb5,0x24,0xd9,0xcf,0x7c,0x24,0x04,0x36,0x0b,0xa8,0x91,0xd0};
 
 /*
  * TYPEDEFS 
@@ -398,6 +398,9 @@ static void mesh_callback_func(mesh_event_t * event)
         case MESH_EVT_STOPPED:
             system_sleep_enable();
             break;
+        case MESH_EVT_IN_NETWORK:
+            co_printf("device already in network\r\n");
+            break;    
         case MESH_EVT_RESET:
             co_printf("removed from network by provisoner.\r\n");
             mesh_info_clear();
@@ -422,6 +425,9 @@ static void mesh_callback_func(mesh_event_t * event)
         case MESH_EVT_PROV_AUTH_DATA_REQ:
             sha256_gen_auth_value((BYTE *)ali_mesh_key_pid, (BYTE *)ali_mesh_key_bdaddr, (BYTE *)ali_mesh_key_secret, tmp_data);
             mesh_send_prov_auth_data_rsp(true, 16, (uint8_t *)tmp_data);
+            break;
+        case MESH_EVT_PROV_RESULT:
+            co_printf("result=%d\r\n",event->param.prov_result.state);
             break;
         case MESH_EVT_UPDATE_IND:
 #if ALI_MESH_VERSION == 1
@@ -566,9 +572,12 @@ static void mesh_callback_func(mesh_event_t * event)
  */
 void app_mesh_led_init(void)
 {
-    app_mesh_ali_info_load_key(ali_mesh_key_secret);
-    app_mesh_ali_info_load_bdaddr(ali_mesh_key_bdaddr);
-    app_mesh_ali_info_load_pid(ali_mesh_key_pid);
+    if(app_mesh_ali_info_check_valid())
+    {
+        app_mesh_ali_info_load_key(ali_mesh_key_secret);
+        app_mesh_ali_info_load_bdaddr(ali_mesh_key_bdaddr);
+        app_mesh_ali_info_load_pid(ali_mesh_key_pid);
+    }
     mesh_set_cb_func(mesh_callback_func);
     
     mesh_init(MESH_FEATURE_RELAY, MESH_INFO_STORE_ADDR);

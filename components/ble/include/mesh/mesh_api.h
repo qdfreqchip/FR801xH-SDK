@@ -42,6 +42,7 @@ enum mesh_event_type_t
     MESH_EVT_STOPPED,                   //!< Mesh stopped.
     MESH_EVT_RESET,                     //!< Received reset command from provisioner.
     MESH_EVT_READY,                     //!< Mesh is ready, can be started.
+    MESH_EVT_IN_NETWORK,                //!< The device has been added to the network.
     MESH_EVT_MODEL_APPKEY_BINDED,       //!< Model is binded with an appkey, used in ali mesh provisioning procedure
     MESH_EVT_MODEL_GRPADDR_SUBED,       //!< Model has subscribed to a group addr, used in ali mesh provisioning procedure. 5
     MESH_EVT_PROV_PARAM_REQ,            //!< Received provision parameter request from provisioner.

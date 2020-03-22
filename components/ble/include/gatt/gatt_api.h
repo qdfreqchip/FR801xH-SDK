@@ -411,11 +411,11 @@ void gatt_mtu_exchange_req(uint8_t conidx);
 /****************************************************************************************
  * @fn      gatt_get_mtu
  *
- * @brief Gets the negotiated MTU. This function gets the negotiated MTU.
+ * @brief   Gets the negotiated MTU. This function gets the negotiated MTU.
  *
  * @param   conidx  - Link idx.
  *
- * @return MTU negotiated
+ * @return  MTU negotiated
  */
 uint16_t gatt_get_mtu(uint8_t conidx);
 
