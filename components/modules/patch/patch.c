@@ -17,49 +17,6 @@ struct patch_element_t
     void *replace_function;
 };
 
-/* used to access flash */
-struct qspi_stig_reg_t {
-    uint32_t execute:1;
-    uint32_t progress_status:1;
-    uint32_t enable_bank:1;
-    uint32_t reserved0:4;
-    uint32_t dummy_cycles:5;
-    uint32_t write_bytes:3;     //0~1bytes
-    uint32_t enable_write:1;
-    uint32_t addr_bytes:2;      //0~1bytes
-    uint32_t enable_mode:1;
-    uint32_t enable_cmd_addr:1;
-    uint32_t read_bytes:3;
-    uint32_t enable_read:1;
-    uint32_t opcode:8;
-};
-
-/* used to access flash */
-enum qspi_stig_cmd_type_t {
-    QSPI_STIG_CMD_READ,
-    QSPI_STIG_CMD_BANK_READ,
-    QSPI_STIG_CMD_WRITE,
-    QSPI_STIG_CMD_EXE,
-};
-
-/* used to access flash */
-const struct qspi_stig_reg_t page_erase_cmd = {
-    .enable_bank = 0,
-    .dummy_cycles = 0,
-    .write_bytes = 0,
-    .enable_write = 0,
-    .addr_bytes = 2,    // QSPI_STIG_ADDR_BYTES_3,
-    .enable_mode = 0,
-    .enable_cmd_addr = 1,
-    .read_bytes = 0,
-    .enable_read = 0,
-    .opcode = 0x81,
-};
-
-/* used to access flash */
-extern const struct qspi_stig_reg_t read_status_cmd;
-extern const struct qspi_stig_reg_t write_enable_cmd;
-
 #ifdef USER_MEM_API_ENABLE
 extern void *ke_malloc_user(uint32_t size, uint8_t type);
 extern void ke_free_user(void* mem_ptr);
@@ -316,39 +273,5 @@ __attribute__((section("ram_code"))) void flash_erase(uint32_t offset, uint32_t 
     flash_erase_(offset, length);
     enable_cache(false);
     GLOBAL_INT_RESTORE();
-}
-
-/*********************************************************************
- * @fn      flash_page_erase
- *
- * @brief   erase one page of flash, this function can only be used in
- *          Puya flash.
- *
- * @param   offset  - page offset to be erased
- *
- * @return  None.
- */
-__attribute__((section("ram_code"))) uint8_t flash_page_erase(uint32_t offset)
-{
-    uint8_t status;
-
-    offset &= 0xFFFFFF00;
-    GLOBAL_INT_DISABLE();
-    disable_cache();
-    qspi_stig_cmd(write_enable_cmd, QSPI_STIG_CMD_EXE, 0, 0);
-    *(volatile uint32_t *)0x500b0094 = offset;  // qspi_set_cmd_addr(offset);
-    qspi_stig_cmd(page_erase_cmd, QSPI_STIG_CMD_EXE, 0, 0);
-
-    while(1) {
-        for(volatile uint32_t i=0; i<100; i++);
-        qspi_stig_cmd(read_status_cmd, QSPI_STIG_CMD_READ, 1, &status);
-        if((status & 0x01) == 0) {
-            break;
-        }
-    }
-    enable_cache(true);
-    GLOBAL_INT_RESTORE();
-    
-    return 0;
 }
 
