@@ -23,6 +23,8 @@
 #include "os_mem.h"
 #include "driver_system.h"
 #include "driver_gpio.h"
+#include "ringbuffer.h"
+#include "ble_simple_peripheral.h"
 
 /*
  * MACROS
@@ -45,6 +47,8 @@ volatile uint8_t audio_data[I2S_FIFO_DEPTH*2];
 uint8_t audio_data_len=0;
 uint8_t audio_data_update =0;
 uint8_t TimerCnt=0;
+sApp_BlockRingBuf app_audio_data_BlockRingBuf;
+static uint8_t app_audio_data_blockBuf[CONFIG_AUDIO_DECODER_BLOCKNUM][CONFIG_AUDIO_DECODER_BLOCKSIZE];//
 
 /*
  * LOCAL VARIABLES 
@@ -140,99 +144,198 @@ void PA_init_pins(void)
  */
 __attribute__((section("ram_code"))) void i2s_isr_ram(void)
 {
-	uint32_t last = 0;
-    if((i2s_reg->status.tx_half_empty)&&(i2s_reg->mask.tx_half_empty))//codec_DAC
-    {
-        uint8_t i;
+	uint8_t i;
+    if(App_Mode == CODEC_TEST){
+		uint16_t i2s_adc_data[I2S_FIFO_DEPTH/2];
+	    if((i2s_reg->status.rx_half_full)) {//codec_ADC
+				//co_printf("M");
+				uint8_t LoopBufWrite =0;
+				for(uint32_t i=0; i<(I2S_FIFO_DEPTH/2); i++) {
+						 i2s_adc_data[i] = i2s_reg->data;
+						// uart_putc_noint_no_wait(UART1_BASE,i2s_adc_data[i] );
+					}
+				LoopBufWrite = app_BlockLoopBuf_write(0, 
+											&app_audio_data_BlockRingBuf, 
+											(uint8_t const *)i2s_adc_data, 
+											I2S_FIFO_DEPTH);
+				if(LoopBufWrite == 1){//buffer ย๚มห
+				co_printf("FL");
+				}else{
+				//	co_printf("I");
+				}
+	    }
+
+		 if((i2s_reg->status.tx_half_empty)){
+		 	uint16_t *tx_data;
+			//co_printf("O\r\n");
+			tx_data = (uint16_t*)app_BlockRingBuf_malloc(&app_audio_data_BlockRingBuf);
+			if(tx_data != NULL){
+				for (i=0; i<(I2S_FIFO_DEPTH/2); i++)
+	                {
+	                    uint32_t tmp_data = *tx_data++;
+	                    tmp_data &= 0xFFFF;
+
+						i2s_reg->data = tmp_data;
+					//	uart_putc_noint_no_wait(UART1_BASE,tmp_data);
+	                }
+				app_BlockRingBuf_free(&app_audio_data_BlockRingBuf); 
+			}else{
+				//co_printf("E");
+				for(i=0; i<(I2S_FIFO_DEPTH/2); i++)
+	            {
+					i2s_reg->data = 0;
+
+	            }
+			}
+		 }
+	}else{
+		uint32_t last = 0;
+	    if((i2s_reg->status.tx_half_empty)&&(i2s_reg->mask.tx_half_empty))//codec_DAC
+	    {
+	        
 #define I2S_FIFO_DEPTH      64
-        struct co_list_hdr *element;
-        struct decoder_pcm_t *pcm;
-        uint16_t *tx_data;
+	        struct co_list_hdr *element;
+	        struct decoder_pcm_t *pcm;
+	        uint16_t *tx_data;
+		        if(co_list_is_empty(&decoder_env.pcm_buffer_list))
+		        {
+		            co_printf("F");
+		            for(i=0; i<(I2S_FIFO_DEPTH/2); i++)
+		            {
+						i2s_reg->data = 0;
 
+		            }
+		        }
+		        else
+		        {
+		            element = decoder_env.pcm_buffer_list.first;
 
-        if(co_list_is_empty(&decoder_env.pcm_buffer_list))
-        {
-            co_printf("F");
-            for(i=0; i<(I2S_FIFO_DEPTH/2); i++)
-            {
-				i2s_reg->data = 0;
+		            pcm = (struct decoder_pcm_t *)element;
+		            tx_data = (uint16_t *)&pcm->pcm_data[pcm->pcm_offset];
+		            last = pcm->pcm_size - pcm->pcm_offset;
+		            if(last > (I2S_FIFO_DEPTH/2))
+		            {
+		              //  co_printf("X");
+		                for (i=0; i<(I2S_FIFO_DEPTH/2); i++)
+		                {
+		                    uint32_t tmp_data = *tx_data++;
+		                    tmp_data &= 0xFFFF;
 
-            }
-        }
-        else
-        {
-            element = decoder_env.pcm_buffer_list.first;
-
-            pcm = (struct decoder_pcm_t *)element;
-            tx_data = (uint16_t *)&pcm->pcm_data[pcm->pcm_offset];
-            last = pcm->pcm_size - pcm->pcm_offset;
-            if(last > (I2S_FIFO_DEPTH/2))
-            {
-              //  co_printf("X");
-                for (i=0; i<(I2S_FIFO_DEPTH/2); i++)
-                {
-                    uint32_t tmp_data = *tx_data++;
-                    tmp_data &= 0xFFFF;
-
-					i2s_reg->data = tmp_data;
-                }
-
-                pcm->pcm_offset += (I2S_FIFO_DEPTH/2);
-            }
-            else
-            {
-               
-                for (i=0; i<last; i++)
-                {
-                    uint32_t tmp_data = *tx_data++;
-                    tmp_data &= 0xFFFF;
-					i2s_reg->data = tmp_data;
-                }
-                co_list_pop_front(&decoder_env.pcm_buffer_list);
-                os_free((void *)pcm);
-                decoder_env.pcm_buffer_counter--;
-                decoder_play_next_frame();
-
-                while(!co_list_is_empty(&decoder_env.pcm_buffer_list))
-                {
-                    element = decoder_env.pcm_buffer_list.first;
-
-                    pcm = (struct decoder_pcm_t *)element;
-                    tx_data = (uint16_t *)&pcm->pcm_data[0];
-                    last = pcm->pcm_size - pcm->pcm_offset;
-                    if((last + i) > (I2S_FIFO_DEPTH/2))
-                    {
-                        pcm->pcm_offset = (I2S_FIFO_DEPTH/2) - i;
-                       for(; i<(I2S_FIFO_DEPTH/2); i++)
-                        {
-                            uint32_t tmp_data = *tx_data++;
-                            tmp_data &= 0xFFFF;                      
 							i2s_reg->data = tmp_data;
-                        }
-                        break;
-                    }
-                    else
-                    {
-                        last += i;
-                        for(; i<last; i++)
-                        {
-                            uint32_t tmp_data = *tx_data++;
-                            tmp_data &= 0xFFFF;
-                            //REG_PL_WR(I2S_REG_DATA, tmp_data);
+		                }
+
+		                pcm->pcm_offset += (I2S_FIFO_DEPTH/2);
+		            }
+		            else
+		            {
+		               
+		                for (i=0; i<last; i++)
+		                {
+		                    uint32_t tmp_data = *tx_data++;
+		                    tmp_data &= 0xFFFF;
 							i2s_reg->data = tmp_data;
-                        }
-                        co_list_pop_front(&decoder_env.pcm_buffer_list);
-                        os_free((void *)pcm);
-                        decoder_env.pcm_buffer_counter--;
-                        decoder_play_next_frame();
-                    }
-                }
+		                }
+		                co_list_pop_front(&decoder_env.pcm_buffer_list);
+		                os_free((void *)pcm);
+		                decoder_env.pcm_buffer_counter--;
+		                decoder_play_next_frame();
 
-            }
-        }
-    }
+		                while(!co_list_is_empty(&decoder_env.pcm_buffer_list))
+		                {
+		                    element = decoder_env.pcm_buffer_list.first;
 
+		                    pcm = (struct decoder_pcm_t *)element;
+		                    tx_data = (uint16_t *)&pcm->pcm_data[0];
+		                    last = pcm->pcm_size - pcm->pcm_offset;
+		                    if((last + i) > (I2S_FIFO_DEPTH/2))
+		                    {
+		                        pcm->pcm_offset = (I2S_FIFO_DEPTH/2) - i;
+		                       for(; i<(I2S_FIFO_DEPTH/2); i++)
+		                        {
+		                            uint32_t tmp_data = *tx_data++;
+		                            tmp_data &= 0xFFFF;                      
+									i2s_reg->data = tmp_data;
+		                        }
+		                        break;
+		                    }
+		                    else
+		                    {
+		                        last += i;
+		                        for(; i<last; i++)
+		                        {
+		                            uint32_t tmp_data = *tx_data++;
+		                            tmp_data &= 0xFFFF;
+		                            //REG_PL_WR(I2S_REG_DATA, tmp_data);
+									i2s_reg->data = tmp_data;
+		                        }
+		                        co_list_pop_front(&decoder_env.pcm_buffer_list);
+		                        os_free((void *)pcm);
+		                        decoder_env.pcm_buffer_counter--;
+		                        decoder_play_next_frame();
+		                    }
+		                }
+
+		            }
+		        }
+			
+	    }
+	}
 }
 
+/*********************************************************************
+ * @fn		Test_Codec_demo
+ *
+ * @brief	Codec input and output test, speak into the microphone, the speaker can play audio
+ *
+ * @param	None
+ *
+ * @return	None.
+ */
+void Test_Codec_demo(void)
+{
+	co_printf("Test_Codec_demo\r\n");
+	//App_Mode = CODEX_TEST;
+	app_blockRingBuf_setup(&app_audio_data_BlockRingBuf,
+                            app_audio_data_blockBuf,
+                            CONFIG_AUDIO_DECODER_BLOCKNUM,
+                            CONFIG_AUDIO_DECODER_BLOCKSIZE);
+	PA_init_pins();					//Initialize PA enable pin
+	app_BlockRingBuf_flush(&app_audio_data_BlockRingBuf);
+	pmu_codec_power_enable();
+	codec_init(CODEC_SAMPLE_RATE_8000);
+//	audio_speaker_codec_init();
+	
+	i2s_init(I2S_DIR_TX,8000,1);//speaker
+	codec_enable_dac();
+	i2s_init(I2S_DIR_RX,8000,1);//Mic 
+	codec_enable_adc();
+	PA_ENABLE;
+	NVIC_SetPriority(I2S_IRQn, 2);
+	 i2s_start();
+    NVIC_EnableIRQ(I2S_IRQn);
+	
+
+}
+/*********************************************************************
+ * @fn		Test_codec_demo_stop
+ *
+ * @brief	Stop codec test
+ *
+ * @param	None
+ *
+ * @return	None.
+ */
+void Test_codec_demo_stop(void)
+{
+	co_printf("Test_codec_demo_stop\r\n");
+	NVIC_DisableIRQ(I2S_IRQn);
+	         
+	PA_DISABLE;						
+	codec_disable_dac();				
+    i2s_stop();							
+	co_printf("speaker_stop_hw\r\n");
+	codec_disable_adc();
+	pmu_codec_power_disable(); 
+}
 
 
