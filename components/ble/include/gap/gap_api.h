@@ -711,7 +711,7 @@ void gap_security_enc_req(uint8_t conidx);
 /*********************************************************************
  * @fn      gap_security_get_bond_status
  *
- * @brief   Get bond status of a connection.
+ * @brief   Get bond status of peer device in last connection.
  *
  * @param   None.
  *

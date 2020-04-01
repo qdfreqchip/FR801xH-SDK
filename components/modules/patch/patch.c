@@ -26,7 +26,6 @@ void pmu_calibration_stop(void);
 
 void enable_cache(uint8_t invalid_ram);
 void disable_cache(void);
-int qspi_stig_cmd(struct qspi_stig_reg_t cmd, enum qspi_stig_cmd_type_t type, int len, uint8_t *buffer);
 
 /*
  * keil debug breakpoint will take place FPB entry at the beginning of patch table with increasing

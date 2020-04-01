@@ -94,10 +94,15 @@ static int user_task_func(os_event_t *param)
 								if(picture_idx >= 5)
 									picture_idx = 0;
 								break;
+                            case CODEC_TEST:
+								Test_Codec_demo();
+								break;
 							}
 						}else if(button_msg->button_index == GPIO_PC5){//KEY1  工作模式切换
 							if((App_Mode == SPEAKER_FROM_FLASH)){
 								test_end_speaker();//停止播放音频
+							}else if(App_Mode == CODEX_TEST){
+								Test_codec_demo_stop();
 							}
 							App_Mode++;
 							if(App_Mode >= MODE_MAX){

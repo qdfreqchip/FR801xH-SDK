@@ -238,9 +238,11 @@ void app_otas_recv_data(uint8_t conidx,uint8_t *p_data,uint16_t len)
             rsp_hdr->rsp.version.firmware_version = __jump_table.firmware_version;
             break;
         case OTA_CMD_PAGE_ERASE:
+        {
             rsp_hdr->rsp.page_erase.base_address = cmd_hdr->cmd.page_erase.base_address;
+            uint32_t new_bin_base = app_otas_get_storage_address();
 #if 1
-            //co_printf("cur_code:%x\r\n",app_otas_get_curr_code_address());
+            ///co_printf("cur_code_addr:%x\r\n",new_bin_base);
             if( app_otas_get_curr_code_address() == 0 )
             {
                 if(rsp_hdr->rsp.page_erase.base_address < app_otas_get_image_size())
@@ -258,9 +260,15 @@ void app_otas_recv_data(uint8_t conidx,uint8_t *p_data,uint16_t len)
                 }
             }
 #endif
-
-            flash_erase(rsp_hdr->rsp.page_erase.base_address, 0x1000);
-            break;
+            if(rsp_hdr->rsp.page_erase.base_address == new_bin_base)
+            {
+                for(uint16_t offset = 256; offset < 4096; offset += 256)
+                    flash_page_erase(offset + new_bin_base);
+            }
+            else
+                flash_erase(rsp_hdr->rsp.page_erase.base_address, 0x1000);
+        }
+        break;
         case OTA_CMD_CHIP_ERASE:
             break;
         case OTA_CMD_WRITE_DATA:
@@ -281,7 +289,7 @@ void app_otas_recv_data(uint8_t conidx,uint8_t *p_data,uint16_t len)
             {
                 if(first_pkt.buf == NULL)
                 {
-                    first_pkt.malloced_pkt_num = ROUND(380,rsp_hdr->rsp.write_data.length);
+                    first_pkt.malloced_pkt_num = ROUND(256,rsp_hdr->rsp.write_data.length);
                     first_pkt.buf = os_malloc(rsp_hdr->rsp.write_data.length * first_pkt.malloced_pkt_num);
                     uint8_t * tmp = p_data + (OTA_HDR_OPCODE_LEN+OTA_HDR_LENGTH_LEN)+sizeof(struct write_data_cmd);
                     first_pkt.len = rsp_hdr->rsp.write_data.length;
@@ -315,6 +323,8 @@ void app_otas_recv_data(uint8_t conidx,uint8_t *p_data,uint16_t len)
                         //checksum_minus = new_bin_ver - *(uint32_t *)((uint32_t)first_pkt.buf + firmware_offset);
                         *(uint32_t *)((uint32_t)first_pkt.buf + firmware_offset) = new_bin_ver;
                     }
+                    //write data from 256 ~ rsp_hdr->rsp.write_data.length * first_pkt.malloced_pkt_num
+                    app_otas_save_data(new_bin_base + 256,first_pkt.buf + 256,first_pkt.len - 256);
                 }
             }
         }
@@ -352,7 +362,8 @@ void app_otas_recv_data(uint8_t conidx,uint8_t *p_data,uint16_t len)
             if(first_pkt.buf != NULL)
             {
                 uint32_t new_bin_base = app_otas_get_storage_address();
-                app_otas_save_data(new_bin_base,first_pkt.buf,first_pkt.len);
+                flash_page_erase(new_bin_base);
+                app_otas_save_data(new_bin_base,first_pkt.buf,256);
             }
             uart_finish_transfers(UART1_BASE);
             ota_clr_buffed_pkt();

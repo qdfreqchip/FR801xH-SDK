@@ -11,7 +11,7 @@
  /*
  * INCLUDES (包含头文件)
  */
-
+ #include "gap_api.h"
 /*
  * MACROS (宏定义)
  */
