@@ -39,7 +39,8 @@ SRC_FILES += \
               $(SDK_ROOT)/components/driver/driver_timer.c \
               $(SDK_ROOT)/components/modules/platform/source/exception_handlers.c \
               $(SDK_ROOT)/components/modules/platform/source/app_boot_vectors.c \
-              $(SDK_ROOT)/components/modules/patch/patch.c
+              $(SDK_ROOT)/components/modules/patch/patch.c \
+              $(SDK_ROOT)/components/modules/ringbuffer
 
 # Include folders common to all targets
 INC_FOLDERS += \

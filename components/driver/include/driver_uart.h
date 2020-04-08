@@ -76,7 +76,7 @@ Bit     Name    Type    Function Description
                                 4           0010    THR empty
                                 5           0000    Modem status
 */
-struct uart_iir_t   /*Interrupt Enable Register*/
+struct uart_iir_t   /*Interrupt Identification Register*/
 {
     uint32_t int_id:4;
     uint32_t unused:28;

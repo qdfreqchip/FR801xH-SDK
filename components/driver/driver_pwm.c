@@ -54,6 +54,7 @@ void pwm_update(enum pwm_channel_t channel, uint32_t frequency, uint8_t high_dut
         high_count = total_count * (100-high_duty) / 100;
     }
     else {
+        GLOBAL_INT_RESTORE();
         return;
     }
 
