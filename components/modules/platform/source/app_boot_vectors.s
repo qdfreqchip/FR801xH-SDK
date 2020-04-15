@@ -114,22 +114,24 @@ pmu_isr_ram   PROC
                 B pmu_isr_ram_C
                 ENDP
 	
+				;ALIGN		;default as area align
 SVC_Handler     PROC
                 IMPORT  prv_call_svc_pc
                 IMPORT  vPortSVCHandler
                 IMPORT  svc_exception_handler
-                ldr     r0, [sp, #0x18]
-                ldr     r2, =prv_call_svc_pc
-                add     r2, r2, #1
-                cmp     r0, r2
-                beq     vPortSVCHandler
-                ldr	    r1, [sp, #0x14]
-                ldr     r2, =svc_exception_handler
-                ldr     r2, [r2]
-                blx     r2
-                str     r0, [sp, #0x18]
-                bx      lr
-                nop
+                LDR     R0, [SP, #0x18]
+                LDR     R2, =prv_call_svc_pc
+                ADD     R2, R2, #1
+                CMP     R0, R2
+                BEQ     vPortSVCHandler
+             	LDR	R1, [SP, #0x14]   
+                PUSH    {LR}
+                LDR     R0, [SP, #0x1C]
+		LDR     R2, =svc_exception_handler                
+		LDR     R2, [R2, #0]                
+		BLX     R2      
+                STR     R0, [SP, #0x1C]
+                POP     {PC}
                 ENDP
 
 adc_isr         PROC
@@ -138,4 +140,6 @@ adc_isr         PROC
                 ENDP
                 
 				END
+					
+					
 					

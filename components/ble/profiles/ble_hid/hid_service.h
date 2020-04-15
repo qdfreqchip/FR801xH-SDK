@@ -108,7 +108,7 @@ enum
     HID_REPORT_REF_FEATURE_IDX,     // HID Report Reference characteristic descriptor, feature
     HID_FEATURE_CCCD_IDX,
 
-    HID_ATT_NB = HID_IDX_ATT_UNIQ_NB + (4* (HID_NUM_REPORTS)) - 1,
+    HID_ATT_NB = HID_IDX_ATT_UNIQ_NB + (4* (HID_NUM_REPORTS)),
 };
 /*
  * TYPEDEFS (类型定义)

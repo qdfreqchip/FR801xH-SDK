@@ -523,7 +523,8 @@ enum pmu_bat_full_deb_len_t      // N * pmu_sys_clk_perirod
 #define PMU_DEEP_SLEEP_STATE_OPTION     CO_BIT(6)
 #define PMU_DEEP_SLEEP_ON_OPTION        CO_BIT(7)
 
-#define PMU_REG_LED_CTRL1               0xb7        // [7:4] led pull, [3:0] mux(0-regs, 1-pwm)
+/* bit[7:4] pull_up LED3~LED0*/
+#define PMU_REG_LED_PULL                0xb7
 
 #define PMU_REG_QDEC_CNTA_VALUE         0xb8
 #define PMU_REG_QDEC_CNTB_VALUE         0xb9

@@ -462,6 +462,7 @@ uint16_t ali_ota_svc_msg_handler(gatt_msg_t *p_msg)
                                        ali_gatt_packet_rx->ali_gatt_header.frame_length);
                         }
                     }
+                    #if 0
                     if(ali_ota_env.ali_ota_version_current_buf_len == ali_ota_env.ali_ota_version_buf_len)
                     {
                         uint32_t firmware_offset = (uint32_t)&((struct jump_table_t *)0x01000000)->firmware_version- 0x01000000;
@@ -474,6 +475,7 @@ uint16_t ali_ota_svc_msg_handler(gatt_msg_t *p_msg)
                             *(uint32_t *)((uint32_t)ali_ota_env.ali_ota_version_buf + firmware_offset) = new_bin_ver;
                         }
                     }
+                    #endif
                     ali_ota_env.ali_ota_total_size += ali_gatt_packet_rx->ali_gatt_header.frame_length;
                     co_printf("total:%d,%d\r\n",ali_ota_env.ali_ota_totalframe,ali_ota_env.ali_ota_total_size);
                         

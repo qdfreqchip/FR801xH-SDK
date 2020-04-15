@@ -9,26 +9,35 @@
 #define GAP_API_H
 
 /*
- * INCLUDES 
+ * INCLUDES
  */
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
 
 /*
- * MACROS 
+ * MACROS
  */
 
 /*
- * CONSTANTS 
+ * CONSTANTS
  */
 /** @defgroup GAP_ADV_MODE_DEFINES
  * @{
  */
-#define GAP_ADV_MODE_UNDIRECT   		0x01
-#define GAP_ADV_MODE_DIRECT     		0x02
-#define GAP_ADV_MODE_NON_CONN_NON_SCAN          0x03
-#define GAP_ADV_MODE_NON_CONN_SCAN  	        0x04
+#define GAP_ADV_MODE_UNDIRECT               0x01
+#define GAP_ADV_MODE_DIRECT                 0x02
+#define GAP_ADV_MODE_NON_CONN_NON_SCAN      0x03
+#define GAP_ADV_MODE_NON_CONN_SCAN          0x04
+#define GAP_ADV_MODE_HDC_DIRECT             0x05
+
+#define GAP_ADV_MODE_EXTEND_CONN_UNDIRECT   0x11
+#define GAP_ADV_MODE_EXTEND_CONN_DIRECT     0x12
+#define GAP_ADV_MODE_EXTEND_NON_CONN_SCAN   0x14
+
+#define GAP_ADV_MODE_PER_ADV_UNDIRECT       0x21
+#define GAP_ADV_MODE_PER_ADV_DIRECT         0x22
+
 
 /** @defgroup GAP_ADDR_TYPE_DEFINES GAP address type define
  * @{
@@ -45,6 +54,14 @@
 #define GAP_ADV_CHAN_38  0x02                                                   //!< Advertisement Channel 38
 #define GAP_ADV_CHAN_39  0x04                                                   //!< Advertisement Channel 39
 #define GAP_ADV_CHAN_ALL (GAP_ADV_CHAN_37 | GAP_ADV_CHAN_38 | GAP_ADV_CHAN_39)  //!< All Advertisement Channels Enabled
+
+/** @defgroup GAP_SEC_CAHNNEL_PHY_DEFINES GAP extend adv secondery phy define
+ * @{
+ */
+#define GAP_SEC_PHY_LE_1MBPS    (1 << 0)
+#define GAP_SEC_PHY_LE_2MBPS    (1 << 1)
+#define GAP_SEC_PHY_LE_CODED    (1 << 2)
+
 
 /** @defgroup GAP_ADV_FILTER_MODE_DEFINES
  * @{
@@ -108,6 +125,10 @@
 #define GAP_SCAN_EVT_NONCONN_UNDIR     0x02  //!< Non Connectable advertising
 #define GAP_SCAN_EVT_SCAN_RSP          0x04  //!< Scan Response
 
+#define GAP_SCAN_EVT_EXT_ADV           0x10  //!< Scan Response of extended adv
+#define GAP_SCAN_EVT_EXT_SCAN_RSP      0x14  //!< Scan Response of extended scan response
+#define GAP_SCAN_EVT_PER_ADV           0x20  //!< Periodic adv
+
 
 /** @defgroup GAP_PAIRING_MODE_DEFINES GAP Bond Manager Pairing Modes
  * @{
@@ -162,7 +183,7 @@
 /** @} End GAP_APPEARANCE_VALUES */
 
 /*
- * TYPEDEFS 
+ * TYPEDEFS
  */
 
 /** @defgroup GAP_EVT_TYPE_DEFINES for application layer callbacks
@@ -179,6 +200,7 @@ typedef enum
     GAP_EVT_LINK_PARAM_UPDATE,      //!< Parameter update successful
     GAP_EVT_ADV_END,                //!< Advertising ended
     GAP_EVT_SCAN_END,               //!< Scanning ended
+    GAP_EVT_PER_SYNC_END,           //!< Periodic adv sync event ended
     GAP_EVT_ADV_REPORT,             //!< Find a BLE device
     GAP_EVT_CONN_END,               //!< Connecion procedure canceled
     GAP_EVT_PEER_FEATURE,           //!< Got peer device supported features
@@ -194,21 +216,21 @@ typedef enum
 /// Maximal length of the Device Name value
 #define LOCAL_NAME_MAX_LEN      (18)
 
-// BD ADDR 
-typedef struct 
+// BD ADDR
+typedef struct
 {
     uint8_t  addr[MAC_ADDR_LEN];           //!< 6-byte array address value
-}mac_addr_t;
+} mac_addr_t;
 
 // GAP BD ADDR strucrue, includes address type
 typedef struct
 {
-    mac_addr_t 	addr;            //!< BD Address of device
-    uint8_t 	addr_type;       //!< Address type of the device 0=public/1=private random
-}gap_mac_addr_t;
+    mac_addr_t  addr;            //!< BD Address of device
+    uint8_t     addr_type;       //!< Address type of the device 0=public/1=private random
+} gap_mac_addr_t;
 
 // Connected peer devcie link parameters
-typedef struct 
+typedef struct
 {
     uint8_t     conidx;         //!< Connection index
     mac_addr_t  peer_addr;      //!< BDADDR of peer device
@@ -216,21 +238,21 @@ typedef struct
     uint16_t    con_interval;   //!< Connection interval
     uint16_t    con_latency;    //!< Slave latency
     uint16_t    sup_to;         //!< Supervision timeout
-}conn_peer_param_t;
+} conn_peer_param_t;
 
 // Link disconnected event & reason
-typedef struct 
+typedef struct
 {
     uint8_t conidx;             //!< Connection index
     uint8_t reason;             //!< Reason of disconnection
-}gap_evt_disconnect_t;
+} gap_evt_disconnect_t;
 
 // Link parameter update reject event
-typedef struct 
+typedef struct
 {
     uint8_t conidx;             //!< Connection index
     uint8_t status;             //!< Parameter reject status
-}gap_evt_link_param_reject_t;
+} gap_evt_link_param_reject_t;
 
 // Link parameter update success event
 typedef struct
@@ -239,39 +261,39 @@ typedef struct
     uint16_t    con_interval;   //!< Connection interval
     uint16_t    con_latency;    //!< Connection latency value
     uint16_t    sup_to;         //!< Supervision timeout
-}gap_evt_link_param_update_t;
+} gap_evt_link_param_update_t;
 
 // Scan result, find remote advertising devide
-typedef struct 
+typedef struct
 {
-    uint8_t 		evt_type;		//!< Bit field providing information about the received report (@see GAP_SCAN_EVT_TYPE_DEFINES)
-    gap_mac_addr_t 	src_addr;		//!< Target address (in case of a directed advertising report)
-    int8_t              tx_pwr;			//!< TX power (in dBm)
-    int8_t              rssi;			//!< RSSI (between -127 and +20 dBm)
-    uint16_t 		length;			//!< Report length
-    uint8_t 		*data;			//!< Report data
-}gap_evt_adv_report_t;
+    uint8_t         evt_type;       //!< Bit field providing information about the received report (@see GAP_SCAN_EVT_TYPE_DEFINES)
+    gap_mac_addr_t  src_addr;       //!< Target address (in case of a directed advertising report)
+    int8_t              tx_pwr;         //!< TX power (in dBm)
+    int8_t              rssi;           //!< RSSI (between -127 and +20 dBm)
+    uint16_t        length;         //!< Report length
+    uint8_t         *data;          //!< Report data
+} gap_evt_adv_report_t;
 
 // Connected peer device supported features
-typedef struct 
+typedef struct
 {
     uint8_t conidx;                 //!< Connection index
     uint8_t features[8];            //!< Features bitmask
-}gap_evt_peer_feature_t;
+} gap_evt_peer_feature_t;
 
 // Connected peer device MTU size
 typedef struct
 {
-    uint8_t 	conidx;		//!< Connection index
-    uint16_t 	value;		//!< MTU size
-}gattc_mtu_t;
+    uint8_t     conidx;     //!< Connection index
+    uint16_t    value;      //!< MTU size
+} gattc_mtu_t;
 
 // Authentication request from master
-typedef struct 
+typedef struct
 {
     uint8_t conidx;                 //!< Connection index
     uint8_t auth;                   //!< Authentication level (@see gap_auth)
-}gap_sec_evt_master_auth_req_t;
+} gap_sec_evt_master_auth_req_t;
 
 // GAT event structure
 typedef struct
@@ -305,14 +327,17 @@ typedef void(* gap_callback_func_t)(gap_event_t * event);
 // Gap advertising parameters
 typedef struct
 {
-    uint8_t     	adv_mode;               //!< Advertising mode, connectable/none-connectable, see @ GAP_ADV_MODE_DEFINES
-    uint8_t     	adv_addr_type;          //!< see @ GAP_ADDR_TYPE_DEFINES
-    gap_mac_addr_t 	peer_mac_addr;          //!< peer mac addr,used for direction adv
-    uint8_t     	phy_mode;               //!< reseverd
-    uint16_t    	adv_intv_min;           //!< Minimum advertising interval, (in unit of 625us). Must be greater than 20ms
-    uint16_t    	adv_intv_max;           //!< Maximum advertising interval, (in unit of 625us). Must be greater than 20ms
-    uint8_t     	adv_chnl_map;           //!< Advertising channal map, 37, 38, 39, see @ GAP_ADVCHAN_DEFINES
-    uint8_t     	adv_filt_policy;        //!< Advertising filter policy, see @ GAP_ADV_FILTER_MODE_DEFINES
+    uint8_t         adv_mode;               //!< Advertising mode, connectable/none-connectable, see @ GAP_ADV_MODE_DEFINES
+    uint8_t         adv_addr_type;          //!< see @ GAP_ADDR_TYPE_DEFINES
+    gap_mac_addr_t  peer_mac_addr;          //!< peer mac addr,used for direction adv
+    uint8_t         phy_mode;               //!< see @GAP_SEC_CAHNNEL_PHY_DEFINES
+    uint16_t        adv_intv_min;           //!< Minimum advertising interval, (in unit of 625us). Must be greater than 20ms
+    uint16_t        adv_intv_max;           //!< Maximum advertising interval, (in unit of 625us). Must be greater than 20ms
+    uint8_t         adv_chnl_map;           //!< Advertising channal map, 37, 38, 39, see @ GAP_ADVCHAN_DEFINES
+    uint8_t         adv_filt_policy;        //!< Advertising filter policy, see @ GAP_ADV_FILTER_MODE_DEFINES
+    uint8_t         adv_sid;                //!< Advertising set idx, for EXTENDED adv and PERIODIC ADV only, range:0~0xF
+    uint16_t        per_adv_intv_min;       //!< Minimum periodic advertising interval (in unit of 1.25ms).. Must be greater than 20ms,for PERIODIC ADV only
+    uint16_t        per_adv_intv_max;       //!< Maximum periodic advertising interval (in unit of 1.25ms). Must be greater than 20ms,for PERIODIC ADV only
 } gap_adv_param_t;
 
 // Gap scan parameters
@@ -325,6 +350,14 @@ typedef struct
     uint16_t    duration;            //!< Scan duration (in unit of 10ms). 0 means that the controller will scan continuously until host stop it
 } gap_scan_param_t;
 
+// Gap sync parameters
+typedef struct
+{
+    gap_mac_addr_t  adv_dev_addr;        //!< periodic adv device mac address 
+    uint8_t         adv_sid;             //!< periodic adv setting id
+    uint16_t        sup_to;              //!< Supervision timeout,(in unit of 10ms between 100ms and 163.84s)
+} gap_per_sync_param_t;
+
 // Gap security parameters
 typedef struct
 {
@@ -332,29 +365,35 @@ typedef struct
     bool     ble_secure_conn;   //!< BLE Secure Simple Pairing, also called Secure Connection mode.
     uint8_t  io_cap;            //!< IO capbilities, see @ GAP_IO_CAP_DEFINES
     uint8_t  pair_init_mode;    //!< If initialize pairing procesure or not, see @ GAP_PAIRING_MODE_DEFINES
-    bool     bond_auth;         //!< Bond_auth enable/disable,if true, then will distribute encryption key,and will check this key_req when bonding. 
+    bool     bond_auth;         //!< Bond_auth enable/disable,if true, then will distribute encryption key,and will check this key_req when bonding.
     uint32_t password;          //!< Password.
 } gap_security_param_t;
 
+// Gap bond information
+typedef struct
+{
+    gap_mac_addr_t peer_addr;   //!<mac addr of bonded peer device
+    uint8_t bond_flag;          //!<bond flag
+} gap_bond_info_t;
 
 /*
- * GLOBAL VARIABLES 
+ * GLOBAL VARIABLES
  */
 
 /*
- * LOCAL VARIABLES 
+ * LOCAL VARIABLES
  */
 
 /*
- * LOCAL FUNCTIONS 
+ * LOCAL FUNCTIONS
  */
 
 /*
- * EXTERN FUNCTIONS 
+ * EXTERN FUNCTIONS
  */
 
 /*
- * PUBLIC FUNCTIONS 
+ * PUBLIC FUNCTIONS
  */
 
 
@@ -393,18 +432,29 @@ void gap_set_advertising_param(gap_adv_param_t *p_adv_param);
  *
  * @return  None.
  */
-void gap_set_advertising_data(uint8_t *p_adv_data, uint8_t adv_data_len);
+void gap_set_advertising_data(uint8_t *p_adv_data, uint16_t adv_data_len);
 /*********************************************************************
  * @fn      gap_set_advertising_param
  *
- * @brief   Set ble advertising parameters.
+ * @brief   Set ble advertising response data.
  *
  * @param   p_rsp_data    - pointer to scan response data buffer.
  *          rsp_data_len  - scan response data len.
  *
  * @return  None.
  */
-void gap_set_advertising_rsp_data(uint8_t *p_rsp_data, uint8_t rsp_data_len);
+void gap_set_advertising_rsp_data(uint8_t *p_rsp_data, uint16_t rsp_data_len);
+/*********************************************************************
+ * @fn      gap_set_per_adv_data
+ *
+ * @brief   Set ble periodic advertising data.
+ *
+ * @param   p_per_adv_data    - pointer to periodic adv data buffer.
+ *          per_adv_data_len  - periodic adv data len.
+ *
+ * @return  None.
+ */
+void gap_set_per_adv_data(uint8_t *p_per_adv_data, uint16_t per_adv_data_len);
 
 /*********************************************************************
  * @fn      gap_start_advertising
@@ -449,6 +499,26 @@ void gap_start_scan(gap_scan_param_t *p_scan_param);
 * @return  None.
 */
 void gap_stop_scan(void);
+/*********************************************************************
+* @fn      gap_start_per_sync
+*
+* @brief   Start periodic sync .
+*
+* @param   p_per_sync_msg - periodic sync paramters.
+*
+* @return  None.
+*/
+void gap_start_per_sync(gap_per_sync_param_t *p_per_sync_msg);
+/*********************************************************************
+* @fn      gap_stop_per_sync
+*
+* @brief   Stop periodic sync.
+*
+* @param   None.
+*
+* @return  None.
+*/
+void gap_stop_per_sync(void);
 
 /*********************************************************************
 * @fn       gap_start_conn
@@ -629,9 +699,9 @@ void gap_conn_param_update(uint8_t conidx, uint16_t min_intv, uint16_t max_intv,
  *
  * @brief   Initialize bonding manager. For bonding features when security is needed.
  *
- * @param   flash_addr      - Flash page addr where peer device bond information is stored, 
+ * @param   flash_addr      - Flash page addr where peer device bond information is stored,
  *                            should be integer multiple of 0x1000
- *          svc_flash_addr  - Flash page addr where peer device services information is stored, 
+ *          svc_flash_addr  - Flash page addr where peer device services information is stored,
  *                            should be integer multiple of 0x1000
  *          max_dev_num     - Max supported number of peer devices
  *          enable          - Enable bit of bond manager fucntion. True -Enalbe; False-Disable
@@ -639,6 +709,18 @@ void gap_conn_param_update(uint8_t conidx, uint16_t min_intv, uint16_t max_intv,
  * @return  None.
  */
 void gap_bond_manager_init(uint32_t flash_addr,uint32_t svc_flash_addr,uint8_t max_dev_num,bool enable);
+/*********************************************************************
+ * @fn      gap_bond_manager_get_info
+ *
+ * @brief   Get bond info which is stored in flash.
+ *
+ * @param   device_idx      - device index, range:0 ~ max_dev_num -1;
+ *                            max_dev_num: Max supported number of peer devices
+ *          bond_info       - bond info of peer device stored in flash.
+ *
+ * @return  None.
+ */
+void gap_bond_manager_get_info(uint8_t device_idx, gap_bond_info_t *bond_info);
 
 /*********************************************************************
  * @fn      gap_bond_manager_delete_all
@@ -742,4 +824,6 @@ void gap_security_req(uint8_t conidx);
 conn_peer_param_t *gap_get_latest_conn_parameter(void);
 
 #endif // end of #ifndef GAP_API_H
+
+
 

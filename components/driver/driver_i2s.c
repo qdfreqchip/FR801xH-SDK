@@ -28,7 +28,7 @@
 /*
  * LOCAL VARIABLES
  */
-static volatile struct i2s_reg_t *i2s_reg = (struct i2s_reg_t *)I2S_BASE;
+volatile struct i2s_reg_t *i2s_reg = (struct i2s_reg_t *)I2S_BASE;
 
 void i2s_clear_fifo(void)
 {

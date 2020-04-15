@@ -138,7 +138,7 @@ static void pmu_chg_dec_set_debounce_cnt(uint8_t cnt)
  *
  * @brief   Hand over the IO control from digital to PMU (always on),
  *          this function can be used to set more than one IO belong
- *          to the same port. 
+ *          to the same port.
  *          example usage: pmu_set_pin_to_PMU(GPIO_PORT_A, (1<<GPIO_BIT_0) | (1<<GPIO_BIT_1))
  *
  * @param   port    - which group the io belongs to, @ref system_port_t
@@ -189,7 +189,7 @@ void pmu_set_port_mux(enum system_port_t port, enum system_port_bit_t bit, enum 
 {
     uint16_t value;
     uint8_t pmu_port_reg;
-    
+
     if(port == GPIO_PORT_A)
         pmu_port_reg = PMU_REG_PORTA_MUX_L;
     else if(port == GPIO_PORT_B)
@@ -277,10 +277,28 @@ void pmu_set_gpio_value(enum system_port_t port, uint8_t bits, uint8_t value)
 
 void pmu_set_led2_value(uint8_t value)
 {
+    
     if( value == 0 )
-        ool_write(PMU_REG_LED_CTRL, 0x00);
+    {
+        ool_write(PMU_REG_LED_CTRL, 0x00);  //set as output
+        ool_write(PMU_REG_LED_PULL, 0x40);  //pull down
+    }
     else
+    {
+        ool_write(PMU_REG_LED_CTRL, 0x40);  //set as input
+        ool_write(PMU_REG_LED_PULL, 0x00);  //pull up
+    }
+//another method
+/*
+    if( value == 0 )
+    {
+        ool_write(PMU_REG_LED_CTRL, 0x00);
+    }
+    else
+    {
         ool_write(PMU_REG_LED_CTRL, 0x04 );
+    }
+*/
 }
 
 
@@ -293,7 +311,7 @@ void pmu_set_led2_value(uint8_t value)
  *
  * @param   port    - which group the io belongs to, @ref system_port_t
  *          bit     - the number of io
- *          
+ *
  *
  * @return  1: the IO is high, 0: the IO is low..
  */
@@ -345,14 +363,14 @@ void pmu_sub_init(void)
 
     /* remove internal osc cap */
     ool_write(PMU_REG_OSC_CAP_CTRL, 0x00);
-    
+
     /* remove the resistor load of BUCK */
     ool_write(PMU_REG_RL_CTRL, ool_read(PMU_REG_RL_CTRL) & (~(1<<6)));
 #ifndef CFG_FPGA_TEST
     ool_write(PMU_REG_BUCK_CTRL0, ool_read(PMU_REG_BUCK_CTRL0) & (~(1<<3)));
     /* BIT3 ALDO bypass mode，这样底电流会小1uA，跟PB0连接到cs线有关 */
     //ool_write(PMU_REG_ADKEY_ALDO_CTRL, ool_read(PMU_REG_ADKEY_ALDO_CTRL) | (1<<3));
-    
+
     /* change BUCK setting for better sensitivity performance */
     ool_write(PMU_REG_BUCK_CTRL0, 0x40);
     /* set BUCK voltage to min */
@@ -372,11 +390,11 @@ void pmu_sub_init(void)
 
     /* set PKVDD voltage to 0.85v */
 #ifndef CFG_FPGA_TEST
-    ool_write(PMU_REG_PKVDD_CTRL2, (ool_read(PMU_REG_PKVDD_CTRL2) & 0xF0) | 0x09);
+    ool_write(PMU_REG_PKVDD_CTRL2, (ool_read(PMU_REG_PKVDD_CTRL2) & 0xF0) | 0x07);
 #else
     ool_write(PMU_REG_PKVDD_CTRL2, (ool_read(PMU_REG_PKVDD_CTRL2) & 0xF0) | 0x04);
 #endif
-    
+
     /*
         1. set PMU interrupt wake up pmu ctrl first
         2. enable gpio monitor module
@@ -403,12 +421,12 @@ void pmu_sub_init(void)
 
 #if 0
     /* sleep and wakeup timing settings */
-#ifndef CFG_FPGA_TEST	
+#ifndef CFG_FPGA_TEST
     ool_write(PMU_REG_WKUP_PWO_DLY, 0x40);
     ool_write(PMU_REG_WKUP_PMUFSM_CHG_DLY, 0x41);
     ool_write(PMU_REG_BT_TIMER_WU_IRQ_PROTECT, 0x42);
 #else
-	ool_write(PMU_REG_WKUP_PWO_DLY, 0x18);
+    ool_write(PMU_REG_WKUP_PWO_DLY, 0x18);
     ool_write(PMU_REG_WKUP_PMUFSM_CHG_DLY, 0x19);
     ool_write(PMU_REG_BT_TIMER_WU_IRQ_PROTECT, 0x20);
 #endif
@@ -419,13 +437,13 @@ void pmu_sub_init(void)
     ool_write(PMU_REG_GPIO_PKVDDH_OFF, 0x0a);
 
     /* RAM and IO isolation control */
-    #ifndef KEEP_CACHE_SRAM_RETENTION
+#ifndef KEEP_CACHE_SRAM_RETENTION
     ool_write(PMU_REG_MEM_ISO_EN_CTRL, 0xef);
     ool_write(PMU_REG_MEM_RET_CTRL, 0x3f);
-    #else
+#else
     ool_write(PMU_REG_MEM_ISO_EN_CTRL, 0x1f);
     ool_write(PMU_REG_MEM_RET_CTRL, 0x1f);
-    #endif
+#endif
     ool_write(PMU_REG_ISO_CTRL, 0x02);
 
     /* debounce settings */
@@ -435,10 +453,10 @@ void pmu_sub_init(void)
     pmu_bat_full_set_debounce_cnt(2);
     pmu_lvd_set_debounce_cnt(2);
     pmu_chg_dec_set_debounce_cnt(2);
-    
+
 #ifndef CFG_FPGA_TEST
-    #if 0
-    /* 
+#if 0
+    /*
      * init PB0 used for internal flash cs control. CS pin is bonded with
      * PB0, use PB0 to keep cs pin in high level after system enter deep
      * sleep mode.
@@ -459,7 +477,7 @@ void pmu_sub_init(void)
     ool_write(PMU_REG_GPIOB_V, ool_read(PMU_REG_GPIOB_V) | 0x01);
     ool_write(PMU_REG_GPIOB_V, ool_read(PMU_REG_GPIOB_V) & 0x3e);
     ool_write(PMU_REG_PORTB_SEL, ool_read(PMU_REG_PORTB_SEL) | 0x3f);
-    #endif
+#endif
 
     /* LED1 is bounded with efuse power */
     ool_write(PMU_REG_LED_CTRL, 0x00);
@@ -470,23 +488,23 @@ void pmu_sub_init(void)
 
     /* Enable PMU SIGNAL diagport output, only for debug usage */
 #if 0
-#if 1
-        ool_write(PMU_REG_PORTA_SEL, 0x0c);
-        ool_write(PMU_REG_PORTA_OEN, 0x00);
-        ool_write16(PMU_REG_PORTA_MUX_L, 0xAAAA);
+#if 0
+    ool_write(PMU_REG_PORTA_SEL, 0x0c);
+    ool_write(PMU_REG_PORTA_OEN, 0x00);
+    ool_write16(PMU_REG_PORTA_MUX_L, 0xAAAA);
+#endif
+#if 0
+    ool_write(PMU_REG_PORTB_SEL, 0x00);
+    ool_write(PMU_REG_PORTB_OEN, 0x00);
+    ool_write16(PMU_REG_PORTB_MUX_L, 0xAAAA);
 #endif
 #if 1
-        ool_write(PMU_REG_PORTB_SEL, 0x00);
-        ool_write(PMU_REG_PORTB_OEN, 0x00);
-        ool_write16(PMU_REG_PORTB_MUX_L, 0xAAAA);
-#endif
-#if 1
-        ool_write(PMU_REG_PORTD_SEL, 0xef);
-        ool_write(PMU_REG_PORTD_OEN, 0x00);
-        ool_write16(PMU_REG_PORTD_MUX_L, 0xAAAA);
+    ool_write(PMU_REG_PORTD_SEL, 0x00);
+    ool_write(PMU_REG_PORTD_OEN, 0x00);
+    ool_write16(PMU_REG_PORTD_MUX_L, 0xAAAA);
 #endif
 
-        ool_write(PMU_REG_DIAG_SEL, 0x08);
+    ool_write(PMU_REG_DIAG_SEL, 0x50);
 #endif
 
 }
@@ -502,20 +520,25 @@ void pmu_sub_init(void)
  */
 void pmu_enable_irq(uint16_t irqs)
 {
-    if(irqs & 0xff) {
+    if(irqs & 0xff)
+    {
         pmu_enable_isr(irqs & 0xff);
     }
-    if((irqs >> 8) & 0xff) {
+    if((irqs >> 8) & 0xff)
+    {
         pmu_enable_isr2((irqs >> 8) & 0xff);
     }
 
-    if(irqs & (PMU_ISR_BIT_ACOK|PMU_ISR_BIT_ACOFF)) {
+    if(irqs & (PMU_ISR_BIT_ACOK|PMU_ISR_BIT_ACOFF))
+    {
         ool_write(PMU_REG_ACOK_DEB_NEW_CFG, ool_read(PMU_REG_ACOK_DEB_NEW_CFG) | (PMU_ACOK_DEB_NEW_SEL));  // release debounce block
     }
-    if(irqs & PMU_ISR_BIT_BAT) {
+    if(irqs & PMU_ISR_BIT_BAT)
+    {
         ool_write(PMU_REG_LVD_BAT_DEB_CFG, ool_read(PMU_REG_LVD_BAT_DEB_CFG) | PMU_BAT_DEB_SEL);    // release debounce block
     }
-    if(irqs & PMU_ISR_BIT_LVD) {
+    if(irqs & PMU_ISR_BIT_LVD)
+    {
         ool_write(PMU_REG_LVD_BAT_DEB_CFG, ool_read(PMU_REG_LVD_BAT_DEB_CFG) | PMU_LVD_DEB_SEL);    // release debounce block
     }
 }
@@ -531,10 +554,12 @@ void pmu_enable_irq(uint16_t irqs)
  */
 void pmu_disable_irq(uint16_t irqs)
 {
-    if(irqs & 0xff) {
+    if(irqs & 0xff)
+    {
         pmu_disable_isr(irqs & 0xff);
     }
-    if((irqs >> 8) & 0xff) {
+    if((irqs >> 8) & 0xff)
+    {
         pmu_disable_isr2((irqs >> 8) & 0xff);
     }
 }
@@ -596,10 +621,12 @@ void pmu_codec_power_disable(void)
  */
 void pmu_set_aldo_voltage(enum pmu_aldo_work_mode_t mode, uint8_t value)
 {
-    if(mode == PMU_ALDO_MODE_NORMAL) {
+    if(mode == PMU_ALDO_MODE_NORMAL)
+    {
         ool_write(PMU_REG_ADKEY_ALDO_CTRL, (ool_read(PMU_REG_ADKEY_ALDO_CTRL) & (~(0x1f<<3))) | value);
     }
-    else {
+    else
+    {
         ool_write(PMU_REG_ADKEY_ALDO_CTRL, ool_read(PMU_REG_ADKEY_ALDO_CTRL) | (1<<3));
     }
 }
@@ -615,13 +642,15 @@ void pmu_set_aldo_voltage(enum pmu_aldo_work_mode_t mode, uint8_t value)
  */
 void pmu_set_lp_clk_src(enum pmu_lp_clk_src_t src)
 {
-    if(src == PMU_LP_CLK_SRC_EX_32768) {
+    if(src == PMU_LP_CLK_SRC_EX_32768)
+    {
         /* disalbe 32768 osc PD */
         ool_write(PMU_REG_OSC32K_OTD_CTRL, ool_read(PMU_REG_OSC32K_OTD_CTRL) & 0xfe);
         /* set clock source to external 32768 */
         ool_write(PMU_REG_CLK_CONFIG, (ool_read(PMU_REG_CLK_CONFIG) & (~PMU_SYS_CLK_SEL_MSK)) | 0x80);
     }
-    else {
+    else
+    {
         /* set clock source to RC/2 */
         ool_write(PMU_REG_CLK_CONFIG, (ool_read(PMU_REG_CLK_CONFIG) & (~PMU_SYS_CLK_SEL_MSK)) | 0x40);
         /* enable 32768 osc PD */
@@ -784,7 +813,7 @@ __attribute__((section("ram_code"))) void pmu_isr_ram_C(unsigned int* hardfault_
         clr_bits |= PMU_ISR_QDEC_CLR;
         qdec_isr_ram();
     }
-    
+
     if(clr_bits)
         pmu_clear_isr_state(clr_bits);
 }

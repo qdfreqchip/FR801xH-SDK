@@ -92,6 +92,19 @@ void flash_erase(uint32_t offset, uint32_t size);
 uint8_t flash_page_erase(uint32_t offset);
 
 /*********************************************************************
+* @fn      flash_OTP_read
+*
+* @brief   read data from OTP sections. otp section size: 512 = 0x200 
+*
+* @param   offset - Security flash section offset, only valid for 0x1000,0x2000,0x3000 
+*		   length - buffer length to be read from security flash section. rang[1,512]			
+*		   buffer - pointer to buffer which will store data			
+*						
+* @return  None.
+*/
+__attribute__((section("ram_code"))) void flash_OTP_read(uint32_t offset, uint32_t length, uint8_t *buffer);
+    
+/*********************************************************************
 * @fn      qspi_flash_enable_quad
 *
 * @brief   enable the QUAD read mode.

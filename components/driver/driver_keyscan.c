@@ -21,7 +21,7 @@
  * MACROS 
  */
 #undef LOG_LEVEL_MODULE
-#define LOG_LEVEL_MODULE        LOG_LEVEL_INFO
+#define LOG_LEVEL_MODULE        LOG_LEVEL_NONE
 
 /*
  *                                                KEYBOARD PIN-VALUE MAPPING
@@ -162,7 +162,7 @@ void keyscan_init(keyscan_param_t *param)
     ool_write(PMU_REG_PORTD_PUL, param->row_en ^ 0xff);
 
     /* enable keyscan module and interrupt */
-    ool_write(PMU_REG_KEYSCAN_CTRL, ool_read(PMU_REG_KEYSCAN_CTRL) | PMU_KEYSCAN_EN | PMU_KEYSCAN_IRQ_EN );
+    ool_write(PMU_REG_KEYSCAN_CTRL, ool_read(PMU_REG_KEYSCAN_CTRL) | PMU_KEYSCAN_EN | PMU_KEYSCAN_IRQ_EN | PMU_KEYSCAN_LP_EN );
 }
 
 /*********************************************************************

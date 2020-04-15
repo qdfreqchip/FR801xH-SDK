@@ -1,9 +1,11 @@
 #include <stdint.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include "sys_utils.h"
 
 #include "driver_adc.h"
+#include "driver_flash.h"
 #include "driver_plf.h"
 #include "driver_pmu.h"
 #include "driver_pmu_regs.h"
@@ -75,6 +77,9 @@ struct adc_env_t {
 
 static volatile struct adc_regs_t *adc_regs = (volatile struct adc_regs_t *)SAR_ADC_BASE;
 static struct adc_env_t adc_env;
+static uint8_t adc_ref_calib = false;
+static uint16_t adc_ref_internal = 1200;
+static uint16_t adc_ref_avdd = 2900;
 
 /*********************************************************************
  * @fn      adc_set_sample_clock
@@ -341,6 +346,28 @@ void adc_get_result(enum adc_trans_source_t src, uint8_t channels, uint16_t *buf
 }
 
 /*********************************************************************
+ * @fn      adc_get_ref_voltage
+ *
+ * @brief   use to calculate absolute value after get ADC sample result.
+ *
+ * @param   ref - ADC reference setting. @ref adc_reference_t
+ *       
+ * @return  reference voltage, unit: mv.
+ */
+uint16_t adc_get_ref_voltage(enum adc_reference_t ref)
+{
+    if(ref == ADC_REFERENCE_INTERNAL) {
+        return adc_ref_internal;
+    }
+    else if(ref == ADC_REFERENCE_AVDD) {
+        return adc_ref_avdd;
+    }
+    else {
+        return 0;
+    }
+}
+
+/*********************************************************************
  * @fn      adc_init
  *
  * @brief   initiate ADC with parameters stored in cfg.
@@ -352,6 +379,16 @@ void adc_get_result(enum adc_trans_source_t src, uint8_t channels, uint16_t *buf
 void adc_init(struct adc_cfg_t *cfg)
 {
     uint8_t channels = cfg->channels;
+    uint32_t data[5];
+
+    if(adc_ref_calib == false) {
+		adc_ref_calib = true;
+        flash_OTP_read(0x1000, 5*sizeof(uint32_t), (void *)data);
+		if(data[0] == 0x31303030) {
+			adc_ref_internal = ((400*1024)/(data[3] / 32) + (800*1024)/(data[4] / 32)) / 2;
+			adc_ref_avdd = ((2400*1024)/(data[1] / 32) + (800*1024)/(data[2] / 32)) / 2;
+		}
+    }
 
     memset((void *)&adc_env, 0, sizeof(adc_env));
 

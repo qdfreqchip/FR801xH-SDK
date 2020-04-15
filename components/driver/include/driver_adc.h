@@ -8,7 +8,7 @@
                           USAGE SAMPLE
     1. get vbat value
         struct adc_cfg_t cfg;
-        uint16_t result;
+        uint16_t result, ref_vol;
 
         memset((void*)&cfg, 0, sizeof(cfg));
         cfg.src = ADC_TRANS_SOURCE_VBAT;
@@ -20,7 +20,8 @@
         adc_enable(NULL, NULL, 0);
 
         adc_get_result(ADC_TRANS_SOURCE_VBAT, 0, &result);
-        // vbat_vol = (result * 4800) / 1024 mV.
+		ref_vol = adc_get_ref_voltage(ADC_REFERENCE_INTERNAL);
+        // vbat_vol = (result * 4 * ref_vol) / 1024 mV.
 
     2. sample voltage from PAD
         struct adc_cfg_t cfg;
@@ -154,6 +155,17 @@ void adc_disable(void);
  * @return  None.
  */
 void adc_get_result(enum adc_trans_source_t src, uint8_t channels, uint16_t *buffer);
+
+/*********************************************************************
+ * @fn      adc_get_ref_voltage
+ *
+ * @brief   use to calculate absolute value after get ADC sample result.
+ *
+ * @param   ref - ADC reference setting. @ref adc_reference_t
+ *       
+ * @return  reference voltage, unit: mv.
+ */
+uint16_t adc_get_ref_voltage(enum adc_reference_t ref);
 
 /*********************************************************************
  * @fn      adc_init

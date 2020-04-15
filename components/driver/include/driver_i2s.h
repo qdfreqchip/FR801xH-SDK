@@ -75,6 +75,7 @@ struct i2s_reg_t {
 	struct i2s_int_en_t mask;
 };
 
+extern volatile struct i2s_reg_t *i2s_reg;
 /*********************************************************************
  * @fn      i2s_init
  *
