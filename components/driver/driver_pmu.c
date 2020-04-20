@@ -16,6 +16,7 @@
 
 #include "sys_utils.h"
 #include "driver_pmu.h"
+#include "driver_efuse.h"
 
 /*
  * EXTERNAL FUNCTIONS
@@ -377,7 +378,7 @@ void pmu_sub_init(void)
     ool_write(PMU_REG_BUCK_CTRL1, 0x05);
 
     /* set DLDO voltage to min */
-    ool_write(PMU_REG_DLDO_CTRL, 0x42);
+    //ool_write(PMU_REG_DLDO_CTRL, 0x42);
 #endif
     /* separate PKVDD and PKVDDH */
     ool_write(PMU_REG_ALDO_BG_CTRL, 0x06);
@@ -390,7 +391,30 @@ void pmu_sub_init(void)
 
     /* set PKVDD voltage to 0.85v */
 #ifndef CFG_FPGA_TEST
-    ool_write(PMU_REG_PKVDD_CTRL2, (ool_read(PMU_REG_PKVDD_CTRL2) & 0xF0) | 0x07);
+    uint32_t data0, data1, data2;
+    uint8_t dldo_v = 0;
+    efuse_read(&data0, &data1, &data2);
+    for(uint8_t i=8; i<12; i++) {
+        dldo_v <<= 1;
+        if(data0 & (1<<i)) {
+            dldo_v |= 1;
+        }
+    }
+    if(dldo_v != 0) {
+        if(dldo_v/2 >= 4) {
+            ool_write(PMU_REG_PKVDD_CTRL2, (ool_read(PMU_REG_PKVDD_CTRL2) & 0xF0) | 0x05);
+        }
+        else {
+            ool_write(PMU_REG_PKVDD_CTRL2, (ool_read(PMU_REG_PKVDD_CTRL2) & 0xF0) | (9-dldo_v/2));
+        }
+        ool_write(PMU_REG_DLDO_CTRL, 0x42 | (3-dldo_v/4));
+    }
+    else {
+        ool_write(PMU_REG_PKVDD_CTRL2, (ool_read(PMU_REG_PKVDD_CTRL2) & 0xF0) | 0x07);
+
+        /* set DLDO voltage to min */
+        ool_write(PMU_REG_DLDO_CTRL, 0x42);
+    }
 #else
     ool_write(PMU_REG_PKVDD_CTRL2, (ool_read(PMU_REG_PKVDD_CTRL2) & 0xF0) | 0x04);
 #endif

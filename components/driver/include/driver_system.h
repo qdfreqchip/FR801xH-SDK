@@ -12,6 +12,7 @@
  * INCLUDES 
  */
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "driver_iomux.h"
 
@@ -286,6 +287,20 @@ void system_sleep_disable(void);
  * @return  None.
  */
 uint32_t system_get_curr_time(void);
+
+/*********************************************************************
+ * @fn      system_power_off
+ *
+ * @brief   put the system into power off mode, GPIO or pmu interrupt can 
+ *          power on system according user configurations.
+ *
+ * @param   aldo_bypass - set aldo working in bypass true save more power.
+ *                        suggest user enable this function if power supply
+ *                        is less than 3.3v.
+ *
+ * @return  None.
+ */
+void system_power_off(bool aldo_bypass);
 
 #endif // _DRIVER_IOMUX_H
 

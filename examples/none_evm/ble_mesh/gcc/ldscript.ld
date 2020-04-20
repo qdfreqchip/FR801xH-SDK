@@ -96,6 +96,12 @@ SECTIONS
         LONG(ADDR(.isr_vector)+SIZEOF(.isr_vector));
         __vector_regions_array_end = .;
         
+        __critical_regions_array_front_start = .;
+        LONG(LOADADDR(.critical_regions_front));
+        LONG(ADDR(.critical_regions_front));
+        LONG(ADDR(.critical_regions_front)+SIZEOF(.critical_regions_front));
+        __critical_regions_array_front_end = .;
+        
         __critical_regions_array_start = .;
         LONG(LOADADDR(.critical_regions));
         LONG(ADDR(.critical_regions));
@@ -214,6 +220,13 @@ SECTIONS
      * It is one task of the startup to copy the initial values from 
      * FLASH to RAM.
      */
+    .critical_regions_front : ALIGN(4)
+    {
+        *(.ram_code_front.*)            /* RAM code */
+        *(ram_code_front*)            /* RAM code */
+        
+    } >RAM  AT>FLASH
+	
     .critical_regions : ALIGN(4)
     {
         *(.ram_code.*)            /* RAM code */
