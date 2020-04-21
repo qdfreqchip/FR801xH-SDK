@@ -21,7 +21,12 @@ ROM 0x01000000  0x80000
         app_boot_vectors.o (RESET, +FIRST)
     }
     
-    USER_RE_RAM 0x20000B60
+    USER_RE_RAM_FRONT 0x20000B60
+	{
+		*(ram_code_front)
+    }
+    
+    USER_RE_RAM +0
 	{
 		*(ram_code)
     }
