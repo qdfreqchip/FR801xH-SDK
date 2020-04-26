@@ -119,20 +119,35 @@ SVC_Handler     PROC
                 IMPORT  prv_call_svc_pc
                 IMPORT  vPortSVCHandler
                 IMPORT  svc_exception_handler
+                IMPORT  con_sched_patch
                 TST     LR, #4			;test bit[2] is 0 ,then exe EQ branch, MSP as sp
                 ITE     EQ
                 MRSEQ   R3, MSP
                 MRSNE   R3, PSP
-                LDR     R0, [R3, #0x18]
+                LDR     R0, [R3, #0x18]     ;r0 = return_address
                 LDR     R2, =prv_call_svc_pc
                 ADD     R2, R2, #1
                 CMP     R0, R2
                 BEQ     vPortSVCHandler
-                LDR	    R1, [R3, #0x14]
+                
                 PUSH    {LR, R3}
+                LDR     R2, =0x00011f50
+                CMP     R0, R2              ;if return_address == 0x00011f50
+                BNE     SVC_Handler_1
+                PUSH    {R4-R12}
+                MOV     R0, R4
+                MOV     R1, R5
+                BL      con_sched_patch
+                POP     {R4-R12}
+                MOV     R5, R0
+                LDR     R0, =0x00011f67     ;return_address = 0x00011f67
+                B       SVC_Handler_2
+SVC_Handler_1
+                LDR     R1, [R3, #0x14]     ;r1 = lr
                 LDR     R2, =svc_exception_handler
                 LDR     R2, [R2, #0]
                 BLX     R2
+SVC_Handler_2
                 POP     {LR, R3}
                 STR     R0, [R3, #0x18]
                 BX      LR

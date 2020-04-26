@@ -64,7 +64,7 @@ void __attribute__ ((weak, alias ("Default_Handler")))
 pdm_isr(void);
 void __attribute__ ((weak, alias ("Default_Handler")))
 uart1_isr(void);
-
+void SVC_Handler_ram (void);
 // ----------------------------------------------------------------------------
 
 typedef void
@@ -95,7 +95,7 @@ pHandler __isr_vectors[] =
         0,                                        // Reserved
         0,                                        // Reserved
         0,                                        // Reserved
-        SVC_Handler,                              // SVCall handler
+        SVC_Handler_ram,                          // SVCall handler
 #if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
         DebugMon_Handler,                         // Debug monitor handler
 #else

@@ -271,17 +271,38 @@ UsageFault_Handler_C (ExceptionStackFrame* frame __attribute__((unused)),
 #endif
 
 void __attribute__ ((section(".after_vectors")))
-SVC_Handler (void)
+SVC_Handler_ram (void)
 {
     asm volatile(
-          " ldr r1, [sp, #0x14]             \n"
-          " push {lr}                       \n"
-          " ldr r0, [sp, #0x1c]             \n"
-          " ldr r2, =svc_exception_handler  \n"
-          " ldr r2, [r2, #0]                \n"
-          " blx r2                          \n"
-          " str r0, [sp, #0x1c]             \n"
-          " pop {pc}"
+          " tst lr, #4                      \n"
+		  " ite eq                          \n"
+		  " mrseq r3, msp                   \n"
+		  " mrsne r3, psp                   \n"
+		  " ldr r0, [r3, #0x18]             \n"
+		  " ldr r2, =prv_call_svc_pc        \n"
+		  " add r2, r2, #1                  \n"
+		  " cmp r0, r2                      \n"
+		  " beq vPortSVCHandler             \n"
+		  " push {r3, lr}                   \n"
+		  " ldr r2, =0x00011f50             \n"
+		  " cmp r0, r2                      \n"
+		  " bne SVC_Handler_1               \n"
+		  " push {r4-r12}                   \n"
+		  " mov r0, r4                      \n"
+		  " mov r1, r5                      \n"
+		  " bl con_sched_patch              \n"
+		  " pop {r4-r12}                    \n"
+		  " mov r5, r0                      \n"
+		  " ldr r0, =0x00011f67             \n"
+		  " b SVC_Handler_2                 \n"
+		  " SVC_Handler_1:                  \n"
+		  " ldr r1, [r3, #0x14]             \n"
+		  " ldr r2, =svc_exception_handler  \n"
+		  " ldr r2, [r2, #0]                \n"
+		  " blx r2                          \n"
+		  " SVC_Handler_2:                  \n"
+          " pop {r3, lr}                    \n"
+          " str r0, [r3, #0x18]"
 
           : /* Outputs */
           : /* Inputs */

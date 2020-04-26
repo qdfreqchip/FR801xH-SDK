@@ -278,16 +278,15 @@ void pmu_set_gpio_value(enum system_port_t port, uint8_t bits, uint8_t value)
 
 void pmu_set_led2_value(uint8_t value)
 {
-    
     if( value == 0 )
     {
-        ool_write(PMU_REG_LED_CTRL, 0x00);  //set as output
-        ool_write(PMU_REG_LED_PULL, 0x40);  //pull down
+        ool_write(PMU_REG_LED_CTRL, ool_read(PMU_REG_LED_CTRL) & (~ (BIT(6)|BIT(2)) ) );  //set as output,clr bit6 bit2
+        ool_write(PMU_REG_LED_PULL, ool_read(PMU_REG_LED_PULL) | BIT(6) );  //pull down
     }
     else
     {
-        ool_write(PMU_REG_LED_CTRL, 0x40);  //set as input
-        ool_write(PMU_REG_LED_PULL, 0x00);  //pull up
+        ool_write(PMU_REG_LED_CTRL, ool_read(PMU_REG_LED_CTRL) | BIT(6) );  //set as input      0x40
+        ool_write(PMU_REG_LED_PULL, ool_read(PMU_REG_LED_PULL) & (~ BIT(6)) );  //pull up
     }
 //another method
 /*
@@ -300,6 +299,27 @@ void pmu_set_led2_value(uint8_t value)
         ool_write(PMU_REG_LED_CTRL, 0x04 );
     }
 */
+}
+void pmu_set_led2_as_pwm(void)
+{
+    ool_write(PMU_REG_LED_PULL, ool_read(PMU_REG_LED_PULL) | BIT(2) );  
+}
+void pmu_set_led1_value(uint8_t value)
+{
+    if( value == 0 )
+    {
+        ool_write(PMU_REG_LED_CTRL, ool_read(PMU_REG_LED_CTRL) & (~ (BIT(5)|BIT(1)) ) );  //set as output,clr bit5 bit1
+        ool_write(PMU_REG_LED_PULL, ool_read(PMU_REG_LED_PULL) | BIT(5) );  //pull down
+    }
+    else
+    {
+        ool_write(PMU_REG_LED_CTRL, ool_read(PMU_REG_LED_CTRL) | BIT(5) );  //set as input      0x40
+        ool_write(PMU_REG_LED_PULL, ool_read(PMU_REG_LED_PULL) & (~ BIT(5)) );  //pull up
+    }
+}
+void pmu_set_led1_as_pwm(void)
+{
+    ool_write(PMU_REG_LED_PULL, ool_read(PMU_REG_LED_PULL) | BIT(1) );  
 }
 
 

@@ -200,6 +200,7 @@ typedef enum
     GAP_EVT_LINK_PARAM_UPDATE,      //!< Parameter update successful
     GAP_EVT_ADV_END,                //!< Advertising ended
     GAP_EVT_SCAN_END,               //!< Scanning ended
+    GAP_EVT_PER_SYNC_ESTABLISHED,   //!< Per_sync is established
     GAP_EVT_PER_SYNC_END,           //!< Periodic adv sync event ended
     GAP_EVT_ADV_REPORT,             //!< Find a BLE device
     GAP_EVT_CONN_END,               //!< Connecion procedure canceled
@@ -274,6 +275,15 @@ typedef struct
     uint8_t         *data;          //!< Report data
 } gap_evt_adv_report_t;
 
+// Periodic sync is established event
+typedef struct
+{
+    uint8_t phy;                /// PHY on which synchronization has been established (@see gap_phy_type)
+    uint16_t intv;              /// Periodic advertising interval (in unit of 1.25ms, min is 7.5ms)
+    uint8_t adv_sid;            /// Advertising SID
+    gap_mac_addr_t addr;        /// Advertiser address
+} gap_evt_per_sync_ready_t;
+
 // Connected peer device supported features
 typedef struct
 {
@@ -308,6 +318,8 @@ typedef struct
         gap_evt_link_param_update_t     link_update;            //!< Parameter update success event
         uint8_t                         adv_end_status;         //!< Advertising end status
         uint8_t                         scan_end_status;        //!< Scanning end status
+        uint8_t                         per_sync_end_status;    //!< Per_sync event end status
+        gap_evt_per_sync_ready_t        per_sync_ready;         //!< Per_sync is established
         gap_evt_adv_report_t            *adv_rpt;               //!< Scanning results
         uint8_t                         conn_end_reason;        //!< Connection end reason
         gap_evt_peer_feature_t          peer_feature;           //!< Peer device supported features

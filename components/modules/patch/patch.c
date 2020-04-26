@@ -48,7 +48,7 @@ const struct patch_element_t patch_elements[] =
      * will make the system working with higher power consumption in deep sleep mode.
      */
     [13] = {
-        .patch_pc = 0x00011f4c, // remove (con_par->instant_proc.type == INSTANT_PROC_NO_PROC) in lld_con_sched
+        .patch_pc = 0x00011f4c, // replace processing in if (sync) condition, take reference in svc_handler
     },
     [12] = {
         .patch_pc = 0x00000001, // take place
@@ -79,6 +79,19 @@ const struct patch_element_t patch_elements[] =
     [7] = {
         .patch_pc = 0x0001e500,
     },
+    [6] = {
+        .patch_pc = 0x00000001,
+    },
+
+    /* evt->time.hs = CLK_ADD_2(timestamp, 2*1) in lld_adv_frm_isr */
+    [5] = {
+        //.patch_pc = 0x0000f800,
+        .patch_pc = 0x00000001,
+    },
+    [4] = {
+        //.patch_pc = 0x0000f804,
+        .patch_pc = 0x00000001,
+    },
 };
 
 __attribute__((aligned(64))) uint32_t patch_map[16] =
@@ -87,8 +100,8 @@ __attribute__((aligned(64))) uint32_t patch_map[16] =
     0xBF00DF01,
     0xBF00DF02,
     0xBF00DF03,
-    0xBF00DF04,
-    0xBF00DF05,
+    0x46080141,
+    0xEB062106,
     0xBF00DF06,
     0x0001F8FF,
     0xEB01201B,     // 8
@@ -96,7 +109,7 @@ __attribute__((aligned(64))) uint32_t patch_map[16] =
     0xBF00DF0a,		//10
     0xBF00DF0b,
     0x2000b57c, // PUSH {r2-r6,lr}; MOVS r0, #0
-    0x6EA2BF00,
+    0xDF0CBF00,
     0x22087933,
     0x4B2A0051,
 };

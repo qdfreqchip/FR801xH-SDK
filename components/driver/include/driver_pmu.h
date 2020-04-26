@@ -365,7 +365,25 @@ void pmu_calibration_start(uint8_t type, uint16_t counter);
  */
 void pmu_calibration_stop(void);
 
+/*********************************************************************
+ * @fn      pmu_set_led2_value
+ *
+ * @brief   Set LED2 output voltage level
+ *
+ * @param   value  - 1:output high voltage; 0:output low voltage; 
+ *
+ * @return  None.
+ */
 void pmu_set_led2_value(uint8_t value);
+
+/*********************************************************************
+ * @fn      pmu_set_led2_as_pwm
+ *
+ * @brief   configure LED2 pin as pmu_pwm2 output.
+ *
+ * @return  None.
+ */
+void pmu_set_led2_as_pwm(void);
 
 #endif  //_DRIVER_PMU_H
 

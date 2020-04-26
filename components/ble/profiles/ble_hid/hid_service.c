@@ -48,7 +48,7 @@ static const uint8_t hid_report_map[] =
     0xA1, 0x00,  //   Collection (Physical)
 
 //rpt id == 1
-    0x05, 0x09,  //     Usage Page (Buttons)
+    0x05, 0x09,  //     Usage Page (Mouse)
     0x19, 0x01,  //     Usage Minimum (01) - Button 1
     0x29, 0x03,  //     Usage Maximum (03) - Button 3
     0x15, 0x00,  //     Logical Minimum (0)
