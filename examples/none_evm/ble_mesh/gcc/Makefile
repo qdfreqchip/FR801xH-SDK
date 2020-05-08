@@ -32,6 +32,7 @@ SRC_FILES += \
               $(SDK_ROOT)/components/driver/driver_exti.c \
               $(SDK_ROOT)/components/driver/driver_uart.c \
               $(SDK_ROOT)/components/driver/driver_pwm.c \
+			  $(SDK_ROOT)/components/driver/driver_efuse.c \
               $(SDK_ROOT)/components/modules/platform/source/exception_handlers.c \
               $(SDK_ROOT)/components/modules/platform/source/app_boot_vectors.c \
               $(SDK_ROOT)/components/modules/patch/patch.c \

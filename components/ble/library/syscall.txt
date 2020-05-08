@@ -470,8 +470,8 @@
 0x0000499d T fputc
 0x000049ed T freertos_baseband_restore_done
 0x00004a8d T frspim_init
-0x00004aad T frspim_rd
-0x00004b01 T frspim_wr
+;0x00004aad T frspim_rd
+;0x00004b01 T frspim_wr
 0x00004b51 T get_crc_table
 0x00004b59 T get_stack_limit
 0x00004b65 T get_stack_usage

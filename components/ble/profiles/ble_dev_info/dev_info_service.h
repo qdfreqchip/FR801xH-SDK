@@ -84,11 +84,13 @@
     ///All features are supported
 #define    DIS_ALL_FEAT_SUP                     0x01FF
 
-#define DIS_FEATURES             (DIS_MANUFACTURER_NAME_CHAR_SUP |\
-                                      DIS_MODEL_NB_STR_CHAR_SUP      |\
-                                      DIS_SYSTEM_ID_CHAR_SUP         |\
-                                      DIS_FIRM_REV_STR_CHAR_SUP     |\
-                                      DIS_SW_REV_STR_CHAR_SUP |\
+#define DIS_FEATURES             (DIS_MANUFACTURER_NAME_CHAR_SUP    | \
+                                      DIS_HARD_REV_STR_CHAR_SUP     | \
+                                      DIS_MODEL_NB_STR_CHAR_SUP     | \
+                                      DIS_SERIAL_NB_STR_CHAR_SUP    | \
+                                      DIS_SYSTEM_ID_CHAR_SUP        | \
+                                      DIS_FIRM_REV_STR_CHAR_SUP     | \
+                                      DIS_SW_REV_STR_CHAR_SUP       | \
                                       DIS_PNP_ID_CHAR_SUP)
 
 /*

@@ -422,7 +422,7 @@ void multi_role_init(void)
     
     gap_set_cb_func(app_gap_evt_cb);
 
-    gap_bond_manager_init(0x32000, 0x33000, 8, true);
+    gap_bond_manager_init(0x7D000, 0x7E000, 8, true);
     gap_bond_manager_delete_all();
     
     // set local device name

@@ -306,7 +306,7 @@ void user_entry_after_ble_init(void)
     
     gap_set_dev_name("FR8010H", strlen("FR8010H"));
     
-    gap_bond_manager_init(0x32000,0x33000,8,true);
+    gap_bond_manager_init(0x7D000, 0x7E000, 8, true);
     gap_bond_manager_delete_all();
     
     /* ²âÊÔGPIOµÄ»½ĞÑ¹¦ÄÜ */

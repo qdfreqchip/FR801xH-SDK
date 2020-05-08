@@ -86,6 +86,10 @@
 
 #define PMU_REG_FLASH_POR_CTRL      0x28
 
+#define PMU_REG_PKPD_CTRL_CFG       0x2c
+
+#define PMU_REG_MEM_EN_SW           0x2d
+
 #define PMU_REG_SLEEP_CTRL          0x36
 #define PMU_STANDBY_EN              (CO_BIT(0))
 #define PMU_SHUTDOWN_EN             (CO_BIT(1))

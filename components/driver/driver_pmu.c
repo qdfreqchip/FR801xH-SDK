@@ -387,7 +387,6 @@ void pmu_sub_init(void)
 
     /* remove the resistor load of BUCK */
     ool_write(PMU_REG_RL_CTRL, ool_read(PMU_REG_RL_CTRL) & (~(1<<6)));
-#ifndef CFG_FPGA_TEST
     ool_write(PMU_REG_BUCK_CTRL0, ool_read(PMU_REG_BUCK_CTRL0) & (~(1<<3)));
     /* BIT3 ALDO bypass mode，这样底电流会小1uA，跟PB0连接到cs线有关 */
     //ool_write(PMU_REG_ADKEY_ALDO_CTRL, ool_read(PMU_REG_ADKEY_ALDO_CTRL) | (1<<3));
@@ -399,7 +398,7 @@ void pmu_sub_init(void)
 
     /* set DLDO voltage to min */
     //ool_write(PMU_REG_DLDO_CTRL, 0x42);
-#endif
+
     /* separate PKVDD and PKVDDH */
     ool_write(PMU_REG_ALDO_BG_CTRL, 0x06);
     ool_write(PMU_REG_ALDO_BG_CTRL, 0x0e);
@@ -410,7 +409,6 @@ void pmu_sub_init(void)
     ool_write(PMU_REG_OTD_PKVDDH_CTRL, ool_read(PMU_REG_OTD_PKVDDH_CTRL) & 0xcf);
 
     /* set PKVDD voltage to 0.85v */
-#ifndef CFG_FPGA_TEST
     uint32_t data0, data1, data2;
     uint8_t dldo_v = 0;
     efuse_read(&data0, &data1, &data2);
@@ -435,9 +433,6 @@ void pmu_sub_init(void)
         /* set DLDO voltage to min */
         ool_write(PMU_REG_DLDO_CTRL, 0x42);
     }
-#else
-    ool_write(PMU_REG_PKVDD_CTRL2, (ool_read(PMU_REG_PKVDD_CTRL2) & 0xF0) | 0x04);
-#endif
 
     /*
         1. set PMU interrupt wake up pmu ctrl first
@@ -450,11 +445,9 @@ void pmu_sub_init(void)
         2. release bt sleep timer reset
         3. enable external reset pin
      */
-#ifndef CFG_FPGA_TEST
+
     ool_write(PMU_REG_RST_CTRL, (ool_read(PMU_REG_RST_CTRL) & (~(PMU_RST_WDT_EN|PMU_RST_EXT_PIN_EN))) | PMU_RST_SLP_TIMER);
-#else
-    ool_write(PMU_REG_RST_CTRL, (ool_read(PMU_REG_RST_CTRL) & (~PMU_RST_WDT_EN)) | PMU_RST_SLP_TIMER);
-#endif
+
     /* enable bt timer clock */
     ool_write(PMU_REG_CLK_CTRL, ool_read(PMU_REG_CLK_CTRL) | PMU_BT_TIMER_CLK_EN);
 
@@ -465,15 +458,9 @@ void pmu_sub_init(void)
 
 #if 0
     /* sleep and wakeup timing settings */
-#ifndef CFG_FPGA_TEST
     ool_write(PMU_REG_WKUP_PWO_DLY, 0x40);
     ool_write(PMU_REG_WKUP_PMUFSM_CHG_DLY, 0x41);
     ool_write(PMU_REG_BT_TIMER_WU_IRQ_PROTECT, 0x42);
-#else
-    ool_write(PMU_REG_WKUP_PWO_DLY, 0x18);
-    ool_write(PMU_REG_WKUP_PMUFSM_CHG_DLY, 0x19);
-    ool_write(PMU_REG_BT_TIMER_WU_IRQ_PROTECT, 0x20);
-#endif
 #endif
 
     ool_write(PMU_REG_BUCK_OFF_DLY, 0x00);
@@ -494,11 +481,10 @@ void pmu_sub_init(void)
     pmu_set_debounce_clk(16);   // set debounce clock to 1kHz
     pmu_onkey_set_debounce_cnt(9);
     pmu_adkey_set_debounce_cnt(9);
-    pmu_bat_full_set_debounce_cnt(2);
+    pmu_bat_full_set_debounce_cnt(10);
     pmu_lvd_set_debounce_cnt(2);
-    pmu_chg_dec_set_debounce_cnt(2);
+    pmu_chg_dec_set_debounce_cnt(10);
 
-#ifndef CFG_FPGA_TEST
 #if 0
     /*
      * init PB0 used for internal flash cs control. CS pin is bonded with
@@ -525,7 +511,6 @@ void pmu_sub_init(void)
 
     /* LED1 is bounded with efuse power */
     ool_write(PMU_REG_LED_CTRL, 0x00);
-#endif
 
     /* PD4~7如果被配置上拉，如果这个地方不配置，会导致漏电，跟SAR-ADC有关 */
     ool_write(PMU_REG_PWR_CTRL, ool_read(PMU_REG_PWR_CTRL) & 0xfc);
@@ -543,12 +528,17 @@ void pmu_sub_init(void)
     ool_write16(PMU_REG_PORTB_MUX_L, 0xAAAA);
 #endif
 #if 1
+    ool_write(PMU_REG_PORTC_SEL, 0x00);
+    ool_write(PMU_REG_PORTC_OEN, 0x00);
+    ool_write16(PMU_REG_PORTC_MUX_L, 0xAAAA);
+#endif
+#if 0
     ool_write(PMU_REG_PORTD_SEL, 0x00);
     ool_write(PMU_REG_PORTD_OEN, 0x00);
     ool_write16(PMU_REG_PORTD_MUX_L, 0xAAAA);
 #endif
 
-    ool_write(PMU_REG_DIAG_SEL, 0x50);
+    ool_write(PMU_REG_DIAG_SEL, 0x30);
 #endif
 
 }
@@ -663,7 +653,7 @@ void pmu_codec_power_disable(void)
  *
  * @return  None.
  */
-void pmu_set_aldo_voltage(enum pmu_aldo_work_mode_t mode, uint8_t value)
+void pmu_set_aldo_voltage(enum pmu_aldo_work_mode_t mode, enum pmu_aldo_voltage_t value)
 {
     if(mode == PMU_ALDO_MODE_NORMAL)
     {

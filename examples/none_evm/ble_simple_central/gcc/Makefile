@@ -23,6 +23,7 @@ SRC_FILES += \
               $(SDK_ROOT)/components/driver/driver_i2s.c \
               $(SDK_ROOT)/components/driver/driver_exti.c \
               $(SDK_ROOT)/components/driver/driver_timer.c \
+			  $(SDK_ROOT)/components/driver/driver_efuse.c \
               $(SDK_ROOT)/components/modules/platform/source/exception_handlers.c \
               $(SDK_ROOT)/components/modules/platform/source/app_boot_vectors.c \
               $(SDK_ROOT)/components/modules/patch/patch.c

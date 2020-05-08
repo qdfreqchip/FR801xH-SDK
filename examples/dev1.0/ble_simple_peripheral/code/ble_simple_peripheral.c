@@ -346,7 +346,7 @@ void simple_peripheral_init(void)
 
 	gap_set_cb_func(app_gap_evt_cb);
 
-	gap_bond_manager_init(0x7e000,0x7f000,8,true);
+	gap_bond_manager_init(0x7D000, 0x7E000, 8, true);
 	gap_bond_manager_delete_all();
 
 	mac_addr_t addr;

@@ -157,7 +157,7 @@ adc_isr         PROC
                 EXPORT  adc_isr           [WEAK]
                 B       .
                 ENDP
-                
+                NOP
 				END
 					
 					

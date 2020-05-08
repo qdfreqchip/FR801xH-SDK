@@ -298,7 +298,6 @@ uint8_t iic_read_bytes(enum iic_channel_t channel, uint8_t slave_addr, uint8_t r
     {
         return true;
     }
-    length--;
 
     if(channel == IIC_CHANNEL_0)
     {
@@ -319,16 +318,28 @@ uint8_t iic_read_bytes(enum iic_channel_t channel, uint8_t slave_addr, uint8_t r
 
     iic_reg->data = reg_addr & 0xff;
     iic_reg->data = slave_addr | 0x01 | IIC_TRAN_START;
-    while(length)
+	
+    while(length > 1)
     {
-        iic_reg->data = 0;
-        while(iic_reg->status.rec_emp == 1);
-        *buffer++ = iic_reg->data;
-        length--;
+        iic_reg->data = 0x00;
+
+        while(iic_reg->status.rec_emp != 1)
+        {
+            *buffer++ = iic_reg->data;
+            length--;
+        }
+        while(iic_reg->status.trans_emp != 1);
     }
+
     iic_reg->data = IIC_TRAN_STOP;
 
     while(iic_reg->status.bus_atv == 1);
+
+    while(length)
+    {
+        *buffer++ = iic_reg->data;
+        length--;
+    }
 
     *buffer = iic_reg->data&0xff;
 

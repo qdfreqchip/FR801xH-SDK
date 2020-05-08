@@ -27,6 +27,8 @@ void pmu_calibration_stop(void);
 void enable_cache(uint8_t invalid_ram);
 void disable_cache(void);
 
+int llc_patch_1(void);
+
 /*
  * keil debug breakpoint will take place FPB entry at the beginning of patch table with increasing
  * direction, so use patch entry point start at the end of patch table with decreasing direction.
@@ -51,7 +53,7 @@ const struct patch_element_t patch_elements[] =
         .patch_pc = 0x00011f4c, // replace processing in if (sync) condition, take reference in svc_handler
     },
     [12] = {
-        .patch_pc = 0x00000001, // take place
+        .patch_pc = 0x0000849c, // check adv interval in set adv parameter cmd handler
     },
 #ifdef USER_MEM_API_ENABLE
     [11] = {
@@ -80,35 +82,30 @@ const struct patch_element_t patch_elements[] =
         .patch_pc = 0x0001e500,
     },
     [6] = {
-        .patch_pc = 0x00000001,
+        .patch_pc = 0x0001e808,
     },
 
-    /* evt->time.hs = CLK_ADD_2(timestamp, 2*1) in lld_adv_frm_isr */
+    // this position has been taken in private mesh application, search FPB_CompSet for details
     [5] = {
-        //.patch_pc = 0x0000f800,
-        .patch_pc = 0x00000001,
-    },
-    [4] = {
-        //.patch_pc = 0x0000f804,
         .patch_pc = 0x00000001,
     },
 };
 
 __attribute__((aligned(64))) uint32_t patch_map[16] =
 {
-    0xBF00DF00,		//0
+    0xBF00DF00,  //0
     0xBF00DF01,
     0xBF00DF02,
     0xBF00DF03,
+    0xBF00DF04,
     0x46080141,
-    0xEB062106,
-    0xBF00DF06,
+    (uint32_t)llc_patch_1,
     0x0001F8FF,
-    0xEB01201B,     // 8
+    0xEB01201B, // 8
     0xBF00BF00,
-    0xBF00DF0a,		//10
+    0xBF00DF0a, //10
     0xBF00DF0b,
-    0x2000b57c, // PUSH {r2-r6,lr}; MOVS r0, #0
+    0xe002d87f, // 12
     0xDF0CBF00,
     0x22087933,
     0x4B2A0051,
@@ -181,38 +178,7 @@ __attribute__((section("ram_code"))) void low_power_save_entry_imp(uint8_t type)
     }
 }
 
-#ifdef CFG_FPGA_TEST        //for FPGA
-__attribute__((section("ram_code"))) void low_power_restore_entry_imp(uint8_t type)
-{
-    if(type == LOW_POWER_RESTORE_ENTRY_BEGINNING)
-    {
-        SCB->VTOR = 0x20000000; //set exception vector offset to RAM space
-    }
-    else if(type == LOW_POWER_RESTORE_ENTRY_BASEBAND)
-    {
-#ifndef KEEP_CACHE_SRAM_RETENTION
-        // manul enable the cache and invalidating the SRAM
-        enable_cache(true);
-#else
-        // manul enable the cache without invalidating the SRAM
-        enable_cache(false);
-#endif
-    }
-    else if(type == LOW_POWER_RESTORE_ENTRY_DRIVER)
-    {
-        NVIC_EnableIRQ(PMU_IRQn);
-        system_set_port_mux(GPIO_PORT_D, GPIO_BIT_6, PORTD6_FUNC_UART1_RXD);
-        system_set_port_mux(GPIO_PORT_D, GPIO_BIT_7, PORTD7_FUNC_UART1_TXD);
-        uart_init(UART1, BAUD_RATE_115200);
-        NVIC_EnableIRQ(UART1_IRQn);
 
-        system_set_port_mux(GPIO_PORT_A, GPIO_BIT_2, PORTA2_FUNC_UART0_RXD);
-        system_set_port_mux(GPIO_PORT_A, GPIO_BIT_3, PORTA3_FUNC_UART0_TXD);
-        uart_init(UART0, BAUD_RATE_115200);
-        NVIC_EnableIRQ(UART0_IRQn);
-    }
-}
-#else       //for chip
 __attribute__((section("ram_code"))) void low_power_restore_entry_imp(uint8_t type)
 {
     if(type == LOW_POWER_RESTORE_ENTRY_BEGINNING)
@@ -246,7 +212,7 @@ __attribute__((section("ram_code"))) void low_power_restore_entry_imp(uint8_t ty
         patch_init();
     }
 }
-#endif
+
 
 __attribute__((section("ram_code"))) __attribute__((weak)) void user_entry_before_sleep_imp(void)
 {

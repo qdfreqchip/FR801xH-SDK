@@ -55,13 +55,14 @@
 #define GAP_ADV_CHAN_39  0x04                                                   //!< Advertisement Channel 39
 #define GAP_ADV_CHAN_ALL (GAP_ADV_CHAN_37 | GAP_ADV_CHAN_38 | GAP_ADV_CHAN_39)  //!< All Advertisement Channels Enabled
 
-/** @defgroup GAP_SEC_CAHNNEL_PHY_DEFINES GAP extend adv secondery phy define
+/** @defgroup GAP_PHY_VALUES GAP PHY values
  * @{
  */
-#define GAP_SEC_PHY_LE_1MBPS    (1 << 0)
-#define GAP_SEC_PHY_LE_2MBPS    (1 << 1)
-#define GAP_SEC_PHY_LE_CODED    (1 << 2)
-
+#define GAP_PHY_ANY      (0)    //!< No preferred PHY
+#define GAP_PHY_1MBPS    (1)    //!< LE 1M PHY preferred for an active link,
+#define GAP_PHY_2MBPS    (2)    //!< LE 2M PHY preferred for an active link2
+#define GAP_PHY_CODED    (3)    //!< LE Coded PHY preferred for an active link4
+/** @} End GAP_PHY_VALUES */
 
 /** @defgroup GAP_ADV_FILTER_MODE_DEFINES
  * @{
@@ -198,6 +199,8 @@ typedef enum
     GAP_EVT_DISCONNECT,             //!< Disconnected
     GAP_EVT_LINK_PARAM_REJECT,      //!< Parameter update rejected
     GAP_EVT_LINK_PARAM_UPDATE,      //!< Parameter update successful
+    GAP_EVT_PHY_REJECT,             //!< Parameter update rejected
+    GAP_EVT_PHY_UPDATE,             //!< PHY update indication
     GAP_EVT_ADV_END,                //!< Advertising ended
     GAP_EVT_SCAN_END,               //!< Scanning ended
     GAP_EVT_PER_SYNC_ESTABLISHED,   //!< Per_sync is established
@@ -239,6 +242,8 @@ typedef struct
     uint16_t    con_interval;   //!< Connection interval
     uint16_t    con_latency;    //!< Slave latency
     uint16_t    sup_to;         //!< Supervision timeout
+    uint8_t     tx_phy;         //!< TX PHY type
+    uint8_t     rx_phy;         //!< RX PHY type
 } conn_peer_param_t;
 
 // Link disconnected event & reason
@@ -263,6 +268,20 @@ typedef struct
     uint16_t    con_latency;    //!< Connection latency value
     uint16_t    sup_to;         //!< Supervision timeout
 } gap_evt_link_param_update_t;
+
+// PHY update update success event
+typedef struct
+{
+    uint8_t     conidx;     //!< Connection index
+    uint8_t     tx_phy;     //!< Connection latency value
+    uint8_t     rx_phy;     //!< RX PHY
+} gap_evt_phy_update_t;
+// Link parameter update reject event
+typedef struct
+{
+    uint8_t conidx;             //!< Connection index
+    uint8_t status;             //!< Parameter reject status
+} gap_evt_phy_reject_t;
 
 // Scan result, find remote advertising devide
 typedef struct
@@ -316,6 +335,8 @@ typedef struct
         gap_evt_disconnect_t            disconnect;             //!< Disconnect event
         gap_evt_link_param_reject_t     link_reject;            //!< Parameter reject event
         gap_evt_link_param_update_t     link_update;            //!< Parameter update success event
+        gap_evt_phy_update_t            phy_update;             //!< PHY update success event
+        gap_evt_phy_reject_t            phy_reject;             //!< PHY update reject event
         uint8_t                         adv_end_status;         //!< Advertising end status
         uint8_t                         scan_end_status;        //!< Scanning end status
         uint8_t                         per_sync_end_status;    //!< Per_sync event end status
@@ -342,7 +363,7 @@ typedef struct
     uint8_t         adv_mode;               //!< Advertising mode, connectable/none-connectable, see @ GAP_ADV_MODE_DEFINES
     uint8_t         adv_addr_type;          //!< see @ GAP_ADDR_TYPE_DEFINES
     gap_mac_addr_t  peer_mac_addr;          //!< peer mac addr,used for direction adv
-    uint8_t         phy_mode;               //!< see @GAP_SEC_CAHNNEL_PHY_DEFINES
+    uint8_t         phy_mode;               //!< see @GAP_PHY_VALUES
     uint16_t        adv_intv_min;           //!< Minimum advertising interval, (in unit of 625us). Must be greater than 20ms
     uint16_t        adv_intv_max;           //!< Maximum advertising interval, (in unit of 625us). Must be greater than 20ms
     uint8_t         adv_chnl_map;           //!< Advertising channal map, 37, 38, 39, see @ GAP_ADVCHAN_DEFINES
@@ -357,6 +378,7 @@ typedef struct
 {
     uint8_t     scan_mode;           //!< scan mode, see @ GAP_SCAN_MODE_DEFINES
     uint8_t     dup_filt_pol;        //!< scan duplicated pkt filter enbale, 0, donot filter; 1 filter duplicated pkt
+    uint8_t     phy_mode;            //!< see @GAP_PHY_VALUES
     uint16_t    scan_intv;           //!< scan interval, (in unit of 625us). range [4,16384]
     uint16_t    scan_window;         //!< scan window, (in unit of 625us). must <= scan_intv, range [4,16384]
     uint16_t    duration;            //!< Scan duration (in unit of 10ms). 0 means that the controller will scan continuously until host stop it
@@ -365,7 +387,7 @@ typedef struct
 // Gap sync parameters
 typedef struct
 {
-    gap_mac_addr_t  adv_dev_addr;        //!< periodic adv device mac address 
+    gap_mac_addr_t  adv_dev_addr;        //!< periodic adv device mac address
     uint8_t         adv_sid;             //!< periodic adv setting id
     uint16_t        sup_to;              //!< Supervision timeout,(in unit of 10ms between 100ms and 163.84s)
 } gap_per_sync_param_t;
@@ -549,6 +571,22 @@ void gap_stop_per_sync(void);
 void gap_start_conn(mac_addr_t *addr, uint8_t addr_type, uint16_t min_itvl, uint16_t max_itvl, uint16_t slv_latency, uint16_t timeout);
 
 /*********************************************************************
+* @fn       appm_start_conn_long_range
+*
+* @brief    Start connecting for extended adv on CODED PHY.
+*
+* @param    addr        - peer device mac addr.
+*           addr_type   - peer device mac addr type.
+*           min_itvl    - minimum connection inteval. uint: 1.25ms
+*           max_itvl    - maximum connection inteval. uint: 1.25ms
+*           slv_latency - number of slave latency.
+*           timeout     - supervision timeout of the link. uint: 10ms
+*
+* @return   None.
+*/
+void gap_start_conn_long_range(mac_addr_t *addr, uint8_t addr_type, uint16_t min_itvl, uint16_t max_itvl, uint16_t slv_latency, uint16_t timeout);
+
+/*********************************************************************
 * @fn      gap_stop_conn
 *
 * @brief   Stop connecting procedure, cancel it.
@@ -706,16 +744,45 @@ void gap_set_link_rssi_report(bool enable);
  */
 void gap_conn_param_update(uint8_t conidx, uint16_t min_intv, uint16_t max_intv, uint16_t slave_latency, uint16_t supervision_timeout);
 
+/**********************************************************************
+ * @fn      gap_conn_phy_update
+ *
+ * @brief   Set active link PHY mode.
+ *
+ * @param   conidx             - connection handle/index of the connection.
+ *
+ *          tx_phy             - TX PHY mode.   //!< see @GAP_PHY_VALUES    1M/2M
+ *
+ *          rx_phy             - RX PHY mode.   //!< see @GAP_PHY_VALUES    1M/2M
+ *
+ * @return  None.
+ */
+void gap_conn_phy_update(uint8_t conidx, uint8_t tx_phy, uint8_t rx_phy);
+
+
+/**********************************************************************
+ * @fn      gap_get_conn_phy
+ *
+ * @brief   Read active link PHY mode.
+ *
+ * @param   conidx             - connection handle/index of the connection.
+ *
+ * @return  None.
+ */
+void gap_get_conn_phy(uint8_t conidx);
+
 /*********************************************************************
  * @fn      gap_bond_manager_init
  *
  * @brief   Initialize bonding manager. For bonding features when security is needed.
  *
  * @param   flash_addr      - Flash page addr where peer device bond information is stored,
- *                            should be integer multiple of 0x1000
+ *                            should be integer multiple of 0x1000. 
+ *                              IF this value is zero, bond info will not be stored in flash
  *          svc_flash_addr  - Flash page addr where peer device services information is stored,
  *                            should be integer multiple of 0x1000
- *          max_dev_num     - Max supported number of peer devices
+ *                              IF this value is zero, peer service info will not be stored in flash
+ *          max_dev_num     - Max supported number of peer devices.
  *          enable          - Enable bit of bond manager fucntion. True -Enalbe; False-Disable
  *
  * @return  None.

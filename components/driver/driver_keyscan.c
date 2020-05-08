@@ -152,11 +152,11 @@ void keyscan_init(keyscan_param_t *param)
         ool_write(PMU_REG_KEYSCAN_CTRL, ool_read(PMU_REG_KEYSCAN_CTRL) & (~ PMU_KEYSCAN_MAP) );
 
     /* interval between two continuous scanning operation,  unit: RC clock/4 */
-    /* actual interval is scan_interval * 4 * RC period + 1.9ms              */
+    /* actual interval is scan_interval * 4 * RC period + 1.9ms   = 80*38us + 1.9ms = 4940ms  */
     ool_write(PMU_REG_KEYSCAN_INTERVAL, 20);
     
     /* settings for anti-shake and ghost key */
-    ool_write(PMU_REG_KEYSCAN_GLICTH_CFG, 0xf2);
+    ool_write(PMU_REG_KEYSCAN_GLICTH_CFG, 0xf2);    //anti-shake tim = 9880ms
 
     /* enable row pull up */
     ool_write(PMU_REG_PORTD_PUL, param->row_en ^ 0xff);

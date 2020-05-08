@@ -9,7 +9,7 @@
 #define _DRIVER_PMU_H
 
 /*
- * INCLUDES 
+ * INCLUDES
  */
 #include <stdint.h>
 #include <stdbool.h>
@@ -21,7 +21,7 @@
 #include "driver_frspim.h"
 
 /*
- * MACROS 
+ * MACROS
  */
 #define ool_write(addr, data)       frspim_wr(FR_SPI_PMU_CHAN,(addr),1, (data))
 #define ool_read(addr)              (uint8_t)frspim_rd(FR_SPI_PMU_CHAN,(addr),1)
@@ -33,7 +33,7 @@
 #define ool_read32(addr)            (uint32_t)frspim_rd(FR_SPI_PMU_CHAN,(addr),4)
 
 /*
- * CONSTANTS 
+ * CONSTANTS
  */
 #define PMU_ALDO_OUT_3_3            0xe0
 #define PMU_ALDO_OUT_2_9            0xc0
@@ -41,7 +41,7 @@
 #define PMU_ALDO_OUT_1_8            0x30
 
 /*
- * TYPEDEFS 
+ * TYPEDEFS
  */
 enum pmu_sys_pow_mode_t
 {
@@ -53,6 +53,18 @@ enum pmu_aldo_work_mode_t
 {
     PMU_ALDO_MODE_BYPASS,   // aldo bypass to vbat
     PMU_ALDO_MODE_NORMAL,
+};
+
+enum pmu_aldo_voltage_t
+{
+    PMU_ALDO_VOL_3_5 = 0xf0,
+    PMU_ALDO_VOL_3_3 = 0xe0,
+    PMU_ALDO_VOL_3_1 = 0xd0,
+    PMU_ALDO_VOL_2_9 = 0xc0,
+    PMU_ALDO_VOL_2_7 = 0xb0,
+    PMU_ALDO_VOL_2_5 = 0xa0,
+    PMU_ALDO_VOL_2_3 = 0x90,
+    PMU_ALDO_VOL_2_1 = 0x80,
 };
 
 enum pmu_lp_clk_src_t
@@ -80,23 +92,23 @@ enum pmu_isr_enable_t
 };
 
 /*
- * GLOBAL VARIABLES 
+ * GLOBAL VARIABLES
  */
 
 /*
- * LOCAL VARIABLES 
+ * LOCAL VARIABLES
  */
 
 /*
- * LOCAL FUNCTIONS 
+ * LOCAL FUNCTIONS
  */
 
 /*
- * EXTERN FUNCTIONS 
+ * EXTERN FUNCTIONS
  */
 
 /*
- * PUBLIC FUNCTIONS 
+ * PUBLIC FUNCTIONS
  */
 
 /*********************************************************************
@@ -104,7 +116,7 @@ enum pmu_isr_enable_t
  *
  * @brief   Hand over the IO control from main digital core to PMU (always on),
  *          this function can be used to set more than one IO belong
- *          to the same port. 
+ *          to the same port.
  *          example usage: pmu_set_pin_to_PMU(GPIO_PORT_A, (1<<GPIO_BIT0)|((1<<GPIO_BIT1))
  *
  * @param   port    - which group the io belongs to, @ref system_port_t
@@ -297,11 +309,11 @@ void pmu_codec_power_disable(void);
  * @brief   set the aldo output voltage, also known as IO voltage.
  *
  * @param   mode    - bypass to VBAT or not.
- *          value   - voltage target value.
+ *          value   - voltage target value, @ref pmu_aldo_voltage_t.
  *
  * @return  None.
  */
-void pmu_set_aldo_voltage(enum pmu_aldo_work_mode_t mode, uint8_t value);
+void pmu_set_aldo_voltage(enum pmu_aldo_work_mode_t mode, enum pmu_aldo_voltage_t value);
 
 /*********************************************************************
  * @fn      pmu_set_lp_clk_src
@@ -332,7 +344,7 @@ void pmu_port_wakeup_func_set(uint32_t gpios);
 /*********************************************************************
  * @fn      pmu_get_rc_clk
  *
- * @brief   get inner rc clk frequecy 
+ * @brief   get inner rc clk frequecy
  *
  * @param   redo   - true, do rc clk caculation,then get result as rc clk frequecy.
  *                 - false,do nothing, get last caculated rc clk frequecy.
