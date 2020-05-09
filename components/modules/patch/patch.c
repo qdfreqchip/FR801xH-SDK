@@ -36,7 +36,7 @@ int llc_patch_1(void);
  * TAKE CARE !!!!!!!!!!!!!!!!!!!!!!!!!! the patch breakpoint register[0~5, 8~13] may be cleared by
  * KEIL unexpectly when debugging this IDE.
  */
-const struct patch_element_t patch_elements[] =
+struct patch_element_t patch_elements[] =
 {
     [15] = {
         .patch_pc = 0x00002b70, // fix bug: from rx_buf_num to tx_buf_num
@@ -111,6 +111,8 @@ __attribute__((aligned(64))) uint32_t patch_map[16] =
     0x4B2A0051,
 };
 
+uint8_t buck_value_org, dldo_value_org;
+
 __attribute__((section("ram_code"))) void patch_init(void)
 {
     uint8_t patch_num = sizeof(patch_elements) / sizeof(patch_elements[0]);
@@ -163,6 +165,8 @@ __attribute__((section("ram_code"))) void low_power_save_entry_imp(uint8_t type)
 {
     if(type == LOW_POWER_SAVE_ENTRY_BASEBAND)
     {
+        buck_value_org = ool_read(PMU_REG_BUCK_CTRL1);
+        dldo_value_org = ool_read(PMU_REG_DLDO_CTRL);
         /* set BUCK voltage to higher level */
         ool_write(PMU_REG_BUCK_CTRL1, 0x45);
         /* set DLDO voltage to higher level */
@@ -185,10 +189,10 @@ __attribute__((section("ram_code"))) void low_power_restore_entry_imp(uint8_t ty
     {
         SCB->VTOR = 0x20000000; //set exception vector offset to RAM space
 
-        /* set BUCK voltage to min */
-        ool_write(PMU_REG_BUCK_CTRL1, 0x05);
-        /* set DLDO voltage to min */
-        ool_write(PMU_REG_DLDO_CTRL, 0x42);
+        /* restore BUCK voltage */
+        ool_write(PMU_REG_BUCK_CTRL1, buck_value_org);
+        /* restore DLDO voltage */
+        ool_write(PMU_REG_DLDO_CTRL, dldo_value_org);
 
         /* power on flash */
         ool_write(PMU_REG_FLASH_POR_CTRL, ool_read(PMU_REG_FLASH_POR_CTRL) | 0x02);
