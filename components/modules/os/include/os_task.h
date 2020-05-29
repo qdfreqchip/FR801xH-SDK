@@ -40,6 +40,47 @@ void os_task_delete(uint8_t task_id);
  */
 uint16_t os_task_create(os_task_func_t task_func);
 
+/*********************************************************************
+ * @fn      os_user_loop_event_set
+ *
+ * @brief   set a loop event that run inside the while(1),and attention that the prioity is lowest.
+ *          If you want to goto sleep,you should clear the event.
+ *
+ * @param   callback     - the callback function of the loop event. 
+ *       
+ * @return  None.
+ */
+void os_user_loop_event_set(void (*callback)(void));
+
+/*********************************************************************
+ * @fn      os_user_loop_event_clear
+ *
+ * @brief   clear the event when you want not to run the loop.
+ *
+ * @param   None. 
+ *       
+ * @return  None.
+ */
+void os_user_loop_event_clear(void);
+/**********************************************************************
+ ************loop event eg***************
+ 
+void user_loop_callback(void)
+{
+    static uint16_t count = 0;
+
+    count++;
+    if(count > 30000)
+    {
+    	count = 0;
+    	uart_putc_noint(UART1,'t');
+    	os_user_loop_event_clear(); // clear event
+    }
+    //uart_putc_noint(UART1,'t');
+}
+
+os_user_loop_event_set(&user_loop_callback); // create a loop event
+ */
 
 
 #endif // APP_HT_H_

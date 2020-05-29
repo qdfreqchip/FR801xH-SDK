@@ -120,7 +120,9 @@ __attribute__((weak)) __attribute__((section("ram_code"))) void wdt_isr_ram(unsi
     co_printf("R3    = 0x%08X\r\n",hardfault_args[3]);
     co_printf("R12   = 0x%08X\r\n",hardfault_args[4]);
     /* reset the system */
-    ool_write(PMU_REG_RST_CTRL, ool_read(PMU_REG_RST_CTRL) & (~ PMU_RST_WDT_EN) );
+    wdt_init(WDT_ACT_RST_CHIP,1);
+    ool_write(PMU_REG_WTD_CTRL, ool_read(PMU_REG_WTD_CTRL) | PMU_WTD_EN );
+    while(1);
 }
 
 void wdt_test(void)

@@ -61,7 +61,8 @@ void os_free(void *ptr);
  */
 uint16_t os_get_free_heap_size(void);
 
-/** @functions API for memory leakage debug, before call these functions, must define USER_MEM_API_ENABLE in app_config.h
+/** @functions API for memory leakage debug,
+ *   before call these functions, must define USER_MEM_API_ENABLE in your project Preprocessor Symbols.
  * @{
  */
 void show_msg_list(void);

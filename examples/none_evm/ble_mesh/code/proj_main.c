@@ -31,6 +31,7 @@
 #include "driver_uart.h"
 #include "driver_gpio.h"
 
+#include "ali_mesh_ota.h"
 #include "ali_mesh_info.h"
 
 /*
@@ -51,7 +52,9 @@
 uint8_t slave_link_conidx;
 uint8_t master_link_conidx;
 uint8_t tick = 1;
-
+#ifdef MESH_QUICK_SWITCH_CTRL
+uint8_t first_power_on = 0;
+#endif
 /*
  * LOCAL VARIABLES
  */
@@ -365,6 +368,14 @@ void user_entry_before_ble_init(void)
         }
     }
 #endif
+
+#ifdef MESH_QUICK_SWITCH_CTRL
+    if(first_power_on)
+    {
+        app_mesh_store_switch_time();
+        co_delay_100us(5000); // 500ms
+    }
+#endif    
 }
 
 /*********************************************************************
@@ -405,7 +416,15 @@ void user_entry_after_ble_init(void)
     mac_addr_t addr;
     gap_address_get(&addr);
     show_reg(&addr.addr[0], 6, 1);
-
+#if 0
+    pmu_set_pin_pull(GPIO_PORT_D,(1<<GPIO_BIT_6),true);
+    pmu_port_wakeup_func_set(GPIO_PD6);
+    button_init(GPIO_PD6);
+    NVIC_EnableIRQ(PMU_IRQn);
+#endif
     ali_ota_server_create();
+#ifdef MESH_QUICK_SWITCH_CTRL    
+    app_mesh_clear_switch_time();   
+#endif    
 }
 

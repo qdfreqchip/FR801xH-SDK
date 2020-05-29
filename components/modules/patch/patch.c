@@ -23,11 +23,13 @@ extern void ke_free_user(void* mem_ptr);
 #endif
 void pmu_calibration_start(uint8_t type, uint16_t counter);
 void pmu_calibration_stop(void);
+uint16_t pmu_get_isr_state(void);
 
 void enable_cache(uint8_t invalid_ram);
 void disable_cache(void);
 
 int llc_patch_1(void);
+void platform_reset_patch(uint32_t error);
 
 /*
  * keil debug breakpoint will take place FPB entry at the beginning of patch table with increasing
@@ -88,6 +90,19 @@ struct patch_element_t patch_elements[] =
     // this position has been taken in private mesh application, search FPB_CompSet for details
     [5] = {
         .patch_pc = 0x00000001,
+    },
+
+    [4] = {
+        .patch_pc = 0x00004aae,
+        .replace_function = frspim_rd,
+    },
+    [3] = {
+        .patch_pc = 0x00004b02,
+        .replace_function = frspim_wr,
+    },
+    [2] = {
+        .patch_pc = 0x000195d2,
+        .replace_function = platform_reset_patch,
     },
 };
 
@@ -212,6 +227,12 @@ __attribute__((section("ram_code"))) void low_power_restore_entry_imp(uint8_t ty
         /* handle the cs control to QSPI controller */
         //pmu_gpio_set_dir(GPIO_PORT_B, GPIO_BIT_0, GPIO_DIR_IN);
         pmu_calibration_start(PMU_CALI_SRC_LP_RC, __jump_table.lp_clk_calib_cnt);
+
+        if((ool_read(PMU_REG_KEYSCAN_CTRL) & PMU_KEYSCAN_EN)
+            && ((pmu_get_isr_state() & PMU_ISR_KEYSCAN_STATE) == 0)) {
+            ool_write(PMU_REG_RST_CTRL, ool_read(PMU_REG_RST_CTRL) &(~PMU_RST_KEYSCAN));
+            ool_write(PMU_REG_RST_CTRL, ool_read(PMU_REG_RST_CTRL) | PMU_RST_KEYSCAN);
+        }
 
         patch_init();
     }

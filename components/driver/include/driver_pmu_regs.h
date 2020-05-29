@@ -90,6 +90,8 @@
 
 #define PMU_REG_MEM_EN_SW           0x2d
 
+#define PMU_REG_RET_SLP_DLY         0x35
+
 #define PMU_REG_SLEEP_CTRL          0x36
 #define PMU_STANDBY_EN              (CO_BIT(0))
 #define PMU_SHUTDOWN_EN             (CO_BIT(1))
@@ -654,6 +656,8 @@ read is keyscan_status
 #define PMU_REG_LVD_DEB_LEN             0xcf    // {N, 5'd0} * deb_clock
 
 #define PMU_REG_BUCK_ON_DLY             0xd6    // default value is 0x04
+
+#define PMU_REG_ISO_SLP_DLY             0xd7
 
 #define PMU_REG_BUCK_OFF_DLY            0xd9
 

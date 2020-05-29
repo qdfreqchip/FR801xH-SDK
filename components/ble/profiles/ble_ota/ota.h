@@ -2,6 +2,7 @@
 #define _OTA_H
 
 #include <stdint.h>
+#include "driver_plf.h"
 
 #define OTA_HDR_RESULT_LEN          1
 #define OTA_HDR_OPCODE_LEN          1
@@ -36,51 +37,51 @@ typedef enum
     OTA_NVDS_EEPROM,
 }ota_nvds_type;
 
-__packed struct firmware_version
+__PACKED struct firmware_version
 {
     uint32_t firmware_version;
-};
+}GCC_PACKED;
 
-__packed struct storage_baseaddr
+__PACKED struct storage_baseaddr
 {
     uint32_t baseaddr;
-};
+}GCC_PACKED;
 
-__packed struct page_erase_rsp
+__PACKED struct page_erase_rsp
 {
     uint32_t base_address;
-};
+}GCC_PACKED;
 
-__packed struct write_mem_rsp
-{
-    uint32_t base_address;
-    uint16_t length;
-};
-
-__packed struct read_mem_rsp
+__PACKED struct write_mem_rsp
 {
     uint32_t base_address;
     uint16_t length;
-};
+}GCC_PACKED;
 
-__packed struct write_data_rsp
+__PACKED struct read_mem_rsp
 {
     uint32_t base_address;
     uint16_t length;
-};
+}GCC_PACKED;
 
-__packed struct read_data_rsp
+__PACKED struct write_data_rsp
 {
     uint32_t base_address;
     uint16_t length;
-};
+}GCC_PACKED;
 
-__packed struct app_ota_rsp_hdr_t
+__PACKED struct read_data_rsp
+{
+    uint32_t base_address;
+    uint16_t length;
+}GCC_PACKED;
+
+__PACKED struct app_ota_rsp_hdr_t
 {
     uint8_t result;
     uint8_t org_opcode;
     uint16_t length;
-    __packed union
+    __PACKED union
     {
         uint8_t nvds_type;
         struct firmware_version version;
@@ -90,51 +91,51 @@ __packed struct app_ota_rsp_hdr_t
         struct read_mem_rsp read_mem;
         struct write_data_rsp write_data;
         struct read_data_rsp read_data;
-    } rsp;
-};
+    }GCC_PACKED rsp;
+}GCC_PACKED;
 
-__packed struct page_erase_cmd
+__PACKED struct page_erase_cmd
 {
     uint32_t base_address;
-};
+}GCC_PACKED;
 
-__packed struct write_mem_cmd
-{
-    uint32_t base_address;
-    uint16_t length;
-};
-
-__packed struct read_mem_cmd
+__PACKED struct write_mem_cmd
 {
     uint32_t base_address;
     uint16_t length;
-};
+}GCC_PACKED;
 
-__packed struct write_data_cmd
+__PACKED struct read_mem_cmd
 {
     uint32_t base_address;
     uint16_t length;
-};
+}GCC_PACKED;
 
-__packed struct read_data_cmd
+__PACKED struct write_data_cmd
 {
     uint32_t base_address;
     uint16_t length;
-};
+}GCC_PACKED;
 
-__packed struct app_ota_cmd_hdr_t
+__PACKED struct read_data_cmd
+{
+    uint32_t base_address;
+    uint16_t length;
+}GCC_PACKED;
+
+__PACKED struct app_ota_cmd_hdr_t
 {
     uint8_t opcode;
     uint16_t length;
-    __packed union
+    __PACKED union
     {
         struct page_erase_cmd page_erase;
         struct write_mem_cmd write_mem;
         struct read_mem_cmd read_mem;
         struct write_data_cmd write_data;
         struct read_data_cmd read_data;
-    } cmd;
-};
+    }GCC_PACKED cmd;
+}GCC_PACKED;
 
 struct otas_send_rsp
 {

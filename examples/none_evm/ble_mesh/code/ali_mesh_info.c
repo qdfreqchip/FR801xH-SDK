@@ -19,6 +19,7 @@
 #include "os_mem.h"
 #include "mesh_api.h"
 #include "ali_mesh_info.h"
+#include "co_printf.h"
 
 /*
  * MACROS
@@ -295,4 +296,53 @@ void app_mesh_store_user_data_timer_init(void)
 {
 	os_timer_init(&mesh_store_user_data_timer, app_mesh_store_user_data_timer_handler, NULL);
 }
+
+#ifdef MESH_QUICK_SWITCH_CTRL
+/*********************************************************************
+ * @fn      app_mesh_store_switch_time
+ *
+ * @brief   store quick switch time,to exit the network.
+ *
+ * @param   None
+ *
+ * @return  None.
+ */
+void app_mesh_store_switch_time(void)
+{
+    uint8_t switch_time = 0;
+    flash_read(MESH_STORE_SWITCH_TIME,1,&switch_time);
+    if(switch_time == 0xff)
+        switch_time = 1;
+    else
+    {
+        switch_time++;
+    }
+    flash_erase(MESH_STORE_SWITCH_TIME,0x1000);
+    flash_write(MESH_STORE_SWITCH_TIME,1,&switch_time);
+    co_printf("=switch time=%d\r\n",switch_time);
+}
+
+/*********************************************************************
+ * @fn      app_mesh_clear_switch_time
+ *
+ * @brief   clear quick switch time.
+ *
+ * @param   None
+ *
+ * @return  None.
+ */
+void app_mesh_clear_switch_time(void)
+{
+    uint8_t switch_time = 0;
+    flash_read(MESH_STORE_SWITCH_TIME,1,&switch_time);
+
+    if(switch_time > 4)
+    {
+        co_printf("=mesh switch clear=\r\n");
+        mesh_info_clear();
+		app_mesh_user_data_clear();
+    }
+    flash_erase(MESH_STORE_SWITCH_TIME,0x1000);
+}
+#endif
 

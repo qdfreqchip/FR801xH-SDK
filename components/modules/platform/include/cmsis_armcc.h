@@ -73,7 +73,10 @@
 #define __ALIGNED(x)              __attribute__((aligned(x)))
 #endif
 #ifndef   __PACKED
-#define __PACKED                  __attribute__((packed))
+#define __PACKED                  __packed
+#endif
+#ifndef   GCC_PACKED
+#define GCC_PACKED                __attribute__((packed))
 #endif
 
 

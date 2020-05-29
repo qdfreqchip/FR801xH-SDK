@@ -52,6 +52,9 @@
 #define MESH_VENDOR_INDICATION              0x0001A8d4
 #define MESH_VENDOR_CONFIRMATION            0x0001A8d5
 
+#define MESH_EVENT_UPDATA_ID                0xF009
+#define MESH_EVENT_DEV_RST                  0x23
+
 #define MESH_LIGHTNESS_STATUS_MIN_SIZE      2
 #define MESH_LIGHTNESS_STATUS_FULL_SIZE     5
 

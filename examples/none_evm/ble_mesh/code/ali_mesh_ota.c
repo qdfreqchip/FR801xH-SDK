@@ -14,6 +14,7 @@
 
 #include "sys_utils.h" 
 #include "os_mem.h"
+#include "driver_plf.h"
 
 #include "jump_table.h"
 #include "driver_system.h"
@@ -30,16 +31,16 @@
 /*
  * TYPEDEFS
  */
-__packed struct ali_gatt_header_t{
+__PACKED struct ali_gatt_header_t{
     uint8_t msg_id;
     uint8_t cmd;
     uint8_t frame_count;
     uint8_t frame_length;
-};
-__packed struct ali_gatt_packet_t{
+}GCC_PACKED;
+__PACKED struct ali_gatt_packet_t{
     struct ali_gatt_header_t ali_gatt_header;
     uint8_t ali_gatt_paload[__ARRAY_EMPTY]; 
-};
+}GCC_PACKED;
 struct ali_gatt_packet_res_t{
     struct ali_gatt_header_t ali_gatt_header;
     uint8_t ali_gatt_paload[16]; 

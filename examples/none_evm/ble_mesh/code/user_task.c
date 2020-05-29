@@ -10,6 +10,9 @@
 
 uint16_t user_task_id;
 
+//void app_mesh_dev_reset_ctrl(void);
+//void app_auto_update_led_state(uint8_t state);
+
 static int user_task_func(os_event_t *param)
 {
     switch(param->event_id)
@@ -43,6 +46,19 @@ static int user_task_func(os_event_t *param)
                 button_msg = (struct button_msg_t *)param->param;
                 
                 co_printf("KEY 0x%08x, TYPE %s.\r\n", button_msg->button_index, button_type_str[button_msg->button_type]);
+#if 0
+                if(button_msg->button_type == BUTTON_SHORT_PRESSED )
+                {
+                    static uint8_t led_state = 0;
+                    led_state = 1-led_state;
+                    app_auto_update_led_state(led_state);
+                }
+                else if(button_msg->button_type == BUTTON_MULTI_PRESSED )
+                {
+                    if(button_msg->button_cnt == 2)
+                        app_mesh_dev_reset_ctrl();
+                }
+#endif                
             }
             break;
     }

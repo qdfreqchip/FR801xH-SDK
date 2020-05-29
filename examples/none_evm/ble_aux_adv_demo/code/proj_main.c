@@ -70,6 +70,7 @@ void proj_ble_gap_evt_func(gap_event_t *event)
         break;
 
         case GAP_EVT_SCAN_END:
+            gap_set_link_rssi_report(false);
             co_printf("scan_end,status:0x%02x\r\n",event->param.scan_end_status);
             break;
         case GAP_EVT_PER_SYNC_ESTABLISHED:
@@ -83,11 +84,11 @@ void proj_ble_gap_evt_func(gap_event_t *event)
 
         case GAP_EVT_ADV_REPORT:
         {
+			co_printf("evt_type:0x%02x,rssi:%d,rpt_len:%d\r\n",event->param.adv_rpt->evt_type,event->param.adv_rpt->rssi
+                          ,event->param.adv_rpt->length);
             if(event->param.adv_rpt->evt_type == GAP_SCAN_EVT_EXT_ADV || event->param.adv_rpt->evt_type == GAP_SCAN_EVT_PER_ADV
                || event->param.adv_rpt->evt_type == GAP_SCAN_EVT_EXT_SCAN_RSP)
             {
-                co_printf("evt_type:0x%02x,rssi:%d,rpt_len:%d\r\n",event->param.adv_rpt->evt_type,event->param.adv_rpt->rssi
-                          ,event->param.adv_rpt->length);
                 //show_reg(event->param.adv_rpt->data,event->param.adv_rpt->length,1);
                 co_printf("MAC:");
                 show_reg(event->param.adv_rpt->src_addr.addr.addr,MAC_ADDR_LEN,1);

@@ -396,6 +396,19 @@ void mesh_model_sub_group_addr(uint32_t model_id, uint8_t element, uint16_t grou
 void mesh_add_model(const mesh_model_t *p_model);
 
 /*********************************************************************
+ * @fn      mesh_get_remote_param
+ *
+ * @brief   Get the necessaire param for send rsp msg.
+ *
+ * @param   src -- The src id about the gateway device.
+ *
+ * @param   app_key_lid -- App key index of the sending message.
+ * 
+ * @return  None.
+ */
+void mesh_get_remote_param(uint16_t * src,uint8_t * app_key_lid);
+
+/*********************************************************************
  * @fn      mesh_publish_msg
  *
  * @brief   Publish a message in mesh network.

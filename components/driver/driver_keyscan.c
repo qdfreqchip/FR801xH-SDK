@@ -18,7 +18,7 @@
 #include "driver_pmu.h"
 
 /*
- * MACROS 
+ * MACROS
  */
 #undef LOG_LEVEL_MODULE
 #define LOG_LEVEL_MODULE        LOG_LEVEL_NONE
@@ -26,7 +26,7 @@
 /*
  *                                                KEYBOARD PIN-VALUE MAPPING
  *
- *            PA0   PA1   PA2   PA3   PA4   PA5   PA6   PA7   PB0   PB1   PB2   PB3   PB4   PB5   PB6   PB7   PC0   PC1   PC2   PC3 
+ *            PA0   PA1   PA2   PA3   PA4   PA5   PA6   PA7   PB0   PB1   PB2   PB3   PB4   PB5   PB6   PB7   PC0   PC1   PC2   PC3
  *  PD7/PC7   4/27  4/19  4/11  4/03  3/27  3/19  3/11  3/03  2/27  2/19  2/11  2/03  1/27  1/19  1/11  1/03  0/27  0/19  0/11  0/03
  *  PD6/PC6   4/26  4/18  4/10  4/02  3/26  3/18  3/10  3/02  2/26  2/18  2/10  2/02  1/26  1/18  1/10  1/02  0/26  0/18  0/10  0/02
  *  PD5/PC5   4/25  4/17  4/09  4/01  3/25  3/17  3/09  3/01  2/25  2/17  2/09  2/01  1/25  1/17  1/09  1/01  0/25  0/17  0/09  0/01
@@ -159,7 +159,7 @@ void keyscan_init(keyscan_param_t *param)
     ool_write(PMU_REG_KEYSCAN_GLICTH_CFG, 0xf2);    //anti-shake tim = 9880ms
 
     /* enable row pull up */
-    ool_write(PMU_REG_PORTD_PUL, param->row_en ^ 0xff);
+    ool_write(PMU_REG_PORTD_PUL, ool_read(PMU_REG_PORTD_PUL) & (~param->row_en));
 
     /* enable keyscan module and interrupt */
     ool_write(PMU_REG_KEYSCAN_CTRL, ool_read(PMU_REG_KEYSCAN_CTRL) | PMU_KEYSCAN_EN | PMU_KEYSCAN_IRQ_EN | PMU_KEYSCAN_LP_EN );

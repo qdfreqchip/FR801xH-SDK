@@ -25,6 +25,7 @@
 #include "driver_plf.h"
 #include "driver_system.h"
 #include "driver_pmu.h"
+#include "button.h"
 
 /*
  * MACROS 
@@ -48,6 +49,12 @@ uint8_t ali_mesh_key_secret[] = {0x92,0x37,0x41,0x48,0xb5,0x24,0xd9,0xcf,0x7c,0x
 /*
  * TYPEDEFS 
  */
+typedef struct led_hsl_s
+{
+    uint16_t led_l;
+    uint16_t led_h;
+    uint16_t led_s;
+}led_hsl_t;
 
 /*
  * GLOBAL VARIABLES 
@@ -86,13 +93,14 @@ static mesh_model_t light_models[] =
         .element_idx = 0,
         .msg_handler = app_mesh_recv_lightness_msg,
     },
-    #if 0
+    
     [2] = {
-        .model_id = MESH_MODEL_ID_LIGHTCRL,
+        .model_id = MESH_MODEL_ID_HSL,
         .model_vendor = false,
         .element_idx = 0,
-        .msg_handler = app_mesh_recv_CTL_msg,
+        .msg_handler = app_mesh_recv_hsl_msg,
     },
+    #if 1
     [3] = {
         .model_id = MESH_MODEL_ID_VENDOR_ALI,
         .model_vendor = true,
@@ -111,7 +119,7 @@ static uint8_t app_key_binding_count = 0;
 static uint16_t app_key_binding_id = 0;
 /* subscription index, from 0 to total_model_num-1 */
 static uint8_t subscription_count = 0;
-static uint8_t subscription_element = 0;
+//static uint8_t subscription_element = 0;
 struct ali_mesh_sub_map_t {
     uint16_t element_idx;
     uint16_t group_addr;
@@ -119,6 +127,18 @@ struct ali_mesh_sub_map_t {
 static const struct ali_mesh_sub_map_t ali_mesh_sub_map[] =
 {
     [0] = {
+        .element_idx = 0,
+        .group_addr = MESH_ALI_GROUP_ADDR_LED,
+    },
+    [1] = {
+        .element_idx = 0,
+        .group_addr = MESH_ALI_GROUP_ADDR_LED,
+    },
+    [2] = {
+        .element_idx = 0,
+        .group_addr = MESH_ALI_GROUP_ADDR_LED,
+    },
+    [3] = {
         .element_idx = 0,
         .group_addr = MESH_ALI_GROUP_ADDR_LED,
     },
@@ -178,6 +198,92 @@ static void app_mesh_status_send_rsp(mesh_model_msg_ind_t const *ind, uint32_t o
 }
 
 /*********************************************************************
+ * @fn      app_mesh_send_dev_rst_ind
+ *
+ * @brief   The response opration when user delete the network.
+ *
+ * @param   None
+ *
+ * @return  None.
+ */
+static void app_mesh_send_dev_rst_ind(void)
+{
+    mesh_rsp_msg_t * p_rsp_msg = (mesh_rsp_msg_t *)os_malloc((sizeof(mesh_rsp_msg_t)+4));
+    uint16_t option = 0;
+    uint16_t remote_src_id = 0;
+    uint8_t appkey_id = 0;
+
+    app_led_get_remote_msg(&remote_src_id,&appkey_id);
+
+    p_rsp_msg->element_idx = light_models[3].element_idx;
+    p_rsp_msg->app_key_lid = appkey_id;
+    p_rsp_msg->model_id = light_models[3].model_id;
+    p_rsp_msg->opcode = MESH_VENDOR_INDICATION;
+    p_rsp_msg->dst_addr = remote_src_id;
+    
+    p_rsp_msg->msg_len = 4;
+    p_rsp_msg->msg[0] = 0x01;
+    option = MESH_EVENT_UPDATA_ID;
+    memcpy(&(p_rsp_msg->msg[1]), (uint8_t *)&option, 2);
+    p_rsp_msg->msg[3] = MESH_EVENT_DEV_RST;
+
+    mesh_send_rsp(p_rsp_msg);
+    
+    os_free(p_rsp_msg);
+}
+
+/*********************************************************************
+ * @fn      app_mesh_dev_reset_ctrl
+ *
+ * @brief   User delete the network opration.
+ *
+ * @param   None
+ *
+ * @return  None.
+ */
+void app_mesh_dev_reset_ctrl(void)
+{
+    app_mesh_send_dev_rst_ind();
+
+    co_delay_100us(5000);
+    mesh_info_clear();
+    app_mesh_user_data_clear();
+    //platform_reset(0);   
+}
+
+/*********************************************************************
+ * @fn      app_auto_update_led_state
+ *
+ * @brief   Actively report the state of the led when user change the state.
+ *
+ * @param   state     - on/off state
+ *
+ * @return  None.
+ */
+void app_auto_update_led_state(uint8_t state)
+{
+    struct mesh_gen_onoff_model_status_t status;
+    mesh_model_msg_ind_t  *ind;
+    mesh_model_msg_ind_t * p_ind = (mesh_model_msg_ind_t *)os_malloc((sizeof(mesh_model_msg_ind_t)));
+    uint16_t remote_src_id = 0;
+    uint8_t appkey_id = 0;
+
+    app_led_get_remote_msg(&remote_src_id,&appkey_id);
+    
+    p_ind->app_key_lid = appkey_id;
+    p_ind->element = light_models[0].element_idx;
+    p_ind->model_id= light_models[0].model_id;
+    p_ind->src = remote_src_id;
+
+    status.present_onoff = state;
+    status.target_onoff = state;
+    status.remain = 0;
+    app_mesh_status_send_rsp((mesh_model_msg_ind_t const *)p_ind,MESH_GEN_ONOFF_STATUS,(uint8_t *)&status,sizeof(status));
+
+    os_free(p_ind);
+}
+
+/*********************************************************************
  * @fn      app_mesh_recv_gen_onoff_led_msg
  *
  * @brief   used to check new received message whether belongs to generic on-off
@@ -197,8 +303,8 @@ static void app_mesh_recv_gen_onoff_led_msg(mesh_model_msg_ind_t const *ind)
     }
 
     onoff_set = (struct mesh_gen_onoff_model_set_t *)ind->msg;
-    app_led_set_onoffstate(0, onoff_set->onoff);
-    app_led_set_onoffstate(1, onoff_set->onoff);
+    app_led_set_onoffstate(onoff_set->onoff);
+    //app_led_set_onoffstate(1, onoff_set->onoff);
     //co_printf("light on off led:%x,%x\r\n",ind->model_id,onoff_set->onoff);
 
     if(ind->opcode == MESH_GEN_ONOFF_SET) {
@@ -229,8 +335,8 @@ static void app_mesh_recv_gen_onoff_fan_msg(mesh_model_msg_ind_t const *ind)
     }
 
     onoff_set = (struct mesh_gen_onoff_model_set_t *)ind->msg;
-    app_led_set_onoffstate(0, onoff_set->onoff);
-    app_led_set_onoffstate(1, onoff_set->onoff);
+    app_led_set_onoffstate(onoff_set->onoff);
+    //app_led_set_onoffstate(1, onoff_set->onoff);
     //co_printf("light on off fan:%x,%x\r\n",ind->model_id,onoff_set->onoff);
 
     if(ind->opcode == MESH_GEN_ONOFF_SET) {
@@ -261,13 +367,13 @@ static void app_mesh_recv_lightness_msg(mesh_model_msg_ind_t const *ind)
         return;
     }
 
-    app_led_set_level(0, lightness_set->level);
-    app_led_set_level(1, lightness_set->level);
+    app_led_set_lightness(lightness_set->level);
+    //app_led_set_level(1, lightness_set->level);
     //co_printf("light lightness:%x\r\n",lightness_set->level);
     if(ind->opcode == MESH_LIGHTNESS_SET)
     {
-        status.current_level = app_led_get_level(0);
-        status.target_level = app_led_get_level(0);
+        status.current_level = app_led_get_ctl_lightness();
+        status.target_level = lightness_set->level;
         status.remain = 0;
         app_mesh_status_send_rsp(ind, MESH_LIGHTNESS_STATUS, (uint8_t *)&status,sizeof(status));
     }
@@ -294,8 +400,8 @@ static void app_mesh_recv_hsl_msg(mesh_model_msg_ind_t const *ind)
     //co_printf("hsl opcode:%x\r\n",ind->opcode);
     hsl_set = (struct mesh_hsl_model_set_t *)ind->msg;
 
-    app_led_set_hsl(0, hsl_set->hue);
-    app_led_set_hsl(1, hsl_set->hue);
+    app_led_set_hsl(hsl_set->hue,hsl_set->hsl_saturation,hsl_set->lightness);
+    //app_led_set_hsl(1,hsl_set->hue,hsl_set->hsl_saturation,hsl_set->lightness);
     if(ind->opcode == MESH_HSL_SET)
     {
         status.hsl_lightness = hsl_set->lightness;
@@ -326,16 +432,16 @@ static void app_mesh_recv_CTL_msg(mesh_model_msg_ind_t const *ind)
     }
     
     ctl_set = (struct mesh_CTL_model_set_t *)ind->msg;
-    app_led_set_CTL(0, ctl_set->lightness, ctl_set->temperature);
-    app_led_set_CTL(1, ctl_set->lightness, ctl_set->temperature);
+    app_led_set_CTL(ctl_set->lightness, ctl_set->temperature);
+    //app_led_set_CTL(1, ctl_set->lightness, ctl_set->temperature);
     //co_printf("temperature:%x\r\n",ctl_set->temperature);
     
     if(ind->opcode == MESH_TEMPERATURE_SET)
     {
-        status.current_lightness = app_led_get_ctl_lightness(0);
-        status.current_temperature = app_led_get_ctl_temperature(0);
-        status.target_lightness = app_led_get_ctl_lightness(0);
-        status.target_temperature = app_led_get_ctl_temperature(0);
+        status.current_lightness = app_led_get_ctl_lightness();
+        status.current_temperature = app_led_get_ctl_temperature();
+        status.target_lightness = app_led_get_ctl_lightness();
+        status.target_temperature = app_led_get_ctl_temperature();
         status.remain = 0;
         app_mesh_status_send_rsp(ind, MESH_TEMPERATURE_STATUS, (uint8_t *)&status, sizeof(status));
     }
@@ -354,6 +460,7 @@ static void app_mesh_recv_CTL_msg(mesh_model_msg_ind_t const *ind)
 static void app_mesh_recv_vendor_msg(mesh_model_msg_ind_t const *ind)
 {
     struct mesh_vendor_model_set_new_t *vendor_set;
+    led_hsl_t * led_hsl_p;
     
     if((ind->opcode != MESH_VENDOR_SET) 
         && (ind->opcode != MESH_VENDOR_SET_UNACK)
@@ -366,6 +473,19 @@ static void app_mesh_recv_vendor_msg(mesh_model_msg_ind_t const *ind)
     //vendor_set->attr_parameter = (uint8_t *)&ind->msg[3];
 
     //vendor_set_msg_handler(ind);
+    switch(vendor_set->attr_type)
+    {
+        case 0x121: // lightness
+            break;
+        case 0x122: // temperature
+            break;    
+        case 0x0123: // hsl
+            led_hsl_p = (led_hsl_t * )&(vendor_set->attr_parameter);
+            co_printf("h=%x,s=%x,l=%x\r\n",led_hsl_p->led_h,led_hsl_p->led_s,led_hsl_p->led_l);
+            app_led_set_hsl(led_hsl_p->led_h,led_hsl_p->led_s,led_hsl_p->led_l);
+            break;
+        
+    }
     //app_led_set_hsl(1, hsl_set->hue);
     if(ind->opcode == MESH_VENDOR_SET)
     {
@@ -393,7 +513,7 @@ static void mesh_callback_func(mesh_event_t * event)
             break;
         case MESH_EVT_STARTED:
             app_led_init();
-            app_mesh_50Hz_check_enable();
+            //app_mesh_50Hz_check_enable();
             break;
         case MESH_EVT_STOPPED:
             system_sleep_enable();
@@ -482,7 +602,8 @@ static void mesh_callback_func(mesh_event_t * event)
                                             app_mesh_find_group_addr(light_models[subscription_count].element_idx));
                 /* only subscript the primary model inside one element, similar as ALI MESH VERSION 0 */
                 uint8_t element_idx = light_models[subscription_count].element_idx;
-                for(; ((subscription_count<sizeof(light_models)/sizeof(light_models[0])) && (light_models[subscription_count].element_idx == element_idx));)
+                //for(; ((subscription_count<sizeof(light_models)/sizeof(light_models[0])) && (light_models[subscription_count].element_idx == element_idx));)
+                if(((subscription_count<sizeof(light_models)/sizeof(light_models[0])) && (light_models[subscription_count].element_idx == element_idx)))
                 {
                     subscription_count++;
                 }
@@ -496,7 +617,8 @@ static void mesh_callback_func(mesh_event_t * event)
                                             app_mesh_find_group_addr(light_models[subscription_count].element_idx));
                 /* only subscript the primary model inside one element, similar as ALI MESH VERSION 0 */
                 uint8_t element_idx = light_models[subscription_count].element_idx;
-				for(; ((subscription_count<sizeof(light_models)/sizeof(light_models[0])) && (light_models[subscription_count].element_idx == element_idx));)
+				//for(; ((subscription_count<sizeof(light_models)/sizeof(light_models[0])) && (light_models[subscription_count].element_idx == element_idx));)
+                if(((subscription_count<sizeof(light_models)/sizeof(light_models[0])) && (light_models[subscription_count].element_idx == element_idx)))
                 {
                     subscription_count++;
                 }
@@ -504,6 +626,10 @@ static void mesh_callback_func(mesh_event_t * event)
 			else
             {         
 				subscription_count = 0;
+				uint16_t src_id = 0;
+				uint8_t appkey = 0;
+				mesh_get_remote_param(&src_id,&appkey);
+				app_led_set_remote_msg(src_id,appkey);
             }
 			break;
 #endif  // ALI_MESH_VERSION == 1
@@ -531,7 +657,7 @@ static void mesh_callback_func(mesh_event_t * event)
                      * So only element field is checked here, and the code inside msg_handler takes
                      * responsibility to check which model has to deal with this mesasge.
                      */
-                    if(ind->element == light_models[i].element_idx)
+                    if((ind->element == light_models[i].element_idx) && (ind->model_id == light_models[i].model_id))
     				{
     					light_models[i].msg_handler(ind);
     				}
@@ -648,11 +774,14 @@ __attribute__((section("ram_code"))) void pmu_gpio_isr_ram(void)
     curr_value = ool_read32(PMU_REG_GPIOA_V);
     ool_write32(PMU_REG_PORTA_LAST, curr_value);
 
+    #if 0
+    button_toggle_detected(curr_value);
+    #else
     if((curr_value ^ last_value) & ALI_MESH_50HZ_CHECK_IO) {
         /* restart timer */
         os_timer_start(&app_mesh_50Hz_check_timer, 100, false);
     }
-    
+    #endif
     last_value = curr_value;
 }
 

@@ -20,12 +20,17 @@
 /*
  * CONSTANTS 
  */
+//#define MESH_QUICK_SWITCH_CTRL 
 /* flash space used to store ble mesh secret key, such as public key, private key, etc. */
 #define MESH_SECRET_KEY_ADDR                0x61000
 /* flash space used to store mesh network information, such as app key, network key, etc. */
 #define MESH_INFO_STORE_ADDR                0x62000
 /* flash space used to store user data information, such as on-off state, lightness, etc. */
 #define APP_MESH_USER_DATA_STORED_OFFSET    0x63000
+#ifdef MESH_QUICK_SWITCH_CTRL
+/* flash space used to store quick switch time,to exit the network */
+#define MESH_STORE_SWITCH_TIME              0x64000
+#endif
 /* 
  * flash space used to store ali mesh information, this value should
  * be same with configuration in config tools.
@@ -151,6 +156,30 @@ void app_mesh_user_data_clear(void);
  * @return  None.
  */
 void app_mesh_store_user_data_timer_init(void);
+
+#ifdef MESH_QUICK_SWITCH_CTRL
+/*********************************************************************
+ * @fn      app_mesh_store_switch_time
+ *
+ * @brief   store quick switch time,to exit the network.
+ *
+ * @param   None
+ *
+ * @return  None.
+ */
+void app_mesh_store_switch_time(void);
+
+/*********************************************************************
+ * @fn      app_mesh_clear_switch_time
+ *
+ * @brief   clear quick switch time.
+ *
+ * @param   None
+ *
+ * @return  None.
+ */
+void app_mesh_clear_switch_time(void);
+#endif
 
 #endif  // _ALI_MESH_INFO_H_
 

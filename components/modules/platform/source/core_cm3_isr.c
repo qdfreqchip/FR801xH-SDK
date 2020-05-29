@@ -1,11 +1,13 @@
 #include <stdio.h>
-#include <stdio.h>
+#include <stdint.h>
 
 #include "co_printf.h"
 //#include "system.h"
 //#include "user_mem.h"
 //#include "apb2spi.h"
 //#include "uart.h"
+
+void platform_reset_patch(uint32_t error);
 
 void HardFault_Handler_C(unsigned int* hardfault_args)
 {
@@ -40,7 +42,7 @@ void HardFault_Handler_C(unsigned int* hardfault_args)
     uart_finish_transfers();
     apb2spi_write(0x4F,0xC7,APB2SPI_TYPE_OOL);
     __set_FAULTMASK(1);
-    NVIC_SystemReset();
+    platform_reset_patch(0);
 #endif
 
     while(1);

@@ -42,7 +42,12 @@
 #pragma GCC diagnostic ignored "-Wconversion"
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #endif
-
+#ifndef   GCC_PACKED
+#define GCC_PACKED                  __attribute__((packed))
+#endif
+#ifndef __PACKED
+#define __PACKED
+#endif
 
 /* ###########################  Core Function Access  ########################### */
 /** \ingroup  CMSIS_Core_FunctionInterface

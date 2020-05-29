@@ -522,6 +522,7 @@ void start_scan_Or_conn(void)
     scan_param.scan_intv = 32;  //scan event on-going time
     scan_param.scan_window = 20;
     scan_param.duration = 1500;     //15s
+    gap_set_link_rssi_report(true);
     gap_start_scan(&scan_param);
 }
 #endif
