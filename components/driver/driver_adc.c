@@ -7,6 +7,7 @@
 #include "driver_adc.h"
 #include "driver_flash.h"
 #include "driver_plf.h"
+#include "driver_efuse.h"
 #include "driver_pmu.h"
 #include "driver_pmu_regs.h"
 
@@ -381,13 +382,24 @@ void adc_init(struct adc_cfg_t *cfg)
     uint8_t channels = cfg->channels;
     uint32_t data[5];
 
-    if(adc_ref_calib == false) {
-		adc_ref_calib = true;
-        flash_OTP_read(0x1000, 5*sizeof(uint32_t), (void *)data);
-		if(data[0] == 0x31303030) {
-			adc_ref_internal = ((400*1024)/(data[3] / 32) + (800*1024)/(data[4] / 32)) / 2;
-			adc_ref_avdd = ((2400*1024)/(data[1] / 32) + (800*1024)/(data[2] / 32)) / 2;
-		}
+    if(adc_ref_calib == false)
+    {
+        adc_ref_calib = true;
+        uint32_t data0,data1,data2;
+        efuse_read(&data[0], &data[1], &data[2]);
+        if(data[2] != 0)
+        {
+            adc_ref_internal = ((data[2] >> 12) & 0xfff);
+            adc_ref_avdd = (data[2] & 0xfff);
+        }
+        else
+        {
+            flash_OTP_read(0x1000, 5*sizeof(uint32_t), (void *)data);
+            if(data[0] == 0x31303030) {
+                adc_ref_internal = ((400*1024)/(data[3] / 32) + (800*1024)/(data[4] / 32)) / 2;
+                adc_ref_avdd = ((2400*1024)/(data[1] / 32) + (800*1024)/(data[2] / 32)) / 2;
+            }
+        }
     }
 
     memset((void *)&adc_env, 0, sizeof(adc_env));

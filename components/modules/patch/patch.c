@@ -126,6 +126,8 @@ __attribute__((aligned(64))) uint32_t patch_map[16] =
     0x4B2A0051,
 };
 
+static uint32_t lld_regs_buffer[6];
+
 uint8_t buck_value_org, dldo_value_org;
 
 __attribute__((section("ram_code"))) void patch_init(void)
@@ -180,6 +182,13 @@ __attribute__((section("ram_code"))) void low_power_save_entry_imp(uint8_t type)
 {
     if(type == LOW_POWER_SAVE_ENTRY_BASEBAND)
     {
+        lld_regs_buffer[0] = *(volatile uint32_t *)0x40000130;
+        lld_regs_buffer[1] = *(volatile uint32_t *)0x40000134;
+        lld_regs_buffer[2] = *(volatile uint32_t *)0x40000138;
+        lld_regs_buffer[3] = *(volatile uint32_t *)0x4000013c;
+        lld_regs_buffer[4] = *(volatile uint32_t *)0x40000170;
+        lld_regs_buffer[5] = *(volatile uint32_t *)0x40000174;
+        
         buck_value_org = ool_read(PMU_REG_BUCK_CTRL1);
         dldo_value_org = ool_read(PMU_REG_DLDO_CTRL);
         /* set BUCK voltage to higher level */
@@ -214,6 +223,13 @@ __attribute__((section("ram_code"))) void low_power_restore_entry_imp(uint8_t ty
     }
     else if(type == LOW_POWER_RESTORE_ENTRY_BASEBAND)
     {
+        *(volatile uint32_t *)0x40000130 = lld_regs_buffer[0];
+        *(volatile uint32_t *)0x40000134 = lld_regs_buffer[1];
+        *(volatile uint32_t *)0x40000138 = lld_regs_buffer[2];
+        *(volatile uint32_t *)0x4000013c = lld_regs_buffer[3];
+        *(volatile uint32_t *)0x40000170 = lld_regs_buffer[4];
+        *(volatile uint32_t *)0x40000174 = lld_regs_buffer[5];
+        
 #ifndef KEEP_CACHE_SRAM_RETENTION
         // manul enable the cache and invalidating the SRAM
         enable_cache(true);
@@ -227,7 +243,7 @@ __attribute__((section("ram_code"))) void low_power_restore_entry_imp(uint8_t ty
         /* handle the cs control to QSPI controller */
         //pmu_gpio_set_dir(GPIO_PORT_B, GPIO_BIT_0, GPIO_DIR_IN);
         pmu_calibration_start(PMU_CALI_SRC_LP_RC, __jump_table.lp_clk_calib_cnt);
-
+        
         if((ool_read(PMU_REG_KEYSCAN_CTRL) & PMU_KEYSCAN_EN)
             && ((pmu_get_isr_state() & PMU_ISR_KEYSCAN_STATE) == 0)) {
             ool_write(PMU_REG_RST_CTRL, ool_read(PMU_REG_RST_CTRL) &(~PMU_RST_KEYSCAN));
@@ -259,7 +275,7 @@ __attribute__((section("ram_code"))) __attribute__((weak)) void user_entry_after
 __attribute__((section("ram_code"))) void flash_write(uint32_t offset, uint32_t length, uint8_t * buffer)
 {
     void (*flash_write_)(uint32_t offset, uint32_t length, uint8_t * buffer) = (void (*)(uint32_t, uint32_t, uint8_t *))0x00004899;
-    
+
     GLOBAL_INT_DISABLE();
     disable_cache();
     flash_write_(offset, length, buffer);
@@ -270,7 +286,7 @@ __attribute__((section("ram_code"))) void flash_write(uint32_t offset, uint32_t 
 __attribute__((section("ram_code"))) void flash_erase(uint32_t offset, uint32_t length)
 {
     void (*flash_erase_)(uint32_t offset, uint32_t length) = (void (*)(uint32_t, uint32_t))0x00004775;
-    
+
     GLOBAL_INT_DISABLE();
     disable_cache();
     flash_erase_(offset, length);
