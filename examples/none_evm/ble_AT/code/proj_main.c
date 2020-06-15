@@ -53,6 +53,8 @@ void user_custom_parameters(void)
 {
     memcpy(__jump_table.addr.addr,"\x0F\x09\x07\x09\x17\x20",MAC_ADDR_LEN);
     __jump_table.system_clk = SYSTEM_SYS_CLK_12M;
+    __jump_table.local_drift = 600;
+    __jump_table.sleep_algo_dur = 8;
     jump_table_set_static_keys_store_offset(0x49000);
 }
 

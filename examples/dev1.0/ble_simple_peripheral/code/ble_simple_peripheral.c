@@ -117,7 +117,7 @@ void app_gap_evt_cb(gap_event_t *p_event)
     {
         case GAP_EVT_ADV_END:
         {
-            co_printf("adv_end,status:0x%02x\r\n",p_event->param.adv_end_status);
+            co_printf("adv_end,status:0x%02x\r\n",p_event->param.adv_end.status);
             //gap_start_advertising(0);
         }
         break;

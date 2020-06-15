@@ -125,6 +125,8 @@
 #define GAP_SCAN_EVT_CONN_DIR          0x01  //!< Directed advertising
 #define GAP_SCAN_EVT_NONCONN_UNDIR     0x02  //!< Non Connectable advertising
 #define GAP_SCAN_EVT_SCAN_RSP          0x04  //!< Scan Response
+#define GAP_SCAN_EVT_NONCONN_NONSCAN   0x08  //!< Non Connectable Non Scan advertising
+
 
 #define GAP_SCAN_EVT_EXT_ADV           0x10  //!< Scan Response of extended adv
 #define GAP_SCAN_EVT_EXT_SCAN_RSP      0x14  //!< Scan Response of extended scan response
@@ -282,6 +284,12 @@ typedef struct
     uint8_t conidx;             //!< Connection index
     uint8_t status;             //!< Parameter reject status
 } gap_evt_phy_reject_t;
+// Adv end event
+typedef struct
+{
+    uint8_t idx;             //!< Adv idx, 0 = adv0, 1 = adv1.
+    uint8_t status;          //!< Adv end status
+} adv_end_t;
 
 // Scan result, find remote advertising devide
 typedef struct
@@ -337,7 +345,7 @@ typedef struct
         gap_evt_link_param_update_t     link_update;            //!< Parameter update success event
         gap_evt_phy_update_t            phy_update;             //!< PHY update success event
         gap_evt_phy_reject_t            phy_reject;             //!< PHY update reject event
-        uint8_t                         adv_end_status;         //!< Advertising end status
+        adv_end_t                       adv_end;                //!< Advertising end status
         uint8_t                         scan_end_status;        //!< Scanning end status
         uint8_t                         per_sync_end_status;    //!< Per_sync event end status
         gap_evt_per_sync_ready_t        per_sync_ready;         //!< Per_sync is established
@@ -407,8 +415,15 @@ typedef struct
 typedef struct
 {
     gap_mac_addr_t peer_addr;   //!<mac addr of bonded peer device
+    uint8_t peer_irk[16];       //!<peer_irk
     uint8_t bond_flag;          //!<bond flag
 } gap_bond_info_t;
+// resolve address list
+typedef struct
+{
+    gap_mac_addr_t addr;        //!<peer_addr
+    uint8_t peer_irk[16];       //!<peer_irk
+} gap_ral_t;
 
 /*
  * GLOBAL VARIABLES
@@ -629,7 +644,30 @@ void gap_address_get(mac_addr_t *addr);
  * @return  None.
  */
 void gap_address_set(mac_addr_t *addr);
-
+/*********************************************************************
+ * @fn      gap_set_wl
+ *
+ * @brief   Set device mac addr into white list.
+ *          for device with mac addr_type = 0, should call gap_set_wl() only
+ *
+ * @param   p_addr_set - pointer to device mac addr, which will be set into white list
+ *          size     - device number,rang:1~22. how many devices will be set to white list
+ *
+ * @return  None.
+ */
+void gap_set_wl(gap_mac_addr_t *p_addr_set,uint8_t size);
+/*********************************************************************
+ * @fn      gap_set_ral
+ *
+ * @brief   Set resolve device addr & irk into resolve_addr list. 
+ *          for device with mac addr_type = 1, should call gap_set_wl() and gap_set_ral() together
+ *
+ * @param   p_ral_set - pointer to device mac addr, which will be set into white list
+ *          size     - device number,rang:1~2. how many devices will be set to ral list
+ *
+ * @return  None.
+ */
+void gap_set_ral(gap_ral_t *p_ral_set,uint8_t size);
 /*********************************************************************
  * @fn      gap_get_connect_status
  *
@@ -777,7 +815,7 @@ void gap_get_conn_phy(uint8_t conidx);
  * @brief   Initialize bonding manager. For bonding features when security is needed.
  *
  * @param   flash_addr      - Flash page addr where peer device bond information is stored,
- *                            should be integer multiple of 0x1000. 
+ *                            should be integer multiple of 0x1000.
  *                              IF this value is zero, bond info will not be stored in flash
  *          svc_flash_addr  - Flash page addr where peer device services information is stored,
  *                            should be integer multiple of 0x1000

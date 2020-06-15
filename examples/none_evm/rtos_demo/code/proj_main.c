@@ -60,7 +60,7 @@ void proj_ble_gap_evt_func(gap_event_t *event)
     {
         case GAP_EVT_ADV_END:
         {
-            co_printf("adv_end,status:0x%02x\r\n",event->param.adv_end_status);
+            co_printf("adv_end,status:0x%02x\r\n",event->param.adv_end.status);
 #if 0
             uint8_t adv_data[]="\x09\x08\x46\x52\x38\x30\x31\x30\x48\x00";
             uint8_t rsp_data[]="\x09\xFF\x00\x60\x52\x57\x2D\x42\x4C\x22";

@@ -423,6 +423,8 @@ enum pmu_qdec_irq_type
 
 #define PMU_REG_WKUP_PWO_DLY            0x8b    // osc_en to digital release reset delay, N * pmu_sys_clock
 
+#define PMU_REG_PKPD_SHORT_NORMAL       0x8c
+
 #define PMU_REG_WKUP_PMUFSM_CHG_DLY     0x8d    // wakeup from sleep to normal delay, N * pmu_sys_clock
 
 #define PMU_REG_ISO_CTRL                0x8f
@@ -662,7 +664,6 @@ read is keyscan_status
 #define PMU_REG_BUCK_OFF_DLY            0xd9
 
 #define PMU_REG_PWO_SLP_DLY             0xdc    // sleep start to sleep active delay, N * pmu_sys_clock
-
 
 #endif  // _DRIVER_PMU_REGS_H
 

@@ -127,7 +127,7 @@ void gyroscope_i2c_init(uint8_t chl)
 	system_set_port_mux(GPIO_PORT_C,GPIO_BIT_7,PORTC7_FUNC_I2C1_DAT);
 	system_set_port_pull(GPIO_PC6,true);
 	system_set_port_pull(GPIO_PC7,true);
-	iic_init(GYRO_IIC_CHL,1000,GYRO_ADDRESS);
+	iic_init(GYRO_IIC_CHL,350,GYRO_ADDRESS);
 }
 
 /******************************************************************************

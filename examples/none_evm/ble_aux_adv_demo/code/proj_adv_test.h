@@ -17,7 +17,7 @@
 /*
  * MACROS (宏定义)
  */
-#define TEST_ADV_MODE_UNDIRECT   (1)
+#define TEST_ADV_MODE_UNDIRECT   (0)
 #define TEST_ADV_MODE_DIRECT     (0)
 #define TEST_ADV_MODE_HDC_DIRECT (0)
 
@@ -30,8 +30,12 @@
 #define TEST_ADV_MODE_PER_ADV_UNDIRECT       (0)
 #define TEST_ADV_MODE_PER_ADV_DIRECT         (0)
 
-#define TEST_BOARD_ADV                  (0)
-#define TEST_BOARD_SCAN_OR_CONN         (1)
+#define TEST_ADV_MODE_UNDIRECT_WHITE_LIST         (0)
+#define TEST_ADV_MODE_UNDIRECT_DOUBLE_ADV         (1)
+
+
+#define TEST_BOARD_ADV                  (1)
+#define TEST_BOARD_SCAN_OR_CONN         (0)
 
 /*
  * CONSTANTS (常量定义)

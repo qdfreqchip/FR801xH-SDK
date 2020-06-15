@@ -245,7 +245,8 @@ __attribute__((section("ram_code"))) void low_power_restore_entry_imp(uint8_t ty
         pmu_calibration_start(PMU_CALI_SRC_LP_RC, __jump_table.lp_clk_calib_cnt);
         
         if((ool_read(PMU_REG_KEYSCAN_CTRL) & PMU_KEYSCAN_EN)
-            && ((pmu_get_isr_state() & PMU_ISR_KEYSCAN_STATE) == 0)) {
+           && ((pmu_get_isr_state() & PMU_ISR_KEYSCAN_STATE) == 0))
+        {
             ool_write(PMU_REG_RST_CTRL, ool_read(PMU_REG_RST_CTRL) &(~PMU_RST_KEYSCAN));
             ool_write(PMU_REG_RST_CTRL, ool_read(PMU_REG_RST_CTRL) | PMU_RST_KEYSCAN);
         }
@@ -279,7 +280,7 @@ __attribute__((section("ram_code"))) void flash_write(uint32_t offset, uint32_t 
     GLOBAL_INT_DISABLE();
     disable_cache();
     flash_write_(offset, length, buffer);
-    enable_cache(false);
+    enable_cache(true);
     GLOBAL_INT_RESTORE();
 }
 
@@ -290,7 +291,7 @@ __attribute__((section("ram_code"))) void flash_erase(uint32_t offset, uint32_t 
     GLOBAL_INT_DISABLE();
     disable_cache();
     flash_erase_(offset, length);
-    enable_cache(false);
+    enable_cache(true);
     GLOBAL_INT_RESTORE();
 }
 

@@ -165,21 +165,20 @@ void user_entry_before_ble_init(void)
     system_set_port_mux(GPIO_PORT_A, GPIO_BIT_3, PORTA3_FUNC_UART1_TXD);
     uart_init(UART1, BAUD_RATE_115200);    
 
-    if(__jump_table.system_option & SYSTEM_OPTION_ENABLE_HCI_MODE)
-    {
-        /* use PC4 and PC5 for HCI interface */
-        system_set_port_pull(GPIO_PA4, true);
-        system_set_port_mux(GPIO_PORT_A, GPIO_BIT_4, PORTA4_FUNC_UART0_RXD);
-        system_set_port_mux(GPIO_PORT_A, GPIO_BIT_5, PORTA5_FUNC_UART0_TXD);
-    }
-
-    /* used for debug, reserve 3S for j-link once sleep is enabled. */
+#if 1
+    system_sleep_disable();
+#else
     if(__jump_table.system_option & SYSTEM_OPTION_SLEEP_ENABLE)
     {
+        co_printf("\r\na");
+        co_delay_100us(10000);       //must keep it, or pressing reset key may block .
+        co_printf("\r\nb");
         co_delay_100us(10000);
+        co_printf("\r\nc");
         co_delay_100us(10000);
-        co_delay_100us(10000);
-     }
+        co_printf("\r\nd");
+    }
+#endif		
 }
 
 /*********************************************************************

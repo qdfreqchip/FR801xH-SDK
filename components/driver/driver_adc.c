@@ -385,7 +385,7 @@ void adc_init(struct adc_cfg_t *cfg)
     if(adc_ref_calib == false)
     {
         adc_ref_calib = true;
-        uint32_t data0,data1,data2;
+
         efuse_read(&data[0], &data[1], &data[2]);
         if(data[2] != 0)
         {

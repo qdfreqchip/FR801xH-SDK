@@ -20,7 +20,7 @@
 #include "driver_gpio.h"
 #include "driver_iomux.h"
 #include "driver_pmu.h"
-
+#define DEV_V_1_4  (1)  //FR8016H DEV1.4
 /*
  * MACROS
  */
@@ -250,7 +250,118 @@ void Lcd_Init(void)
     LCD_WR_REG(0x11);
     LCD_DriverDelay(120);          //Delay 120ms
 
+#if DEV_V_1_4
+    {
+	LCD_WR_REG(0xfe);
+	LCD_WR_REG(0xef);	
+			
+	LCD_WR_REG(0x36);	
+	LCD_WR_DATA8(0x48);	
+	LCD_WR_REG(0x3a);	
+	LCD_WR_DATA8(0x05);	
 
+
+	LCD_WR_REG(0x85);	
+	LCD_WR_DATA8(0x80);	
+	LCD_WR_REG(0x86);	
+	LCD_WR_DATA8(0xf8);
+	LCD_WR_REG(0x87);	
+	LCD_WR_DATA8(0x79);	
+	LCD_WR_REG(0x89);	
+	LCD_WR_DATA8(0x13);
+		
+	LCD_WR_REG(0x8b);	
+	LCD_WR_DATA8(0x80);	
+		
+	LCD_WR_REG(0x8d);	
+	LCD_WR_DATA8(0x33);	
+	LCD_WR_REG(0x8e);	
+	LCD_WR_DATA8(0x8f);	
+	LCD_WR_REG(0x8f);	
+	LCD_WR_DATA8(0x73);
+
+	//inversion
+	LCD_WR_REG(0xe8);
+	LCD_WR_DATA8(0x12);
+	LCD_WR_DATA8(0x00);	
+
+	LCD_WR_REG(0xec);
+	LCD_WR_DATA8(0x13);
+	LCD_WR_DATA8(0x02);	
+	LCD_WR_DATA8(0x88);	
+
+	//cobD?¡Á?
+	LCD_WR_REG(0xbf);	 
+	LCD_WR_DATA8(0x1c);		  
+
+	LCD_WR_REG(0xad);	   
+	LCD_WR_DATA8(0x4a);
+
+	LCD_WR_REG(0xae);	   
+	LCD_WR_DATA8(0x44);
+
+	LCD_WR_REG(0xac);	   
+	LCD_WR_DATA8(0x44);
+	
+	LCD_WR_REG(0xff);
+	LCD_WR_DATA8(0x62);
+	LCD_WR_REG(0x99);	
+	LCD_WR_DATA8(0x3e);
+	LCD_WR_REG(0x9d);	
+	LCD_WR_DATA8(0x4b);
+	LCD_WR_REG(0x98);	
+	LCD_WR_DATA8(0x3e);
+	LCD_WR_REG(0x9c);	
+	LCD_WR_DATA8(0x4b);
+	
+	LCD_WR_REG(0xc3);	
+	LCD_WR_DATA8(0x58);//58
+
+	LCD_WR_REG(0xc4);	
+	LCD_WR_DATA8(0x4E);//4E
+
+	LCD_WR_REG(0xc9);	
+	LCD_WR_DATA8(0x08);
+
+	LCD_WR_REG(0xf0);
+	LCD_WR_DATA8(0x45);
+	LCD_WR_DATA8(0x0A);
+	LCD_WR_DATA8(0x0A);
+	LCD_WR_DATA8(0x06);
+	LCD_WR_DATA8(0x05);
+	LCD_WR_DATA8(0x2E);
+
+	LCD_WR_REG(0xf2);
+	LCD_WR_DATA8(0x45);
+	LCD_WR_DATA8(0x09);
+	LCD_WR_DATA8(0x0A);
+	LCD_WR_DATA8(0x0b);
+	LCD_WR_DATA8(0x05);
+	LCD_WR_DATA8(0x2E);
+
+	LCD_WR_REG(0xf1);
+	LCD_WR_DATA8(0x45);
+	LCD_WR_DATA8(0x8F);
+	LCD_WR_DATA8(0x8f);
+	LCD_WR_DATA8(0x3B);
+	LCD_WR_DATA8(0x3F);
+	LCD_WR_DATA8(0x7f);
+
+	LCD_WR_REG(0xf3);
+	LCD_WR_DATA8(0x45);
+	LCD_WR_DATA8(0x8f);
+	LCD_WR_DATA8(0x8f);
+	LCD_WR_DATA8(0x3B);
+	LCD_WR_DATA8(0x3F);
+	LCD_WR_DATA8(0x7f);
+
+
+	LCD_WR_REG(0x11);
+	LCD_DriverDelay(120);
+	LCD_WR_REG(0x29);
+	LCD_WR_REG(0x2c);
+}
+#else
 //************* Start Initial Sequence **********//
     LCD_WR_REG(0x36);
     if(USE_HORIZONTAL==0)LCD_WR_DATA8(0x00);
@@ -331,6 +442,7 @@ void Lcd_Init(void)
 //Delay (120);
 
     LCD_WR_REG(0x29);
+#endif    
     LCD_EN_ON;
 }
 
@@ -772,7 +884,7 @@ void demo_LCD_APP(void)
 */
 void LCD_DisPIC(uint8_t pic_idx)
 {
-	LCD_Address_Set(0, 0, 240, 240);
+	LCD_Address_Set(0, 0, 240-1, 240-1);
 	if(pic_idx == 0){
 			LCD_DriverWriteDataBuf((uint8_t *)( gImage_logo240x240), 480*240);
 	}else if(pic_idx == 1){

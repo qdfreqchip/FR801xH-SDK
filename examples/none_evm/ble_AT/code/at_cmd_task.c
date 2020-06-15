@@ -299,6 +299,7 @@ void at_start_scan(void)
         scan_param.duration = 1000;     //10s
     else
         scan_param.duration = gAT_ctrl_env.scan_duration;
+    gap_set_link_rssi_report(true);
     gap_start_scan(&scan_param);
     gAT_ctrl_env.scan_ongoing = true;
 }

@@ -172,6 +172,7 @@ void proj_ble_gap_evt_func(gap_event_t *event)
         case GAP_EVT_SCAN_END:
         {
             co_printf("scan_end,status:0x%02x\r\n",event->param.scan_end_status);
+            gap_set_link_rssi_report(false);
             gAT_ctrl_env.scan_ongoing = false;
 
             if(at_cb_func[AT_GAP_CB_SCAN_END]!=NULL)
