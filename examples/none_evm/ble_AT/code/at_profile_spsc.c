@@ -117,7 +117,7 @@ void at_spsc_send_data(uint8_t conidx,uint8_t *data, uint8_t len)
         write.client_id = spsc_client_id;
         write.att_idx = 1; //TX
         write.p_data = data;
-        write.data_len = MIN(len,gatt_get_mtu(conidx) - 7);
+        write.data_len = MIN(len,gatt_get_mtu(conidx) - 3);
         gatt_client_write_cmd(write);
     } 
 }

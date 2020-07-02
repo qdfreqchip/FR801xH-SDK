@@ -162,7 +162,7 @@ void proj_ble_gap_evt_func(gap_event_t *event)
     {
         case GAP_EVT_ADV_END:
         {
-            co_printf("adv_end,status:0x%02x\r\n",event->param.adv_end_status);
+            co_printf("adv_end,status:0x%02x\r\n",event->param.adv_end.status);
             gAT_ctrl_env.adv_ongoing = false;
 
             if(at_cb_func[AT_GAP_CB_ADV_END]!=NULL)

@@ -116,6 +116,41 @@ __attribute__((section("ram_code"))) void flash_OTP_read(uint32_t offset, uint32
 void qspi_flash_enable_quad(void);
 
 /*********************************************************************
+ * @fn      flash_protect_enable
+ *
+ * @brief   protect flash chip from erase and write.
+ *
+ * @param   wr_mode     - 0: write.enable with command 0x50
+ *                        1: write enable with command 0x06
+ *
+ * @return  None.
+ */
+__attribute__((section("ram_code"))) void flash_protect_enable(uint8_t wr_mode);
+
+/*********************************************************************
+ * @fn      flash_protect_disable
+ *
+ * @brief   remove protection flash chip from erase and write.
+ *
+ * @param   wr_mode     - 0: write.enable with command 0x50
+ *                        1: write enable with command 0x06
+ *
+ * @return  None.
+ */
+__attribute__((section("ram_code"))) void flash_protect_disable(uint8_t wr_mode);
+
+/*********************************************************************
+ * @fn      flash_read_id
+ *
+ * @brief   get flash id.
+ *
+ * @param   None.
+ *
+ * @return  None.
+ */
+__attribute__((section("ram_code"))) uint32_t flash_read_id(void);
+
+/*********************************************************************
 * @fn      qspi_flash_init
 *
 * @brief   initialize the qspi flash controller.

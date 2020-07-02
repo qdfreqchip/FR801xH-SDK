@@ -202,6 +202,8 @@ __attribute__((section("ram_code"))) void low_power_save_entry_imp(uint8_t type)
         /* power off flash */
         ool_write(PMU_REG_FLASH_POR_CTRL, ool_read(PMU_REG_FLASH_POR_CTRL) & 0xfd);
 
+        ool_write(PMU_REG_OSC_DRV_CTRL, 0x3f);
+
         pmu_calibration_stop();
     }
 }
@@ -220,6 +222,8 @@ __attribute__((section("ram_code"))) void low_power_restore_entry_imp(uint8_t ty
 
         /* power on flash */
         ool_write(PMU_REG_FLASH_POR_CTRL, ool_read(PMU_REG_FLASH_POR_CTRL) | 0x02);
+
+        ool_write(PMU_REG_OSC_DRV_CTRL, 0x20);
     }
     else if(type == LOW_POWER_RESTORE_ENTRY_BASEBAND)
     {

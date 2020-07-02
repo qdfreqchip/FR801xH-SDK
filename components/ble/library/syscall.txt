@@ -811,7 +811,7 @@
 0x000197fd T pmu_isr
 0x0001993d T pmu_port_set_mux
 0x00019975 T pmu_port_wakeup_func_clear
-0x00019995 T pmu_port_wakeup_func_set
+;0x00019995 T pmu_port_wakeup_func_set
 0x00019a4d T pmu_set_on_off_mode
 0x00019a81 T print
 0x0001a2d9 T pvPortMalloc

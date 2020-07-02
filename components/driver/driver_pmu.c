@@ -382,8 +382,12 @@ void pmu_sub_init(void)
     {
     }
 
+    #ifndef CFG_FT_CODE
     /* remove internal osc cap */
     ool_write(PMU_REG_OSC_CAP_CTRL, 0x00);
+    #else
+    ool_write(PMU_REG_OSC_CAP_CTRL, 0x18);
+    #endif
 
     /* remove the resistor load of BUCK */
     ool_write(PMU_REG_RL_CTRL, ool_read(PMU_REG_RL_CTRL) & (~(1<<6)));
@@ -420,10 +424,10 @@ void pmu_sub_init(void)
     }
     if(dldo_v != 0) {
         if(dldo_v/2 >= 4) {
-            ool_write(PMU_REG_PKVDD_CTRL2, (ool_read(PMU_REG_PKVDD_CTRL2) & 0xF0) | 0x05);
+            ool_write(PMU_REG_PKVDD_CTRL2, (ool_read(PMU_REG_PKVDD_CTRL2) & 0xF0) | 0x06);
         }
         else {
-            ool_write(PMU_REG_PKVDD_CTRL2, (ool_read(PMU_REG_PKVDD_CTRL2) & 0xF0) | (9-dldo_v/2));
+            ool_write(PMU_REG_PKVDD_CTRL2, (ool_read(PMU_REG_PKVDD_CTRL2) & 0xF0) | (0x0a-dldo_v/2));
         }
         ool_write(PMU_REG_DLDO_CTRL, 0x42 | (3-dldo_v/4));
     }
@@ -518,17 +522,17 @@ void pmu_sub_init(void)
     /* Enable PMU SIGNAL diagport output, only for debug usage */
 #if 0
 #if 0
-    ool_write(PMU_REG_PORTA_SEL, 0x0c);
+    ool_write(PMU_REG_PORTA_SEL, 0x0f);
     ool_write(PMU_REG_PORTA_OEN, 0x00);
     ool_write16(PMU_REG_PORTA_MUX_L, 0xAAAA);
 #endif
-#if 0
-    ool_write(PMU_REG_PORTB_SEL, 0x00);
+#if 1
+    ool_write(PMU_REG_PORTB_SEL, 0x0b);
     ool_write(PMU_REG_PORTB_OEN, 0x00);
     ool_write16(PMU_REG_PORTB_MUX_L, 0xAAAA);
 #endif
 #if 1
-    ool_write(PMU_REG_PORTC_SEL, 0x00);
+    ool_write(PMU_REG_PORTC_SEL, 0xf0);
     ool_write(PMU_REG_PORTC_OEN, 0x00);
     ool_write16(PMU_REG_PORTC_MUX_L, 0xAAAA);
 #endif
@@ -538,7 +542,7 @@ void pmu_sub_init(void)
     ool_write16(PMU_REG_PORTD_MUX_L, 0xAAAA);
 #endif
 
-    ool_write(PMU_REG_DIAG_SEL, 0x30);
+    ool_write(PMU_REG_DIAG_SEL, 0x42);
 #endif
 
 }
@@ -690,6 +694,54 @@ void pmu_set_lp_clk_src(enum pmu_lp_clk_src_t src)
         /* enable 32768 osc PD */
         ool_write(PMU_REG_OSC32K_OTD_CTRL, ool_read(PMU_REG_OSC32K_OTD_CTRL) | 0x01);
     }
+}
+
+/*********************************************************************
+ * @fn      pmu_port_wakeup_func_set
+ *
+ * @brief   indicate which ports should be checked by PMU GPIO monitor module.
+ *          once the state of corresponding GPIO changes, an PMU interrupt
+ *          will be generated.
+ *
+ * @param   gpios   - 32bit value, bit num corresponding to pin num.
+ *                    sample: 0x08080808 means PA3, PB3, PC3, PD3 will be
+ *                    checked.
+ *
+ * @return  None.
+ */
+void pmu_port_wakeup_func_set(uint32_t gpios)
+{    
+    uint8_t mux_regs_addr[] = {PMU_REG_PORTA_MUX_L, PMU_REG_PORTB_MUX_L, PMU_REG_PORTC_MUX_L, PMU_REG_PORTD_MUX_L};
+    
+    /* set pmu to handle gpio */
+    ool_write32(PMU_REG_PORTA_SEL, ool_read32(PMU_REG_PORTA_SEL) & (~gpios));
+
+    /* set gpio function mux */
+    for(uint8_t j=0; j<4; j++) {
+        uint8_t tmp_gpio;
+        uint16_t current_mux;
+        uint8_t mux_reg_addr = mux_regs_addr[j];
+        tmp_gpio = (gpios>>(j*8)) & 0xff;
+        if(tmp_gpio) {
+            current_mux = ool_read16(mux_reg_addr);
+            for(uint8_t i=0; i<8; i++) {
+                if(tmp_gpio & (1<<i)) {
+                    current_mux &= (~(PMU_PORT_MUX_MSK<<(i*2)));
+                    current_mux |= (PMU_PORT_MUX_GPIO<<(i*2));
+                }
+            }
+            ool_write16(mux_reg_addr, current_mux);
+        }
+    }
+
+    /* set gpio in input mode */
+    ool_write32(PMU_REG_PORTA_OEN, ool_read32(PMU_REG_PORTA_OEN) | gpios);
+
+    /* get current gpio value and initial gpio last value */
+    ool_write32(PMU_REG_PORTA_LAST, ool_read32(PMU_REG_GPIOA_V));
+
+    /* set gpio wakeup mask */
+    ool_write32(PMU_REG_PORTA_TRIG_MASK, ool_read32(PMU_REG_PORTA_TRIG_MASK) | gpios);
 }
 
 extern void wdt_isr_ram(unsigned int* hardfault_args);

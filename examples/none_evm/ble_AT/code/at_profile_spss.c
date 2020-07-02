@@ -151,7 +151,7 @@ void at_spss_send_data(uint8_t conidx, uint8_t *data, uint8_t len)
             ntf_att.att_idx = 2;
             ntf_att.conidx = conidx;
             ntf_att.svc_id = spss_svc_id;
-            ntf_att.data_len = MIN(len,gatt_get_mtu(conidx) - 7);
+            ntf_att.data_len = MIN(len,gatt_get_mtu(conidx) - 3);
             ntf_att.p_data = data;
             gatt_notification(ntf_att);
         }
