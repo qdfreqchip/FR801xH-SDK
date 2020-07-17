@@ -13,6 +13,9 @@
 #include "driver_system.h"
 #include "driver_uart.h"
 #include "driver_pmu.h"
+#include "driver_flash.h"
+#include "flash_usage_config.h"
+
 #include "gap_api.h"
 #include "ota_service.h"
 
@@ -36,6 +39,7 @@ void user_custom_parameters(void)
     memcpy(__jump_table.addr.addr,"\x1F\x99\x07\x09\x17\x20",MAC_ADDR_LEN);
     __jump_table.system_clk = SYSTEM_SYS_CLK_12M;
     __jump_table.system_option &= (~SYSTEM_OPTION_CODED_PHY_500);   //125K for PHY CODED
+    jump_table_set_static_keys_store_offset(JUMP_TABLE_STATIC_KEY_OFFSET);
 }
 void user_init_static_memory(void)
 {
@@ -195,6 +199,9 @@ void proj_ble_gap_evt_func(gap_event_t *event)
 void user_entry_before_ble_init(void)
 {
     pmu_set_sys_power_mode(PMU_SYS_POW_BUCK);
+#ifdef FLASH_PROTECT
+    flash_protect_enable(1);
+#endif    
     pmu_enable_irq(PMU_ISR_BIT_ACOK
                    | PMU_ISR_BIT_ACOFF
                    | PMU_ISR_BIT_ONKEY_PO
@@ -214,7 +221,7 @@ void user_entry_after_ble_init(void)
     co_printf("user_entry, kkk_OTA5\r\n");
 
     gap_set_dev_name("FR8010H", strlen("FR8010H"));
-    gap_bond_manager_init(0x7D000, 0x7E000, 8, true);
+    gap_bond_manager_init(BLE_BONDING_INFO_SAVE_ADDR, BLE_REMOTE_SERVICE_SAVE_ADDR, 8, true);
 
     co_printf("random value is 0x%08x.\r\n", rand());
 

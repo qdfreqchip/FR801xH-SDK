@@ -16,6 +16,8 @@
 #include "gatt_api.h"
 #include "gatt_sig_uuid.h"
 #include "sys_utils.h"
+#include "flash_usage_config.h"
+
 /*
  * MACROS (∫Í∂®“Â)
  */
@@ -293,8 +295,8 @@ void simple_central_init(void)
     gap_set_cb_func(app_gap_evt_cb);
     
     // Initialize security related settings.
-    gap_bond_manager_init(0x7D000, 0x7E000, 8, true);
-    gap_bond_manager_delete_all();    
+    gap_bond_manager_init(BLE_BONDING_INFO_SAVE_ADDR, BLE_REMOTE_SERVICE_SAVE_ADDR, 8, true);
+  //  gap_bond_manager_delete_all();    
 
     gap_security_param_t param =
     {

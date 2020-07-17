@@ -382,12 +382,8 @@ void pmu_sub_init(void)
     {
     }
 
-    #ifndef CFG_FT_CODE
     /* remove internal osc cap */
     ool_write(PMU_REG_OSC_CAP_CTRL, 0x00);
-    #else
-    ool_write(PMU_REG_OSC_CAP_CTRL, 0x18);
-    #endif
 
     /* remove the resistor load of BUCK */
     ool_write(PMU_REG_RL_CTRL, ool_read(PMU_REG_RL_CTRL) & (~(1<<6)));
@@ -412,9 +408,13 @@ void pmu_sub_init(void)
     /* set PKVDDH to min */
     ool_write(PMU_REG_OTD_PKVDDH_CTRL, ool_read(PMU_REG_OTD_PKVDDH_CTRL) & 0xcf);
 
+    #ifdef CFG_FT_CODE
+    ool_write(PMU_REG_PKVDD_CTRL2, (ool_read(PMU_REG_PKVDD_CTRL2) & 0xF0) | 0x09);
+    #else   // CFG_FT_CODE
     /* set PKVDD voltage to 0.85v */
     uint32_t data0, data1, data2;
     uint8_t dldo_v = 0;
+    
     efuse_read(&data0, &data1, &data2);
     for(uint8_t i=8; i<12; i++) {
         dldo_v <<= 1;
@@ -437,6 +437,7 @@ void pmu_sub_init(void)
         /* set DLDO voltage to min */
         ool_write(PMU_REG_DLDO_CTRL, 0x42);
     }
+    #endif  // CFG_FT_CODE
 
     /*
         1. set PMU interrupt wake up pmu ctrl first

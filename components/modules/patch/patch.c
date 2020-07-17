@@ -8,6 +8,7 @@
 #include "driver_uart.h"
 #include "driver_pmu.h"
 #include "driver_flash.h"
+#include "flash_usage_config.h"
 
 #define PATCH_MAP_BASE_ADDR             0x20002000
 
@@ -81,7 +82,7 @@ struct patch_element_t patch_elements[] =
         .patch_pc = 0x00012410, // replace em_ble_rxmaxbuf_set(cs_idx, LE_MAX_OCTETS) in lld_con_start
     },
     [7] = {
-        .patch_pc = 0x0001e500,
+        .patch_pc = 0x00000001, // 0x0001e500,
     },
     [6] = {
         .patch_pc = 0x0001e808,
@@ -283,7 +284,13 @@ __attribute__((section("ram_code"))) void flash_write(uint32_t offset, uint32_t 
 
     GLOBAL_INT_DISABLE();
     disable_cache();
+#ifdef FLASH_PROTECT
+    flash_protect_disable(0);
+#endif	
     flash_write_(offset, length, buffer);
+#ifdef FLASH_PROTECT
+    flash_protect_enable(0);
+#endif	
     enable_cache(true);
     GLOBAL_INT_RESTORE();
 }
@@ -294,7 +301,13 @@ __attribute__((section("ram_code"))) void flash_erase(uint32_t offset, uint32_t 
 
     GLOBAL_INT_DISABLE();
     disable_cache();
+#ifdef FLASH_PROTECT
+    flash_protect_disable(0);
+#endif	
     flash_erase_(offset, length);
+#ifdef FLASH_PROTECT
+    flash_protect_enable(0);
+#endif	
     enable_cache(true);
     GLOBAL_INT_RESTORE();
 }

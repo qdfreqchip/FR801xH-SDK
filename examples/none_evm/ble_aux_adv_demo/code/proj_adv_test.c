@@ -8,6 +8,7 @@
 #include "gap_api.h"
 #include "os_timer.h"
 #include "proj_adv_test.h"
+#include "flash_usage_config.h"
 
 
 #if TEST_ADV_MODE_PER_ADV_DIRECT
@@ -617,7 +618,7 @@ void start_adv(void)
     4 set adv filt policy is scan in white list and conn in white list
     This code normally should be placed in entry function: user_entry_after_ble_init()
     *********/
-    gap_bond_manager_init(0x32000,0x33000,1,true);
+    gap_bond_manager_init(BLE_BONDING_INFO_SAVE_ADDR,BLE_REMOTE_SERVICE_SAVE_ADDR,1,true);
     gap_bond_info_t info;
     gap_bond_manager_get_info(0,&info);
     if(info.bond_flag)

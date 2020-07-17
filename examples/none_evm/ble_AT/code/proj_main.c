@@ -13,6 +13,9 @@
 #include "driver_system.h"
 #include "driver_uart.h"
 #include "driver_pmu.h"
+#include "driver_flash.h"
+#include "flash_usage_config.h"
+
 #include "gap_api.h"
 #include "at_gap_event.h"
 #include "at_cmd_task.h"
@@ -118,7 +121,9 @@ __attribute__((section("ram_code"))) void user_entry_after_sleep_imp(void)
 void user_entry_before_ble_init(void)
 {
     pmu_set_sys_power_mode(PMU_SYS_POW_BUCK);
-
+#ifdef FLASH_PROTECT
+    flash_protect_enable(1);
+#endif
     pmu_enable_irq(PMU_ISR_BIT_ACOK
                    | PMU_ISR_BIT_ACOFF
                    | PMU_ISR_BIT_ONKEY_PO

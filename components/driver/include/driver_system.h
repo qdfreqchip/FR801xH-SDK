@@ -289,6 +289,23 @@ void system_sleep_disable(void);
 uint32_t system_get_curr_time(void);
 
 /*********************************************************************
+ * @fn      platform_reset_patch
+ *
+ * @brief   Re-boot FW.
+ *
+ * This function is used to re-boot the FW when error has been detected, it is the end of
+ * the current FW execution.
+ * After waiting transfers on UART to be finished, and storing the information that
+ * FW has re-booted by itself in a non-loaded area, the FW restart by branching at FW
+ * entry point.
+ *
+ * @param   error      Error detected by FW
+ *
+ * @return  None.
+ */
+void platform_reset_patch(uint32_t error);
+
+/*********************************************************************
  * @fn      system_power_off
  *
  * @brief   put the system into power off mode, GPIO or pmu interrupt can 
@@ -301,6 +318,7 @@ uint32_t system_get_curr_time(void);
  * @return  None.
  */
 void system_power_off(bool aldo_bypass);
+
 
 #endif // _DRIVER_IOMUX_H
 

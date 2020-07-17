@@ -25,6 +25,7 @@
 #include "driver_rtc.h"
 
 #include "ble_simple_central.h"
+#include "flash_usage_config.h"
 
 
 extern uint8_t master_link_conidx;
@@ -267,7 +268,7 @@ void user_entry_after_ble_init(void)
 
     user_task_init();
     
-    gap_bond_manager_init(0x32000,0x33000,8,true);
+    gap_bond_manager_init(BLE_BONDING_INFO_SAVE_ADDR,BLE_REMOTE_SERVICE_SAVE_ADDR,8,true);
     gap_bond_manager_delete_all();
     
     /* ²âÊÔGPIOµÄ»½ÐÑ¹¦ÄÜ */

@@ -26,6 +26,7 @@
 #include "sht3x.h"
 #include "decoder.h"
 #include "gyro_alg.h"
+#include "flash_usage_config.h"
 
 
 
@@ -346,7 +347,7 @@ void simple_peripheral_init(void)
 
 	gap_set_cb_func(app_gap_evt_cb);
 
-	gap_bond_manager_init(0x7D000, 0x7E000, 8, true);
+	gap_bond_manager_init(BLE_BONDING_INFO_SAVE_ADDR, BLE_REMOTE_SERVICE_SAVE_ADDR, 8, true);
 	gap_bond_manager_delete_all();
 
 	mac_addr_t addr;

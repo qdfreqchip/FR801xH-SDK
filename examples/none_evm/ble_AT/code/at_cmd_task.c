@@ -248,7 +248,7 @@ void at_scan_done(void *arg)
 
     for(uint8_t idx = 0; idx<ADV_REPORT_NUM; idx++)
     {
-        if(gAT_buff_env.adv_rpt[idx].evt_type ==0)
+        if(gAT_buff_env.adv_rpt[idx].evt_type ==0 || gAT_buff_env.adv_rpt[idx].evt_type ==2 || gAT_buff_env.adv_rpt[idx].evt_type ==8)
         {
             hex_arr_to_str(gAT_buff_env.adv_rpt[idx].adv_addr.addr,MAC_ADDR_LEN,addr_str);
             addr_str[MAC_ADDR_LEN * 2] = 0;
@@ -975,7 +975,7 @@ void at_recv_cmd_handler(struct recv_cmd_t *param)
                         for(uint8_t i=0; i< BLE_CONNECTION_MAX; i++)
                         {
                             if(gap_get_connect_status(i))
-                                at_con_param_update(i,50);
+                                at_con_param_update(i,15);
                         }
                         sprintf((char *)at_rsp,"+SLEEP:S\r\nOK");
                         at_send_rsp((char *)at_rsp);

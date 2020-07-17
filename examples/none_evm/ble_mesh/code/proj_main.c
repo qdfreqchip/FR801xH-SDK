@@ -30,6 +30,8 @@
 #include "driver_pmu.h"
 #include "driver_uart.h"
 #include "driver_gpio.h"
+#include "driver_flash.h"
+#include "flash_usage_config.h"
 
 #include "ali_mesh_ota.h"
 #include "ali_mesh_info.h"
@@ -106,7 +108,7 @@ void initial_static_memory(uint8_t act_num,
 
 void user_init_static_memory(void)
 {
-    initial_static_memory(6, 3, 2, 8, 251, 8, 251, 64, 0x1000);
+    initial_static_memory(7, 4, 2, 8, 251, 8, 251, 64, 0x1000);
 }
 
 
@@ -284,7 +286,9 @@ void user_entry_before_ble_init(void)
 {    
     /* set system power supply in BUCK mode */
     pmu_set_sys_power_mode(PMU_SYS_POW_BUCK);
-
+#ifdef FLASH_PROTECT
+    flash_protect_enable(1);
+#endif
     pmu_enable_irq(PMU_ISR_BIT_ACOK
                    | PMU_ISR_BIT_ACOFF
                    | PMU_ISR_BIT_ONKEY_PO
@@ -304,6 +308,7 @@ void user_entry_before_ble_init(void)
         system_set_port_mux(GPIO_PORT_A, GPIO_BIT_5, PORTA5_FUNC_UART0_TXD);
     }
 
+#if 0
     /* set CPU start delay afte wakeup */
     ool_write(PMU_REG_BUCK_ON_DLY, 0xc0);
     ool_write(PMU_REG_WKUP_PWO_DLY, 0xfc);
@@ -324,6 +329,7 @@ void user_entry_before_ble_init(void)
     /* lower RC frequency */
     ool_write(0x1c, 0x74);
     ool_write(0x1b, 0x00);
+#endif
 
     /*
     pmu_set_pin_dir(GPIO_PORT_D, (1<<GPIO_BIT_4) | (1<<GPIO_BIT_5), GPIO_DIR_OUT);

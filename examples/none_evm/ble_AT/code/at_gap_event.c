@@ -18,7 +18,7 @@
 
 #include "ble_hl_error.h"
 #include "driver_system.h"
-#define LINK_INTERVAL_MIN (6)
+#define LINK_INTERVAL_MIN (24)      //(6)
 
 //Current link interval to be updated
 static uint16_t current_con_interval = LINK_INTERVAL_MIN;
@@ -68,7 +68,7 @@ void at_con_param_update(uint8_t conidx,uint16_t latency)
 static void param_timer_func(void *arg)
 {
     if( gAT_buff_env.default_info.auto_sleep == true)
-        at_con_param_update((uint8_t)arg,50);
+        at_con_param_update((uint8_t)arg,15);
     else
         at_con_param_update((uint8_t)arg,0);
 }
@@ -90,7 +90,7 @@ static void at_cb_param_ind(gap_evt_link_param_update_t *ind)
     if(ind->con_interval > LINK_INTERVAL_MIN)
     {
         if( gAT_buff_env.default_info.auto_sleep == true)
-            at_con_param_update(ind->conidx,50);
+            at_con_param_update(ind->conidx,15);
         else
             at_con_param_update(ind->conidx,0);
     }

@@ -452,6 +452,8 @@ enum pmu_qdec_irq_type
 #define PMU_REG_SYSTEM_STATUS           0x9F //4f
 #define PMU_SYS_PO_MAGIC                0x5A
 #define PMU_SYS_WK_MAGIC                0xC3
+#define PMU_SYS_FT_REBOOT_MAGIC         0x55
+#define PMU_SYS_WK_FROM_WAKEUP_MAGIC    0xC6
 
 #define PMU_REG_PORTA_LAST              0xa0
 #define PMU_REG_PORTB_LAST              0xa1

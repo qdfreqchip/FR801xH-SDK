@@ -21,6 +21,7 @@
 
 #include "ota.h"
 #include "ota_service.h"
+#include "flash_usage_config.h"
 
 struct app_otas_status_t
 {
@@ -263,7 +264,15 @@ void app_otas_recv_data(uint8_t conidx,uint8_t *p_data,uint16_t len)
             if(rsp_hdr->rsp.page_erase.base_address == new_bin_base)
             {
                 for(uint16_t offset = 256; offset < 4096; offset += 256)
+                {
+#ifdef FLASH_PROTECT
+                    flash_protect_disable(0);
+#endif	
                     flash_page_erase(offset + new_bin_base);
+#ifdef FLASH_PROTECT
+                    flash_protect_enable(0);
+#endif
+                }
             }
             else
                 flash_erase(rsp_hdr->rsp.page_erase.base_address, 0x1000);
@@ -362,12 +371,19 @@ void app_otas_recv_data(uint8_t conidx,uint8_t *p_data,uint16_t len)
             if(first_pkt.buf != NULL)
             {
                 uint32_t new_bin_base = app_otas_get_storage_address();
+#ifdef FLASH_PROTECT
+                flash_protect_disable(0);
+#endif	
                 flash_page_erase(new_bin_base);
+#ifdef FLASH_PROTECT
+                flash_protect_enable(0);
+#endif	
                 app_otas_save_data(new_bin_base,first_pkt.buf,256);
             }
             uart_finish_transfers(UART1_BASE);
             ota_clr_buffed_pkt();
-            NVIC_SystemReset();
+            //NVIC_SystemReset();
+            platform_reset_patch(0);
             break;
         default:
             rsp_hdr->result = OTA_RSP_UNKNOWN_CMD;

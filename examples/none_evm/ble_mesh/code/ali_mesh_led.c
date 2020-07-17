@@ -16,6 +16,7 @@
 #include "co_printf.h"
 #include "os_timer.h"
 #include "os_mem.h"
+#include "sys_utils.h"
 
 #include "mesh_api.h"
 #include "mesh_model_msg.h"
@@ -27,9 +28,13 @@
 #include "driver_pmu.h"
 #include "button.h"
 
+#include "flash_usage_config.h"
+#include "demo_clock.h"
+#include "vendor_timer_ctrl.h"
 /*
  * MACROS 
  */
+#define ALI_MESH_TIMER
 
 /*
  * CONSTANTS 
@@ -263,7 +268,7 @@ void app_mesh_dev_reset_ctrl(void)
 void app_auto_update_led_state(uint8_t state)
 {
     struct mesh_gen_onoff_model_status_t status;
-    mesh_model_msg_ind_t  *ind;
+    //mesh_model_msg_ind_t  *ind;
     mesh_model_msg_ind_t * p_ind = (mesh_model_msg_ind_t *)os_malloc((sizeof(mesh_model_msg_ind_t)));
     uint16_t remote_src_id = 0;
     uint8_t appkey_id = 0;
@@ -473,6 +478,9 @@ static void app_mesh_recv_vendor_msg(mesh_model_msg_ind_t const *ind)
     //vendor_set->attr_parameter = (uint8_t *)&ind->msg[3];
 
     //vendor_set_msg_handler(ind);
+#ifdef ALI_MESH_TIMER
+    vendor_set_timer_case(ind);
+#endif    
     switch(vendor_set->attr_type)
     {
         case 0x121: // lightness
@@ -525,7 +533,7 @@ static void mesh_callback_func(mesh_event_t * event)
             co_printf("removed from network by provisoner.\r\n");
             mesh_info_clear();
 			app_mesh_user_data_clear();
-            platform_reset(0);
+            platform_reset_patch(0);
             break;
         case MESH_EVT_PROV_PARAM_REQ:
             tmp_data[0] = 0xa8;
@@ -715,7 +723,9 @@ void app_mesh_led_init(void)
     
     app_mesh_store_info_timer_init();
     os_timer_init(&app_mesh_50Hz_check_timer, app_mesh_50Hz_check_timer_handler, NULL);
-
+#ifdef ALI_MESH_TIMER
+    sys_timer_init();
+#endif
 #if ALI_MESH_VERSION == 1
     app_key_binding_count = 0;
     app_key_binding_id = 0;

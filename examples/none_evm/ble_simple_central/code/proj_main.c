@@ -12,6 +12,8 @@
 #include "driver_system.h"
 #include "driver_pmu.h"
 #include "driver_uart.h"
+#include "driver_flash.h"
+#include "flash_usage_config.h"
 
 #include "ble_simple_central.h"
 
@@ -41,6 +43,7 @@ void user_custom_parameters(void)
 {
 		memcpy(__jump_table.addr.addr,"\xBD\xAD\xD0\xF0\x80\x10",MAC_ADDR_LEN);
     __jump_table.system_clk = SYSTEM_SYS_CLK_12M;
+    jump_table_set_static_keys_store_offset(JUMP_TABLE_STATIC_KEY_OFFSET);
 }
 
 /*********************************************************************
@@ -106,6 +109,9 @@ void user_entry_before_ble_init(void)
 {    
     /* set system power supply in BUCK mode */
     pmu_set_sys_power_mode(PMU_SYS_POW_BUCK);
+#ifdef FLASH_PROTECT
+    flash_protect_enable(1);
+#endif    
     NVIC_EnableIRQ(PMU_IRQn);
     // Enable UART print.
     system_set_port_pull(GPIO_PA2, true);

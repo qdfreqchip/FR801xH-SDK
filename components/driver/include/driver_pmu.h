@@ -342,6 +342,20 @@ void pmu_set_lp_clk_src(enum pmu_lp_clk_src_t src);
 void pmu_port_wakeup_func_set(uint32_t gpios);
 
 /*********************************************************************
+ * @fn      pmu_port_wakeup_func_clear
+ *
+ * @brief   indicate which ports should be removed detection by PMU GPIO
+ *          monitor module.
+ *
+ * @param   gpios   - 32bit value, bit num corresponding to pin num.
+ *                    sample: 0x08080808 means PA3, PB3, PC3, PD3 will be
+ *                    checked.
+ *
+ * @return  None.
+ */
+void pmu_port_wakeup_func_clear(uint32_t gpios);
+
+/*********************************************************************
  * @fn      pmu_get_rc_clk
  *
  * @brief   get inner rc clk frequecy

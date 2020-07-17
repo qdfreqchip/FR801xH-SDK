@@ -20,6 +20,8 @@
 #include "gatt_api.h"
 #include "gatt_sig_uuid.h"
 #include "sys_utils.h"
+#include "flash_usage_config.h"
+
 /*
  * MACROS (ºê¶¨Òå)
  */
@@ -126,6 +128,7 @@ static void app_gap_evt_cb(gap_event_t *p_event)	//GAP callback function, p_evne
     {
         case GAP_EVT_SCAN_END:	//scan action is end
             co_printf("scan_end,status:0x%02x\r\n",p_event->param.scan_end_status);
+						gap_set_link_rssi_report(false);
             break;
  
         case GAP_EVT_ADV_REPORT:	//got adv report
@@ -218,6 +221,7 @@ static void simple_central_start_scan(void)
     scan_param.scan_intv = 32;  //scan event on-going time
     scan_param.scan_window = 20;	//scan windows open time
     scan_param.duration = 0;	//will not stop by self
+		gap_set_link_rssi_report(true);
     gap_start_scan(&scan_param);
 }
 
@@ -326,7 +330,7 @@ void simple_central_init(void)
     gap_set_cb_func(app_gap_evt_cb);
     
     // Initialize security related settings.
-    gap_bond_manager_init(0x7D000, 0x7E000, 8, true);
+    gap_bond_manager_init(BLE_BONDING_INFO_SAVE_ADDR, BLE_REMOTE_SERVICE_SAVE_ADDR, 8, true);
 
     gap_security_param_t param =
     {

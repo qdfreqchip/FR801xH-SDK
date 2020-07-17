@@ -23,6 +23,9 @@
 #include "driver_uart.h"
 #include "driver_rtc.h"
 #include "driver_codec.h"
+#include "driver_flash.h"
+#include "flash_usage_config.h"
+
 
 #include "ble_simple_peripheral.h"
 #include "simple_gatt_service.h"
@@ -151,6 +154,7 @@ void user_custom_parameters(void)
     __jump_table.addr.addr[4] = 0x80;
     __jump_table.addr.addr[5] = 0x10;
     __jump_table.system_clk = SYSTEM_SYS_CLK_48M;
+    jump_table_set_static_keys_store_offset(JUMP_TABLE_STATIC_KEY_OFFSET);
 }
 
 /*********************************************************************
@@ -227,7 +231,9 @@ void user_entry_before_ble_init(void)
 {    
     /* set system power supply in BUCK mode */
     pmu_set_sys_power_mode(PMU_SYS_POW_BUCK);
-
+#ifdef FLASH_PROTECT
+    flash_protect_enable(1);
+#endif
     pmu_enable_irq(PMU_ISR_BIT_ACOK
                    | PMU_ISR_BIT_ACOFF
                    | PMU_ISR_BIT_ONKEY_PO

@@ -74,7 +74,7 @@ void codec_init(uint8_t sample_rate)
     codec_write(0x1a, 0x00);
     codec_write(0x00, 0xf5);
     codec_write(0x25, 0x02);
-    codec_write(0x19, 0x1f);    //gain
+    codec_write(0x19, 0x2A);    //gain, 0x3F ==> noise is big;  0x1F ==> lower volume. result = stg2 * 4 + stg1 *10
     
     codec_write(0x09, 0x02);    //SLAVE_I2S
     codec_write(0x40, 0x81);    //CODEC_STEREO
@@ -105,7 +105,29 @@ void audio_speaker_codec_init(void)
     codec_write(0x40, 0x83);    //CODEC_STEREO
     codec_write(0x0b, 0x03);    //set freq to 16000
     codec_hw_set_freq(CODEC_SAMPLE_RATE_8000);
-
+}
+void speaker_codec_init(uint8_t sample_rate)
+{
+    codec_write(0x10, current_speaker_vol_value);
+    codec_write(0x11, current_speaker_vol_value);   //0x25
+    codec_write(0x12, 0xc4);
+    codec_write(0x13, 0x00);
+    codec_write(0x14, 0x00);
+    codec_write(0x15, 0x0f);
+    codec_write(0x16, 0x00);
+    codec_write(0x17, 0x07);
+    codec_write(0x18, 0x0c);
+    codec_write(0x19, 0xb7);
+    codec_write(0x1a, 0x00);
+    codec_write(0x1d, 0x45);
+    codec_write(0x00, 0x55);
+    codec_write(0x24, 0x00);
+    codec_write(0x25, 0x00);
+    codec_write(0x19, 0xb7);    //gain,
+    codec_write(0x09, 0x02);    //SLAVE_I2S
+    codec_write(0x40, 0x83);    //CODEC_STEREO
+    codec_write(0x0b, 0x03);    //set freq to 16000
+    codec_hw_set_freq(sample_rate);
 }
 
 void codec_adc_init(uint8_t sample_rate)

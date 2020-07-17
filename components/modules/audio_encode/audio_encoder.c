@@ -58,10 +58,13 @@ struct encoder_env_t
     uint16_t frame_size;
 };
 
+static enum encode_type encoder_type = ENCODE_TYPE_ADPCM;        // 0 = ADPCM; 1= SBC;
+
+
 struct CodecState adpcm_state;
 struct encoder_env_t encoder_env;
 static enum encoder_state_t encode_task_status = ENCODER_STATE_IDLE;
-void audio_encode_start(void)
+void audio_encode_start(encode_param_t param)
 {
     uint8_t *sbc_str_buffer;
     //co_printf("encode_start\r\n");
@@ -76,16 +79,27 @@ void audio_encode_start(void)
 
     sbc_init(encoder_env.sbc, (void *)sbc_str_buffer);
 
-    encoder_env.sbc->frequency = SBC_FREQ_16000;
+    encoder_env.sbc->frequency = param.freq;        //SBC_FREQ_48000, SBC_FREQ_16000
     encoder_env.sbc->blocks = SBC_BLK_16;
     encoder_env.sbc->subbands = SBC_SB_8;
     encoder_env.sbc->allocation = SBC_AM_LOUDNESS;
-    encoder_env.sbc->bitpool = 14;
-
+    encoder_env.sbc->bitpool = param.bitpool;      //1bitpool = 6~7 kbps, higher, high quality
+    /*
+        bitpool frame_len
+        14      36
+        21      50
+        25      58
+        29      66
+    */
     encoder_env.block_size = sbc_get_codesize(encoder_env.sbc);     //0x100 = 256
 
-    encoder_env.frame_size = encoder_env.block_size>>2;     //adpcm, fixed compressing rate == 4;
-    memset(&adpcm_state,0x0,sizeof(adpcm_state));
+    if(encoder_type == ENCODE_TYPE_ADPCM)
+    {
+        encoder_env.frame_size = encoder_env.block_size>>2;     //adpcm, fixed compressing rate == 4; frame_len = 64
+        memset(&adpcm_state,0x0,sizeof(adpcm_state));
+    }
+    else
+        encoder_env.frame_size = sbc_get_frame_length(encoder_env.sbc);     //0x3A = 58
 
     //co_printf("blk_sz:%d,frm_sz:%d\r\n",encoder_env.block_size,encoder_env.frame_size);
 
@@ -164,27 +178,25 @@ static int audio_encoder_next_frame_handler(struct pcm_data_t *pcm_data)
 
     if( (encode_task_status == ENCODER_STATE_BUSY) && (encoder_env.reserved_space >= encoder_env.frame_size) )
     {
-        encode( &adpcm_state
-                ,(short *)(pcm_data->data)
-                ,encoder_env.block_size>>1
-                ,&encoder_env.out_buffer[encoder_env.encode_write_pos]
-              );
+        if(encoder_type == ENCODE_TYPE_ADPCM)
+        {
+            encode( &adpcm_state
+                    ,(short *)(pcm_data->data)
+                    ,encoder_env.block_size>>1
+                    ,&encoder_env.out_buffer[encoder_env.encode_write_pos]
+                  );
+        }
+        else
+        {
+            int encoded_len, org_len;
+            org_len = sbc_encode(encoder_env.sbc,
+                                 pcm_data->data,
+                                 encoder_env.block_size,
+                                 &encoder_env.out_buffer[encoder_env.encode_write_pos],
+                                 encoder_env.frame_size,
+                                 &encoded_len);
+        }
         encoder_env.reserved_space -= encoder_env.frame_size;
-
-        /*
-            static uint16_t change_line = 0;
-            for(uint32_t i=0; i<frame_size; i++)
-            {
-                fputc(hex4bit_to_ascii_char( (frame_data[i]>>4)&0x0F ), 0);
-                fputc(hex4bit_to_ascii_char( (frame_data[i]>>0)&0x0F ), 0);
-            }
-            change_line += frame_size;
-            if(change_line >= frame_size*ENCODER_MAX_BUFFERING_BLOCK_COUNT)
-            {
-                change_line = 0;
-                fputc('\n', 0);
-            };
-            */
         encoder_frame_out_func(&encoder_env.out_buffer[encoder_env.encode_write_pos],encoder_env.frame_size);
         encoder_env.reserved_space += encoder_env.frame_size;
         encoder_env.encode_write_pos += encoder_env.frame_size;
@@ -192,8 +204,9 @@ static int audio_encoder_next_frame_handler(struct pcm_data_t *pcm_data)
         {
             encoder_env.encode_write_pos = 0;
         }
+
     }
-		return 0;
+    return 0;
 }
 uint16_t task_id_audio_encode = TASK_ID_NONE;
 int audio_encode_task(os_event_t *param)
@@ -206,8 +219,9 @@ int audio_encode_task(os_event_t *param)
     }
     return EVT_CONSUMED;
 }
-void audio_encoder_init(void)
+void audio_encoder_init(enum encode_type type)
 {
+    encoder_type = type;
     task_id_audio_encode = os_task_create(audio_encode_task);
     encode_task_status = ENCODER_STATE_IDLE;
 }

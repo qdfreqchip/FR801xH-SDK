@@ -17,6 +17,8 @@
 #include "ble_multi_role.h"
 
 #include "sys_utils.h"
+#include "flash_usage_config.h"
+
 /*
  * MACROS (∫Í∂®“Â)
  */
@@ -422,7 +424,7 @@ void multi_role_init(void)
     
     gap_set_cb_func(app_gap_evt_cb);
 
-    gap_bond_manager_init(0x7D000, 0x7E000, 8, true);
+    gap_bond_manager_init(BLE_BONDING_INFO_SAVE_ADDR, BLE_REMOTE_SERVICE_SAVE_ADDR, 8, true);
     gap_bond_manager_delete_all();
     
     // set local device name

@@ -313,6 +313,19 @@ typedef void(* mesh_callback_func_t)(mesh_event_t * event);
 void mesh_set_cb_func(mesh_callback_func_t mesh_evt_cb);
 
 /*********************************************************************
+ * @fn      mesh_set_scan_parameter
+ *
+ * @brief   Custom scan parameters, this function should be called before
+ *          calling mesh_init if necessery.
+ *
+ * @param   interval    - scan interval, unit: 625us, default: 32.
+ *          window      - scan window, unit: 625us, default: 32.
+ *
+ * @return  None.
+ */
+void mesh_set_scan_parameter(uint16_t interval, uint32_t window);
+
+/*********************************************************************
  * @fn      mesh_init
  *
  * @brief   Initialize mesh function in stack.

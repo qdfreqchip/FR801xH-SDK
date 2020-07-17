@@ -374,7 +374,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\components\ble\include;..\..\..\..\components\driver\include;..\..\..\..\components\modules\os\include;..\..\..\..\components\modules\sys\include;..\..\..\..\components\modules\platform\include;..\..\..\..\components\modules\common\include;..\..\..\..\components\modules\lowpow\include;..\..\..\..\components\modules\button;..\..\..\..\components\modules\sha256;..\..\..\..\components\modules\aes_cbc;..\..\..\..\components\ble\include\gap;..\..\..\..\components\ble\include\gatt;..\..\..\..\components\ble\include\mesh;..\..\..\..\components\ble\profiles\ble_ota;..\code</IncludePath>
+              <IncludePath>..\..\..\..\components\ble\include;..\..\..\..\components\driver\include;..\..\..\..\components\modules\os\include;..\..\..\..\components\modules\sys\include;..\..\..\..\components\modules\platform\include;..\..\..\..\components\modules\common\include;..\..\..\..\components\modules\lowpow\include;..\..\..\..\components\modules\button;..\..\..\..\components\modules\sha256;..\..\..\..\components\modules\aes_cbc;..\..\..\..\components\ble\include\gap;..\..\..\..\components\ble\include\gatt;..\..\..\..\components\ble\include\mesh;..\..\..\..\components\ble\profiles\ble_ota;..\code;..\code\mesh_timer</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -587,6 +587,21 @@
               <FileName>aes_cbc.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\components\modules\aes_cbc\aes_cbc.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>mesh_timer</GroupName>
+          <Files>
+            <File>
+              <FileName>demo_clock.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\code\mesh_timer\demo_clock.c</FilePath>
+            </File>
+            <File>
+              <FileName>vendor_timer_ctrl.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\code\mesh_timer\vendor_timer_ctrl.c</FilePath>
             </File>
           </Files>
         </Group>

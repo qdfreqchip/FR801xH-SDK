@@ -23,6 +23,7 @@
 
 #include "sha256.h"
 #include "aes_cbc.h"
+#include "flash_usage_config.h"
 /*
  * MACROS
  */
@@ -515,7 +516,8 @@ uint16_t ali_ota_svc_msg_handler(gatt_msg_t *p_msg)
             if(ali_ota_env.ali_ota_finish == true)
             {
                 co_delay_100us(10000);
-                NVIC_SystemReset();        
+                //NVIC_SystemReset();    
+                platform_reset_patch(0);
             }
             
             break;

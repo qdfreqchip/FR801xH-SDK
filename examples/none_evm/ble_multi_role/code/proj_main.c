@@ -22,6 +22,9 @@
 #include "driver_pmu.h"
 #include "driver_uart.h"
 #include "driver_rtc.h"
+#include "driver_flash.h"
+#include "driver_efuse.h"
+#include "flash_usage_config.h"
 
 #include "ble_multi_role.h"
 /*
@@ -60,13 +63,19 @@ __attribute__((section("ram_code"))) void pmu_gpio_isr_ram(void)
  */
 void user_custom_parameters(void)
 {
+    uint32_t data[3] = {0};
+
+    efuse_read(&data[0],&data[1],&data[2]);
     __jump_table.addr.addr[0] = 0xBD;
     __jump_table.addr.addr[1] = 0xAD;
     __jump_table.addr.addr[2] = 0xD0;
     __jump_table.addr.addr[3] = 0xF0;
-    __jump_table.addr.addr[4] = 0x80;
-    __jump_table.addr.addr[5] = 0x10;
+    __jump_table.addr.addr[4] = 0x17;
+    __jump_table.addr.addr[5] = 0xc0; // random addr->static addr type:the top two bit must be 1.
+    if(data[0])
+        memcpy(__jump_table.addr.addr,(uint8_t *)&data[0],4);
     __jump_table.system_clk = SYSTEM_SYS_CLK_48M;
+    jump_table_set_static_keys_store_offset(JUMP_TABLE_STATIC_KEY_OFFSET);
 }
 
 /*********************************************************************
@@ -143,7 +152,9 @@ void user_entry_before_ble_init(void)
 {    
     /* set system power supply in BUCK mode */
     pmu_set_sys_power_mode(PMU_SYS_POW_BUCK);
-
+#ifdef FLASH_PROTECT
+    flash_protect_enable(1);
+#endif
     pmu_enable_irq(PMU_ISR_BIT_ACOK
                    | PMU_ISR_BIT_ACOFF
                    | PMU_ISR_BIT_ONKEY_PO

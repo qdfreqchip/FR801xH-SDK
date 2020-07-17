@@ -25,6 +25,10 @@
 #include "driver_pmu.h"
 #include "driver_uart.h"
 #include "driver_rtc.h"
+#include "driver_efuse.h"
+#include "driver_flash.h"
+#include "flash_usage_config.h"
+
 /*
  * LOCAL VARIABLES
  */
@@ -201,13 +205,19 @@ void proj_ble_gap_evt_func(gap_event_t *event)
  */
 void user_custom_parameters(void)
 {
-    __jump_table.addr.addr[0] = 0x01;
-    __jump_table.addr.addr[1] = 0x01;
-    __jump_table.addr.addr[2] = 0x01;
-    __jump_table.addr.addr[3] = 0x01;
-    __jump_table.addr.addr[4] = 0x01;
-    __jump_table.addr.addr[5] = 0xc1;
+    uint32_t data[3] = {0};
+
+    efuse_read(&data[0],&data[1],&data[2]);
+    __jump_table.addr.addr[0] = 0xBD;
+    __jump_table.addr.addr[1] = 0xAD;
+    __jump_table.addr.addr[2] = 0xD0;
+    __jump_table.addr.addr[3] = 0xF0;
+    __jump_table.addr.addr[4] = 0x17;
+    __jump_table.addr.addr[5] = 0xc0; // random addr->static addr type:the top two bit must be 1.
+    if(data[0])
+        memcpy(__jump_table.addr.addr,(uint8_t *)&data[0],4);
     __jump_table.system_clk = SYSTEM_SYS_CLK_48M;
+    jump_table_set_static_keys_store_offset(JUMP_TABLE_STATIC_KEY_OFFSET);
     
     /* enable FreeRTOS */
     __jump_table.system_option |= SYSTEM_OPTION_ENABLE_RTOS | SYSTEM_OPTION_RTOS_HEAP_SEL;
@@ -252,7 +262,9 @@ void user_entry_before_ble_init(void)
 {    
     /* set system power supply in BUCK mode */
     pmu_set_sys_power_mode(PMU_SYS_POW_BUCK);
-    
+#ifdef FLASH_PROTECT
+    flash_protect_enable(1);
+#endif    
     //pmu_set_lp_clk_src(PMU_LP_CLK_SRC_EX_32768);
     rtc_init();
 
@@ -306,7 +318,7 @@ void user_entry_after_ble_init(void)
     
     gap_set_dev_name("FR8010H", strlen("FR8010H"));
     
-    gap_bond_manager_init(0x7D000, 0x7E000, 8, true);
+    gap_bond_manager_init(BLE_BONDING_INFO_SAVE_ADDR, BLE_REMOTE_SERVICE_SAVE_ADDR, 8, true);
     gap_bond_manager_delete_all();
     
     /* ²âÊÔGPIOµÄ»½ÐÑ¹¦ÄÜ */
