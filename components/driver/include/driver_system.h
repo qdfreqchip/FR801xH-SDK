@@ -169,6 +169,28 @@ struct system_regs_t
     struct system_keyscan_ctrl_t key_scan_ctrl;
 };
 
+enum rf_tx_power_t {
+    RF_TX_POWER_NEG_16dBm,
+    RF_TX_POWER_NEG_10dBm,
+    RF_TX_POWER_NEG_7dBm,
+    RF_TX_POWER_NEG_5dBm,
+    RF_TX_POWER_NEG_3dBm,
+    RF_TX_POWER_NEG_2dBm,
+    RF_TX_POWER_NEG_1dBm,
+    RF_TX_POWER_0dBm,
+    RF_TX_POWER_POS_1dBm,
+    RF_TX_POWER_POS_2dBm,
+    RF_TX_POWER_POS_3dBm,
+    RF_TX_POWER_POS_4dBm,
+    RF_TX_POWER_POS_5dBm,
+    RF_TX_POWER_POS_6dBm,
+    RF_TX_POWER_POS_7dBm,
+    RF_TX_POWER_POS_8dBm,
+    RF_TX_POWER_POS_9dBm,
+    RF_TX_POWER_POS_10dBm,
+    RF_TX_POWER_MAX,
+};
+
 /*
  * GLOBAL VARIABLES 
  */
@@ -319,6 +341,16 @@ void platform_reset_patch(uint32_t error);
  */
 void system_power_off(bool aldo_bypass);
 
+/*********************************************************************
+ * @fn      system_set_tx_power
+ *
+ * @brief   set RF tx power, increase power means more power consumption
+ *
+ * @param   tx_power    - tx power configuration, @ref rf_tx_power_t.
+ *
+ * @return  None.
+ */
+void system_set_tx_power(enum rf_tx_power_t tx_power);
 
 #endif // _DRIVER_IOMUX_H
 

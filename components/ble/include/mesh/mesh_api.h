@@ -52,6 +52,7 @@ enum mesh_event_type_t
     MESH_EVT_RECV_MSG,                  //!< Received a mesh message. 10
     MESH_EVT_COMPO_DATA_REQ,            //!< Received composition data request from provisioner.
     MESH_EVT_ADV_REPORT,                //!< User interface for deal ADV packets received from adv bearer.
+    MESH_EVT_MODEL_ADDR_PUBLISHED,      //!< Register publish address for a specified model, used in ali mesh provisioning procedure
 };
 
 // Mesh network information update type
@@ -396,6 +397,32 @@ void mesh_model_bind_appkey(uint32_t model_id, uint8_t element, uint8_t app_key_
  * @return  None.
  */
 void mesh_model_sub_group_addr(uint32_t model_id, uint8_t element, uint16_t group_addr);
+
+/*********************************************************************
+ * @fn      mesh_model_add_publish_addr
+ *
+ * @brief   add publish address for specified model
+ *
+ * @param   model_id    - the operated model id
+ *          element     - which element this model belongs to
+ *          pub_addr    - which address does this model publish to
+ *          appkey_lid  - which key is used by this model in publish operation
+ *          ttl         - ttl configuration in publish message
+ *          period      - period configuration in publish operation
+ *          retx_params - retx_params configuration in publish operation
+ *          friend_cred - friend_cred configuration in publish operation
+ *          label_uuid  - valid only when pub_addr is virtual address type
+ *
+ * @return  None.
+ */
+void mesh_model_add_publish_addr(uint32_t model_id, uint8_t element, 
+                                            uint16_t pub_addr,
+                                            uint8_t appkey_lid,
+                                            uint8_t ttl,
+                                            uint8_t period,
+                                            uint8_t retx_params,
+                                            uint8_t friend_cred,
+                                            uint8_t *label_uuid);
 
 /*********************************************************************
  * @fn      mesh_add_model
