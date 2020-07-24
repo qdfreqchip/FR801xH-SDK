@@ -44,34 +44,25 @@ static struct vendor_set_timer_s timer_buff[VENDOR_TIMER_MAX];
 /*
  * PUBLIC FUNCTIONS (È«¾Öº¯Êý)
  */
+extern void app_mesh_start_publish_msg_resend(uint8_t * p_msg,uint8_t p_len);
+
 void vendor_indication_rsp(uint8_t opcode,uint16_t attr_type,uint8_t * attr_param,uint8_t len)
 {
-    mesh_rsp_msg_t * p_rsp_msg = (mesh_rsp_msg_t *)os_malloc((sizeof(mesh_rsp_msg_t)+len));
     struct app_mesh_led_vendor_model_indication_t *indication;
-    //uint16_t option = 0;
-    uint16_t remote_src_id = 0;
-    uint8_t appkey_id = 0;
+    mesh_publish_msg_t *msg = (mesh_publish_msg_t *)os_malloc(sizeof(mesh_publish_msg_t) + len);
+    msg->element_idx = 0;
+    msg->model_id = MESH_MODEL_ID_VENDOR_ALI;
+    msg->opcode = MESH_VENDOR_INDICATION;
 
-    app_led_get_remote_msg(&remote_src_id,&appkey_id);
-
-    p_rsp_msg->element_idx = 0;
-    p_rsp_msg->app_key_lid = appkey_id;
-    p_rsp_msg->model_id = MESH_MODEL_ID_VENDOR_ALI;
-    if(opcode) // status
-        p_rsp_msg->opcode = MESH_VENDOR_STATUS;
-    else
-        p_rsp_msg->opcode = MESH_VENDOR_INDICATION;
-    p_rsp_msg->dst_addr = remote_src_id;
-
-    p_rsp_msg->msg_len = sizeof(struct app_mesh_led_vendor_model_status_t)+len;
-    indication = (struct app_mesh_led_vendor_model_indication_t *)p_rsp_msg->msg;
+    msg->msg_len = sizeof(struct app_mesh_led_vendor_model_status_t)+len;
+    indication = (struct app_mesh_led_vendor_model_indication_t *)msg->msg;
     indication->tid = vendor_tid;
     indication->attr_type = attr_type;
     memcpy(indication->attr_parameter,attr_param,len);
 
-    mesh_send_rsp(p_rsp_msg);
-    
-    os_free(p_rsp_msg);
+    mesh_publish_msg(msg);
+    app_mesh_start_publish_msg_resend(msg->msg,msg->msg_len);
+    os_free(msg);
     vendor_tid ++;
 }
 

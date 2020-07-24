@@ -146,6 +146,12 @@ static void app_at_recv_cmd_A(uint8_t sub_cmd, uint8_t *data)
                 co_printf("\r\n");
             }
             break;
+        case 'V':
+            app_auto_update_led_state(1);
+            break;
+        case 'W':
+            app_auto_update_led_state(0);
+            break;
     }
 }
 

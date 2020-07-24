@@ -463,7 +463,7 @@
 0x00004755 T flash_enter_deep_sleep
 ;0x00004775 T flash_erase
 0x000047e9 T flash_exit_deep_sleep
-0x00004809 T flash_read
+;0x00004809 T flash_read
 0x00004871 T flash_read_status
 ;0x00004899 T flash_write
 0x00004951 T flash_write_status

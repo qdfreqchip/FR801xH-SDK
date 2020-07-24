@@ -280,6 +280,7 @@ __attribute__((section("ram_code"))) __attribute__((weak)) void user_entry_after
 
 __attribute__((section("ram_code"))) void flash_write(uint32_t offset, uint32_t length, uint8_t * buffer)
 {
+    uint32_t last_space;
     void (*flash_write_)(uint32_t offset, uint32_t length, uint8_t * buffer) = (void (*)(uint32_t, uint32_t, uint8_t *))0x00004899;
 
     GLOBAL_INT_DISABLE();
@@ -287,7 +288,36 @@ __attribute__((section("ram_code"))) void flash_write(uint32_t offset, uint32_t 
 #ifdef FLASH_PROTECT
     flash_protect_disable(0);
 #endif	
-    flash_write_(offset, length, buffer);
+    while(length) {
+        if(offset < 1*1024*1024) {
+            last_space = 1*1024*1024-offset;
+            if(last_space >= length) {
+                last_space = length;
+            }
+            
+            flash_write_(offset, last_space, buffer);
+            offset += last_space;
+            buffer += last_space;
+            length -= last_space;
+        }
+        else {
+            uint32_t base_addr = offset & (~(1*1024*1024-1));
+            uint32_t internal_offset = offset & (1*1024*1024-1);
+
+            *(volatile uint32_t *)0x500b0024 = 0x01000000+base_addr;
+            last_space = 1*1024*1024-internal_offset;
+            if(last_space >= length) {
+                last_space = length;
+            }
+
+            flash_write_(internal_offset, last_space, buffer);
+            offset += last_space;
+            buffer += last_space;
+            length -= last_space;
+            
+            *(volatile uint32_t *)0x500b0024 = 0x01000000;
+        }
+    }
 #ifdef FLASH_PROTECT
     flash_protect_enable(0);
 #endif	
@@ -310,5 +340,46 @@ __attribute__((section("ram_code"))) void flash_erase(uint32_t offset, uint32_t 
 #endif	
     enable_cache(true);
     GLOBAL_INT_RESTORE();
+}
+
+__attribute__((section("ram_code"))) void flash_read(uint32_t offset, uint32_t length, uint8_t *buffer)
+{
+    uint32_t last_space;
+    void (*flash_read_)(uint32_t offset, uint32_t length, uint8_t *buffer) = (void (*)(uint32_t, uint32_t, uint8_t *))0x00004809;
+    
+    while(length) {
+        if(offset < 1*1024*1024) {
+            last_space = 1*1024*1024-offset;
+            if(last_space >= length) {
+                last_space = length;
+            }
+            
+            flash_read_(offset, last_space, buffer);
+            offset += last_space;
+            buffer += last_space;
+            length -= last_space;
+        }
+        else {
+            uint32_t base_addr = offset & (~(1*1024*1024-1));
+            uint32_t internal_offset = offset & (1*1024*1024-1);
+
+            GLOBAL_INT_DISABLE();
+            disable_cache();
+            *(volatile uint32_t *)0x500b0024 = 0x01000000+base_addr;
+            last_space = 1*1024*1024-internal_offset;
+            if(last_space >= length) {
+                last_space = length;
+            }
+
+            flash_read_(internal_offset, last_space, buffer);
+            offset += last_space;
+            buffer += last_space;
+            length -= last_space;
+            
+            *(volatile uint32_t *)0x500b0024 = 0x01000000;
+            enable_cache(true);
+            GLOBAL_INT_RESTORE();
+        }
+    }
 }
 

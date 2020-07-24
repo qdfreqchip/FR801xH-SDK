@@ -53,11 +53,6 @@ static int user_task_func(os_event_t *param)
                     led_state = 1-led_state;
                     app_auto_update_led_state(led_state);
                 }
-                else if(button_msg->button_type == BUTTON_MULTI_PRESSED )
-                {
-                    if(button_msg->button_cnt == 2)
-                        app_mesh_dev_reset_ctrl();
-                }
 #endif                
             }
             break;

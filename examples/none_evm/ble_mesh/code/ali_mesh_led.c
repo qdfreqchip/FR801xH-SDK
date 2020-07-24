@@ -34,7 +34,7 @@
 /*
  * MACROS 
  */
-#define ALI_MESH_TIMER
+//#define ALI_MESH_TIMER
 
 /*
  * CONSTANTS 
@@ -78,7 +78,9 @@ static void app_mesh_recv_lightness_msg(mesh_model_msg_ind_t const *ind);
 static void app_mesh_recv_hsl_msg(mesh_model_msg_ind_t const *ind);
 static void app_mesh_recv_CTL_msg(mesh_model_msg_ind_t const *ind);
 static void app_mesh_recv_vendor_msg(mesh_model_msg_ind_t const *ind);
+static void app_mesh_stop_publish_msg_resend(void);
 
+void app_mesh_start_publish_msg_resend(uint8_t * p_msg,uint8_t p_len);
 void app_mesh_50Hz_check_timer_handler(void * arg);
 void app_mesh_50Hz_check_enable(void);
 
@@ -116,6 +118,8 @@ static mesh_model_t light_models[] =
 };
 
 static os_timer_t app_mesh_50Hz_check_timer;
+static os_timer_t publish_msg_resend_t;
+static uint8_t publish_msg_buff[32] = {0},publish_msg_len = 0,resend_count = 0;
 
 #if ALI_MESH_VERSION == 1
 /* binding index, from 0 to total_model_num-1 */
@@ -125,9 +129,15 @@ static uint16_t app_key_binding_id = 0;
 /* subscription index, from 0 to total_model_num-1 */
 static uint8_t subscription_count = 0;
 //static uint8_t subscription_element = 0;
+static uint8_t publish_count = 0;
 struct ali_mesh_sub_map_t {
     uint16_t element_idx;
     uint16_t group_addr;
+};
+struct ali_mesh_pub_map_t {
+    uint16_t element_idx;
+    uint32_t model_id;
+    uint16_t pub_addr;
 };
 static const struct ali_mesh_sub_map_t ali_mesh_sub_map[] =
 {
@@ -146,6 +156,29 @@ static const struct ali_mesh_sub_map_t ali_mesh_sub_map[] =
     [3] = {
         .element_idx = 0,
         .group_addr = MESH_ALI_GROUP_ADDR_LED,
+    },
+};
+
+static const struct ali_mesh_pub_map_t ali_mesh_pub_map[] = {
+    [0] = {
+        .element_idx = 0,
+        .model_id = MESH_MODEL_ID_ONOFF,
+        .pub_addr = MESH_ALI_PUBLISH_ADDR,
+    },
+    [1] = {
+        .element_idx = 0,
+        .model_id = MESH_MODEL_ID_LIGHTNESS,
+        .pub_addr = MESH_ALI_PUBLISH_ADDR,
+    },
+    [2] = {
+        .element_idx = 0,
+        .model_id = MESH_MODEL_ID_HSL,
+        .pub_addr = MESH_ALI_PUBLISH_ADDR,
+    },
+    [3] = {
+        .element_idx = 0,
+        .model_id = MESH_MODEL_ID_VENDOR_ALI,
+        .pub_addr = MESH_ALI_PUBLISH_ADDR,
     },
 };
 #endif  // ALI_MESH_VERSION == 1
@@ -213,47 +246,22 @@ static void app_mesh_status_send_rsp(mesh_model_msg_ind_t const *ind, uint32_t o
  */
 static void app_mesh_send_dev_rst_ind(void)
 {
-    mesh_rsp_msg_t * p_rsp_msg = (mesh_rsp_msg_t *)os_malloc((sizeof(mesh_rsp_msg_t)+4));
     uint16_t option = 0;
-    uint16_t remote_src_id = 0;
-    uint8_t appkey_id = 0;
 
-    app_led_get_remote_msg(&remote_src_id,&appkey_id);
-
-    p_rsp_msg->element_idx = light_models[3].element_idx;
-    p_rsp_msg->app_key_lid = appkey_id;
-    p_rsp_msg->model_id = light_models[3].model_id;
-    p_rsp_msg->opcode = MESH_VENDOR_INDICATION;
-    p_rsp_msg->dst_addr = remote_src_id;
+    mesh_publish_msg_t *msg = (mesh_publish_msg_t *)os_malloc(sizeof(mesh_publish_msg_t) + 4);
+    msg->element_idx = 0;
+    msg->model_id = MESH_MODEL_ID_VENDOR_ALI;
+    msg->opcode = MESH_VENDOR_INDICATION;
     
-    p_rsp_msg->msg_len = 4;
-    p_rsp_msg->msg[0] = 0x01;
+    msg->msg_len = 4;
+    msg->msg[0] = 0x01;
     option = MESH_EVENT_UPDATA_ID;
-    memcpy(&(p_rsp_msg->msg[1]), (uint8_t *)&option, 2);
-    p_rsp_msg->msg[3] = MESH_EVENT_DEV_RST;
+    memcpy(&(msg->msg[1]), (uint8_t *)&option, 2);
+    msg->msg[3] = MESH_EVENT_DEV_RST;
 
-    mesh_send_rsp(p_rsp_msg);
-    
-    os_free(p_rsp_msg);
-}
-
-/*********************************************************************
- * @fn      app_mesh_dev_reset_ctrl
- *
- * @brief   User delete the network opration.
- *
- * @param   None
- *
- * @return  None.
- */
-void app_mesh_dev_reset_ctrl(void)
-{
-    app_mesh_send_dev_rst_ind();
-
-    co_delay_100us(5000);
-    mesh_info_clear();
-    app_mesh_user_data_clear();
-    //platform_reset(0);   
+    mesh_publish_msg(msg);
+    app_mesh_start_publish_msg_resend(msg->msg,msg->msg_len);
+    os_free(msg);
 }
 
 /*********************************************************************
@@ -267,25 +275,122 @@ void app_mesh_dev_reset_ctrl(void)
  */
 void app_auto_update_led_state(uint8_t state)
 {
-    struct mesh_gen_onoff_model_status_t status;
-    //mesh_model_msg_ind_t  *ind;
-    mesh_model_msg_ind_t * p_ind = (mesh_model_msg_ind_t *)os_malloc((sizeof(mesh_model_msg_ind_t)));
-    uint16_t remote_src_id = 0;
-    uint8_t appkey_id = 0;
+    uint8_t on_off_state[] = {0x00, 0x00, 0x01, 0x00};
+    static uint8_t on_off_tid = 0;
+    mesh_publish_msg_t *msg = (mesh_publish_msg_t *)os_malloc(sizeof(mesh_publish_msg_t) + sizeof(on_off_state));
+    msg->element_idx = 0;
+    msg->model_id = MESH_MODEL_ID_VENDOR_ALI;
+    msg->opcode = MESH_VENDOR_INDICATION;
 
-    app_led_get_remote_msg(&remote_src_id,&appkey_id);
+    on_off_state[0] = on_off_tid++;
+    on_off_state[3] = state;
     
-    p_ind->app_key_lid = appkey_id;
-    p_ind->element = light_models[0].element_idx;
-    p_ind->model_id= light_models[0].model_id;
-    p_ind->src = remote_src_id;
+    memcpy(msg->msg, on_off_state, sizeof(on_off_state));
+    msg->msg_len = sizeof(on_off_state);
+    
+    mesh_publish_msg(msg);
+    app_mesh_start_publish_msg_resend(msg->msg,msg->msg_len);
+    os_free((void *)msg);
+}
 
-    status.present_onoff = state;
-    status.target_onoff = state;
-    status.remain = 0;
-    app_mesh_status_send_rsp((mesh_model_msg_ind_t const *)p_ind,MESH_GEN_ONOFF_STATUS,(uint8_t *)&status,sizeof(status));
+/*********************************************************************
+ * @fn      app_mesh_publish_msg_resend
+ *
+ * @brief   Resend publish msg if TiMao not reply.
+ *
+ * @param   arg     - param of timer callback.
+ *
+ * @return  None.
+ */
+static void app_mesh_publish_msg_resend(void * arg)
+{
+    if(!publish_msg_len)
+        return;
+        
+    mesh_publish_msg_t *msg = (mesh_publish_msg_t *)os_malloc(sizeof(mesh_publish_msg_t) + publish_msg_len);
+    msg->element_idx = 0;
+    msg->model_id = MESH_MODEL_ID_VENDOR_ALI;
+    msg->opcode = MESH_VENDOR_INDICATION;
 
-    os_free(p_ind);
+    memcpy(msg->msg, publish_msg_buff, publish_msg_len);
+    msg->msg_len = publish_msg_len;
+    
+    mesh_publish_msg(msg);
+    os_free((void *)msg);
+
+    //co_printf("=publish_msg_resend=\r\n");
+    resend_count++;
+    if(resend_count > 3)
+        app_mesh_stop_publish_msg_resend();
+}
+
+/*********************************************************************
+ * @fn      app_mesh_start_publish_msg_resend
+ *
+ * @brief   Start loop timer to resend publish msg.
+ *
+ * @param   p_msg     - publish msg buff.
+ *
+ * @param   p_len     - publish msg length.
+ *
+ * @return  None.
+ */
+void app_mesh_start_publish_msg_resend(uint8_t * p_msg,uint8_t p_len)
+{
+    if(p_len < 32)
+    {
+        resend_count = 0;
+        memcpy(publish_msg_buff,p_msg,p_len);
+        publish_msg_len = p_len;
+    
+        os_timer_start(&publish_msg_resend_t,2000,true);
+    }
+}
+
+/*********************************************************************
+ * @fn      app_mesh_stop_publish_msg_resend
+ *
+ * @brief   Stop the timer that resend publish msg.
+ *
+ * @param   None
+ *
+ * @return  None.
+ */
+static void app_mesh_stop_publish_msg_resend(void)
+{
+    //co_printf("=stop_publish_msg_resend=\r\n");
+    os_timer_stop(&publish_msg_resend_t);
+    memset(publish_msg_buff,0,32);
+    publish_msg_len = 0;
+    resend_count = 0;
+}
+
+/*********************************************************************
+ * @fn      app_heartbeat_send
+ *
+ * @brief   A example for sending heartbeat packets.
+ *
+ * @param   None
+ *
+ * @return  None.
+ */
+void app_heartbeat_send(void)
+{
+    uint8_t heartbeat_data[] = {0x00,0x00,0x01,0x00,0x0E,0x01,0x10,0x27,0x0F,0x01,0x35,0x00,0x64,0x01,0x03,0x00,0x14,   \
+                                    0x04,0x00,0x06,0x05,0x00,0x0D,0x05,0x01,0x04,0xF0,0x27,0x00};
+    static uint8_t heartbeat_id = 0;
+    mesh_publish_msg_t *msg = (mesh_publish_msg_t *)os_malloc(sizeof(mesh_publish_msg_t) + sizeof(heartbeat_data));
+    msg->element_idx = 0;
+    msg->model_id = MESH_MODEL_ID_VENDOR_ALI;
+    msg->opcode = MESH_VENDOR_STATUS;
+    heartbeat_id++;
+    heartbeat_data[0] = heartbeat_id;
+    memcpy(msg->msg, heartbeat_data, sizeof(heartbeat_data));
+    msg->msg_len = sizeof(heartbeat_data);
+    
+    mesh_publish_msg(msg);
+    //app_mesh_start_publish_msg_resend(msg->msg,msg->msg_len);
+    os_free((void *)msg);
 }
 
 /*********************************************************************
@@ -499,6 +604,10 @@ static void app_mesh_recv_vendor_msg(mesh_model_msg_ind_t const *ind)
     {
         app_mesh_status_send_rsp(ind, MESH_VENDOR_STATUS, (uint8_t *)vendor_set, ind->msg_len);
     }
+    else if(ind->opcode == MESH_VENDOR_CONFIRMATION)
+    {
+        app_mesh_stop_publish_msg_resend();
+    }
 }
 
 /*********************************************************************
@@ -561,12 +670,12 @@ static void mesh_callback_func(mesh_event_t * event)
 #if ALI_MESH_VERSION == 1
             if(event->param.update_ind->upd_type == MESH_UPD_TYPE_APP_KEY_UPDATED) // message type is app key update
             {
-              mesh_appkey_t *appkey = (mesh_appkey_t *)event->param.update_ind->data;
-              app_key_binding_id = appkey->appkey_id;
-              mesh_model_bind_appkey(light_models[app_key_binding_count].model_id,
+                mesh_appkey_t *appkey = (mesh_appkey_t *)event->param.update_ind->data;
+                app_key_binding_id = appkey->appkey_id;
+                mesh_model_bind_appkey(light_models[app_key_binding_count].model_id,
                                       light_models[app_key_binding_count].element_idx,
                                       app_key_binding_id);
-              app_key_binding_count++;
+                app_key_binding_count++;
             }
 #else   // ALI_MESH_VERSION == 1
             #if 0
@@ -604,7 +713,7 @@ static void mesh_callback_func(mesh_event_t * event)
 			}
 			else
 			{
-				app_key_binding_id = 0;
+                app_key_binding_count = 0;
 				mesh_model_sub_group_addr(light_models[subscription_count].model_id,
                                             light_models[subscription_count].element_idx,
                                             app_mesh_find_group_addr(light_models[subscription_count].element_idx));
@@ -630,14 +739,49 @@ static void mesh_callback_func(mesh_event_t * event)
                 {
                     subscription_count++;
                 }
-			}
-			else
-            {         
-				subscription_count = 0;
-				uint16_t src_id = 0;
-				uint8_t appkey = 0;
-				mesh_get_remote_param(&src_id,&appkey);
-				app_led_set_remote_msg(src_id,appkey);
+            }
+            else
+            {
+                subscription_count = 0;
+                uint16_t src_id = 0;
+                uint8_t appkey = 0;
+                mesh_get_remote_param(&src_id,&appkey);
+                
+                mesh_model_add_publish_addr(ali_mesh_pub_map[publish_count].model_id,
+                                            ali_mesh_pub_map[publish_count].element_idx,
+                                            ali_mesh_pub_map[publish_count].pub_addr,
+                                            appkey,
+                                            7,
+                                            0,
+                                            0,
+                                            0,
+                                            NULL);
+                publish_count++;
+            }
+            break;
+        case MESH_EVT_MODEL_ADDR_PUBLISHED:
+            if(publish_count < sizeof(ali_mesh_pub_map)/sizeof(ali_mesh_pub_map[0])) {
+                uint16_t src_id = 0;
+                uint8_t appkey = 0;
+                mesh_get_remote_param(&src_id,&appkey);
+                
+                mesh_model_add_publish_addr(ali_mesh_pub_map[publish_count].model_id,
+                                            ali_mesh_pub_map[publish_count].element_idx,
+                                            ali_mesh_pub_map[publish_count].pub_addr,
+                                            appkey,
+                                            7,
+                                            0,
+                                            0,
+                                            0,
+                                            NULL);
+                publish_count++;
+            }
+            else {
+                publish_count = 0;
+                uint16_t src_id = 0;
+                uint8_t appkey = 0;
+                mesh_get_remote_param(&src_id,&appkey);
+                app_led_set_remote_msg(src_id,appkey);
             }
 			break;
 #endif  // ALI_MESH_VERSION == 1
@@ -723,6 +867,7 @@ void app_mesh_led_init(void)
     
     app_mesh_store_info_timer_init();
     os_timer_init(&app_mesh_50Hz_check_timer, app_mesh_50Hz_check_timer_handler, NULL);
+    os_timer_init(&publish_msg_resend_t,app_mesh_publish_msg_resend,NULL);
 #ifdef ALI_MESH_TIMER
     sys_timer_init();
 #endif
@@ -730,6 +875,7 @@ void app_mesh_led_init(void)
     app_key_binding_count = 0;
     app_key_binding_id = 0;
     subscription_count = 0;
+    publish_count = 0;
 #endif  // ALI_MESH_VERSION == 1
 }
 

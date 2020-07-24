@@ -26,6 +26,8 @@
 #define MESH_ALI_GROUP_ADDR_FUN             0xc007
 #define MESH_ALI_SECOND_GROUP_ADDR          0xcfff
 
+#define MESH_ALI_PUBLISH_ADDR               0xf000
+
 #define MESH_GEN_ONOFF_SET                  0x00000282
 #define MESH_GEN_ONOFF_SET_UNACK            0x00000382
 #define MESH_GEN_ONOFF_STATUS               0x00000482
