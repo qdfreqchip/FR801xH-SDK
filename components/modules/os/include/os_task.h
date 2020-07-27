@@ -82,5 +82,6 @@ void user_loop_callback(void)
 os_user_loop_event_set(&user_loop_callback); // create a loop event
  */
 
+void os_task_process_saved_msg(uint8_t task_id);
 
 #endif // APP_HT_H_

@@ -918,7 +918,16 @@ void gap_security_enc_req(uint8_t conidx);
  * @return  Bond status.
  */
 bool gap_security_get_bond_status(void);
-
+/*********************************************************************
+ * @fn      gap_security_get_bond_status
+ *
+ * @brief   Get if device get bond request in last connection.
+ *
+ * @param   None.
+ *
+ * @return  true - device get bond req. false - device didn't get bond req
+ */
+bool gap_security_get_bond_req(void);
 /*********************************************************************
  * @fn      gap_security_get_bond_status
  *
@@ -933,7 +942,7 @@ void gap_security_req(uint8_t conidx);
 /**********************************************************************
  * @fn      gap_get_latest_conn_parameter
  *
- * @brief   Get the latest connection parameters.
+ * @brief   Get connection parameters of peer device in last connection.
  *
  * @param   None
  *

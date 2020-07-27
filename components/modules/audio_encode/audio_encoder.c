@@ -90,6 +90,10 @@ void audio_encode_start(encode_param_t param)
         21      50
         25      58
         29      66
+		    32      72
+				34			76
+				35			78
+				36			80
     */
     encoder_env.block_size = sbc_get_codesize(encoder_env.sbc);     //0x100 = 256
 

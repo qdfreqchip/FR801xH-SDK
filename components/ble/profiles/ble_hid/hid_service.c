@@ -15,6 +15,7 @@
 #include "gatt_api.h"
 #include "gatt_sig_uuid.h"
 #include "sys_utils.h"
+#include "os_task.h"
 
 #include "hid_service.h"
 
@@ -78,6 +79,7 @@ static const uint8_t hid_report_map[] =
     0x09,0x01,               // Usage index(Consumer Control)
     0xa1,0x01,               // Collection (Application)
     0x85,0x02,               //  Report ID (2)
+#if 0    
     0x15,0x00,         //  Logical Minimum (0)
     0x25,0x01,         //  Logical Maximum (1)
     0x75,0x01,         //  Report Size (1)
@@ -85,7 +87,6 @@ static const uint8_t hid_report_map[] =
 
     0x09,0xcd,        // Usage index(Play/Pause)
     0x81,0x06,              //input(Data,Value,Relative,Bit,Filed)
-    //0x0a,0x83,0x01,   //  Usage (AL Consumer Control Configuration)
     0x0a, 0x21, 0x02,   //   Usage (OPEN_SEARCHA) 5
     0x81,0x06,              //input(Data,Value,Relative,Bit,Filed)
     0x09,0xb5,        //  Usage (Scan Next Track)
@@ -101,6 +102,16 @@ static const uint8_t hid_report_map[] =
     0x81,0x06,              //input(Data,Value,Relative,Bit,Filed)
     0x0a,0x24,0x02,   //Usage(AC Back)
     0x81,0x06,              //input(Data,Value,Relative,Bit,Filed)
+#else
+    0x75,0x10,         //  Report Size (16)
+    0x95,0x01,         //  Report Count (1)
+    0x15, 0x01,         /*   LOGICAL_MINIMUM */
+    0x26, 0xff, 0x03,   /*   LOGICAL_MAXIMUM */
+    0x19, 0x01,          /*   USAGE MINIMUM (Consumer control) */  
+    0x2a, 0xff, 0x03,   /*   USAGE MAXIMUM (Reserved) */      
+    0x81, 0x60,         /*   INPUT (No preferred state, null state) */
+#endif
+
     0xc0,                           // End Collection
 
 //rpt id == 3
@@ -161,6 +172,7 @@ static uint8_t hid_svc_id = 0;
 // HID report information table
 static hid_report_ref_t  hid_rpt_info[HID_NUM_REPORTS];
 static bool hid_link_ntf_enable[CFG_CON] = {0};
+static bool hid_link_enable[CFG_CON] = {0};
 /*
  * TYPEDEFS (类型定义)
  */
@@ -498,6 +510,9 @@ static uint16_t hid_gatt_msg_handler(gatt_msg_t *p_msg)
     switch(p_msg->msg_evt)
     {
         case GATTC_MSG_READ_REQ:
+            if(hid_link_enable[p_msg->conn_idx] == false)
+                return 0xffff;  //save this msg
+                
             if(p_msg->att_idx == HID_REPORT_MAP_IDX)
             {
                 co_printf("report_map request:%d\r\n",sizeof(hid_report_map));
@@ -525,6 +540,8 @@ static uint16_t hid_gatt_msg_handler(gatt_msg_t *p_msg)
             break;
 
         case GATTC_MSG_WRITE_REQ:
+            if(hid_link_enable[p_msg->conn_idx] == false)
+                return 0xffff;  //save this msg
 
             if(p_msg->att_idx == HID_BOOT_KEY_IN_CCCD_IDX)
             {
@@ -571,11 +588,17 @@ static uint16_t hid_gatt_msg_handler(gatt_msg_t *p_msg)
         case GATTC_MSG_LINK_LOST:
             //co_printf("link[%d] lost\r\n",p_msg->conn_idx);
             hid_link_ntf_enable[p_msg->conn_idx] = false;
+            hid_link_enable[p_msg->conn_idx] = false;
             break;
         default:
             break;
     }
     return 0;
+}
+void hid_service_enable(uint8_t conidx)
+{
+    hid_link_enable[conidx] = true;
+    os_task_process_saved_msg(gatt_get_task_no_from_prf_id(hid_svc_id));
 }
 
 /*********************************************************************

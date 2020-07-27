@@ -433,4 +433,15 @@ uint16_t gatt_get_mtu(uint8_t conidx);
  */
 void gatt_msg_default(os_event_t *msg);
 
+/****************************************************************************************
+ * @fn      gatt_get_task_no_from_prf_id
+ *
+ * @brief   Used to get task number from profile index
+ *
+ * @param   prf_idx - profile index.
+ *
+ * @return  task number which is corresponding to the profile
+ */
+uint16_t gatt_get_task_no_from_prf_id(uint8_t prf_idx);
+
 #endif // end of #ifndef GATT_API_H

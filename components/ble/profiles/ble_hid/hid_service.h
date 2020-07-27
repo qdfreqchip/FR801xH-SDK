@@ -159,6 +159,17 @@ void hid_gatt_add_service(void);
  * @return  none.
  */
 void hid_gatt_report_notify(uint8_t conidx, uint8_t rpt_info_id, uint8_t *p_data, uint16_t len);
+/*********************************************************************
+ * @fn      hid_service_enable
+ *
+ * @brief   hid service is valid only after link is encrypted, so need to call this function
+ *			after link is encrypted.
+ *
+ * @param   conidx - link index.
+ *
+ * @return  none.
+ */
+void hid_service_enable(uint8_t conidx);
 
 #endif
 

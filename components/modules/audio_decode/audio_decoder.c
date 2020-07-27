@@ -257,7 +257,7 @@ static void audio_decoder_play_next_frame_handler(struct decoder_play_next_frame
 
                 if(decode_task_status == DECODER_STATE_BUFFERING)
                 {
-                    if (decoder_env.pcm_buffer_counter > 6)
+                    if (decoder_env.pcm_buffer_counter > 2)
                     {
                         decode_task_status = DECODER_STATE_PLAYING;
                         NVIC_EnableIRQ(I2S_IRQn);
