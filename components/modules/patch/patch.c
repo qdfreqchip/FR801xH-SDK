@@ -82,7 +82,7 @@ struct patch_element_t patch_elements[] =
         .patch_pc = 0x00012410, // replace em_ble_rxmaxbuf_set(cs_idx, LE_MAX_OCTETS) in lld_con_start
     },
     [7] = {
-        .patch_pc = 0x00000001, // 0x0001e500,
+        .patch_pc = 0x0001e500, // 0x0001e500,
     },
     [6] = {
         .patch_pc = 0x0001e808,
@@ -105,12 +105,15 @@ struct patch_element_t patch_elements[] =
         .patch_pc = 0x000195d2,
         .replace_function = platform_reset_patch,
     },
+    [1] = {
+        .patch_pc = 0x00019760, // replace pmu_get_rc_clk implement
+    },
 };
 
 __attribute__((aligned(64))) uint32_t patch_map[16] =
 {
     0xBF00DF00,  //0
-    0xBF00DF01,
+    0x2000B57C,
     0xBF00DF02,
     0xBF00DF03,
     0xBF00DF04,

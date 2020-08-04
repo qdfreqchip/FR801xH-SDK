@@ -530,11 +530,6 @@
               <FilePath>..\..\..\..\components\driver\driver_exti.c</FilePath>
             </File>
             <File>
-              <FileName>driver_flash_ssp.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\components\driver\driver_flash_ssp.c</FilePath>
-            </File>
-            <File>
               <FileName>driver_i2s.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\components\driver\driver_i2s.c</FilePath>
