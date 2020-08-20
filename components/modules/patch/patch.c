@@ -31,6 +31,7 @@ void disable_cache(void);
 
 int llc_patch_1(void);
 void platform_reset_patch(uint32_t error);
+void con_max_lat_calc_patch(void);
 
 /*
  * keil debug breakpoint will take place FPB entry at the beginning of patch table with increasing
@@ -107,6 +108,11 @@ struct patch_element_t patch_elements[] =
     },
     [1] = {
         .patch_pc = 0x00019760, // replace pmu_get_rc_clk implement
+    },
+    [0] = {
+        //.patch_pc = 0x000119c8, // 3832: SUBS R0, #50 1fc0: SUBS R0, R0, #1
+        .patch_pc = 0x0001199a,
+        .replace_function = con_max_lat_calc_patch,
     },
 };
 

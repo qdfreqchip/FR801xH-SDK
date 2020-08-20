@@ -84,9 +84,9 @@ __attribute__((section("ram_code"))) static void app_otas_save_data(uint32_t des
     current_remap_address = system_regs->remap_virtual_addr;
     remap_size = system_regs->remap_length;
 
-    //GLOBAL_INT_DISABLE();
-    *(volatile uint32_t *)0x500a0000 = 0x3c;
-    while(((*(volatile uint32_t *)0x500a0004) & 0x03) != 0x00);
+    GLOBAL_INT_DISABLE();
+    //*(volatile uint32_t *)0x500a0000 = 0x3c;
+    //while(((*(volatile uint32_t *)0x500a0004) & 0x03) != 0x00);
     //if(__jump_table.system_option & SYSTEM_OPTION_ENABLE_CACHE)
     //{
     //    system_set_cache_config(0x60, 10);
@@ -98,13 +98,13 @@ __attribute__((section("ram_code"))) static void app_otas_save_data(uint32_t des
 
     system_regs->remap_virtual_addr = current_remap_address;
     system_regs->remap_length = remap_size;
-    *(volatile uint32_t *)0x500a0000 = 0x3d;
-    while(((*(volatile uint32_t *)0x500a0004) & 0x03) != 0x02);
+    //*(volatile uint32_t *)0x500a0000 = 0x3d;
+    //while(((*(volatile uint32_t *)0x500a0004) & 0x03) != 0x02);
     //if(__jump_table.system_option & SYSTEM_OPTION_ENABLE_CACHE)
     //{
     //    system_set_cache_config(0x61, 10);
     //}
-    //GLOBAL_INT_RESTORE();
+    GLOBAL_INT_RESTORE();
     /*
         uint8_t *buffer = (uint8_t *)ke_malloc(len, KE_MEM_NON_RETENTION);
         flash_read(dest, len, buffer);

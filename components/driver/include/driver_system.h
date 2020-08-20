@@ -299,6 +299,41 @@ void system_sleep_enable(void);
 void system_sleep_disable(void);
 
 /*********************************************************************
+ * @fn      system_set_conn_sleep_max_during
+ *
+ * @brief   used to set max sleep time when connection is established.
+ *
+ * @param   during_10ms - max sleep timer, unit: 10ms.
+ *
+ * @return  None.
+ */
+void system_set_conn_sleep_max_during(uint32_t during_10ms);
+
+/*********************************************************************
+ * @fn      system_latency_enable
+ *
+ * @brief   reenable latency of connection indicated by conidx.
+ *
+ * @param   conidx  - connection index, 0xff means latency of all connections
+ *                    should be reenabled.
+ *
+ * @return  None.
+ */
+void system_latency_enable(uint8_t conidx);
+
+/*********************************************************************
+ * @fn      system_latency_disable
+ *
+ * @brief   disable latency of connection indicated by conidx.
+ *
+ * @param   conidx  - connection index, 0xff means latency of all connections
+ *                    should be disabled.
+ *
+ * @return  None.
+ */
+void system_latency_disable(uint8_t conidx);
+
+/*********************************************************************
  * @fn      system_get_curr_time
  *
  * @brief   get how many milliseconds have passed after system start-up,
